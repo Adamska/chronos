@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+@theme {
+  --color-abyss: #05070a;
+  --color-slate-deep: #0b1016;
+  --color-ink: #e9e4d8;
+  --color-ink-muted: #9a9789;
+  --color-ink-faint: #5d6066;
+  --color-ochre: #d9a441;
+  --color-ochre-soft: #e8c47a;
+  --color-teal-chart: #5fb3a8;
+  --color-vermilion: #d8573f;
+  --color-cobalt: #6c9bd2;
+  --color-hairline: rgb(233 228 216 / 0.09);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-newsreader), ui-serif, Georgia, serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, SFMono-Regular, monospace;
+}
+
+@layer base {
+  html,
+  body {
+    height: 100%;
+    background: var(--color-abyss);
+    color: var(--color-ink);
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+
+  ::selection {
+    background: rgb(217 164 65 / 0.35);
+  }
+}
+
+@layer components {
+  .glass-panel {
+    background: linear-gradient(180deg, rgb(15 20 27 / 0.78), rgb(9 12 17 / 0.86));
+    border: 1px solid var(--color-hairline);
+    backdrop-filter: blur(18px) saturate(1.2);
+    box-shadow:
+      0 24px 60px -30px rgb(0 0 0 / 0.9),
+      inset 0 1px 0 rgb(255 255 255 / 0.04);
+  }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-ink-muted);
+  }
+
+  .scrollbar-quiet {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(233 228 216 / 0.15) transparent;
+  }
+}

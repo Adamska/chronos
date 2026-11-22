@@ -1,0 +1,32 @@
+# dependencies
+node_modules
+.pnp
+.pnp.*
+
+# next.js
+.next
+out
+build
+next-env.d.ts
+*.tsbuildinfo
+
+# environment
+.env
+.env*.local
+
+# vercel
+.vercel
+
+# os
+.DS_Store
+Thumbs.db
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+
+# local ai context
+CLAUDE.md
+.claude/
+.cursorrules
+AGENTS.md
