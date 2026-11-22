@@ -43,6 +43,11 @@ function computeAnchors(events: readonly HistoricalEvent[]): Anchor[] {
   });
 }
 
+function createBeaconGeometries() {
+  const pillar = new CylinderGeometry(0.06, 0.2, 1, 10, 1, true).rotateX(Math.PI / 2).translate(0, 0, 0.5);
+  return { ring: new RingGeometry(0.78, 1, 56), pillar, core: new IcosahedronGeometry(1, 1), pick: new IcosahedronGeometry(1, 0) };
+}
+
 function createBeaconMaterial(mode: number): ShaderMaterial {
   return new ShaderMaterial({
     vertexShader: beaconVertex,
@@ -96,10 +101,7 @@ export function EventBeacons() {
   const coreScales = useMemo(() => new Float32Array(events.length), [events]);
   const anchors = useMemo(() => computeAnchors(events), [events]);
 
-  const geometries = useMemo(() => {
-    const pillar = new CylinderGeometry(0.06, 0.2, 1, 10, 1, true).rotateX(Math.PI / 2).translate(0, 0, 0.5);
-    return { ring: new RingGeometry(0.78, 1, 56), pillar, core: new IcosahedronGeometry(1, 1), pick: new IcosahedronGeometry(1, 0) };
-  }, [events]);
+  const geometries = useMemo(() => createBeaconGeometries(), []);
   const materials = useMemo(
     () => ({
       ring: createBeaconMaterial(0),
@@ -119,12 +121,14 @@ export function EventBeacons() {
     const ringMesh = rings.current;
     const pillarMesh = pillars.current;
     if (ringMesh) {
+      ringMesh.geometry.dispose();
       ringMesh.geometry.setAttribute("aPhase", ringAttributes.phase);
       ringMesh.geometry.setAttribute("aColor", ringAttributes.color);
       ringMesh.geometry.setAttribute("aPresence", ringAttributes.presence);
       placeInstances(ringMesh, anchors, RINGS_PER_EVENT, events.map((e) => 0.012 + e.significance * 0.0065));
     }
     if (pillarMesh) {
+      pillarMesh.geometry.dispose();
       pillarMesh.geometry.setAttribute("aPhase", pillarAttributes.phase);
       pillarMesh.geometry.setAttribute("aColor", pillarAttributes.color);
       pillarMesh.geometry.setAttribute("aPresence", pillarAttributes.presence);

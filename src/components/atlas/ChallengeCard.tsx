@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { formatKm } from "@/components/dossier/geoInsights";
 import { formatYear } from "@/data/campaigns/registry";
 import { registerGuessHandler } from "@/scene/globeInteraction";
@@ -39,7 +39,8 @@ export function ChallengeCard() {
   const setActive = useAtlasStore((state) => state.setChallengeActive);
   const campaign = useChronosStore((state) => state.campaign);
   const challenge = useChallengeStore();
-  const [best, setBest] = useState(0);
+  const [bestVersion, setBestVersion] = useState(0);
+  const best = useMemo(() => (campaign && bestVersion >= 0 ? readBest(campaign.id) : 0), [campaign, bestVersion]);
   const current = challenge.queue[challenge.round];
   const last = challenge.results[challenge.results.length - 1];
   const total = challenge.results.reduce((sum, result) => sum + result.points, 0);
@@ -52,7 +53,6 @@ export function ChallengeCard() {
     }
     useChronosStore.getState().select(null);
     useChallengeStore.getState().start(campaign);
-    setBest(readBest(campaign.id));
     wideView(campaign);
     registerGuessHandler((point) => {
       const result = useChallengeStore.getState().guess(point);
@@ -66,11 +66,16 @@ export function ChallengeCard() {
 
   useEffect(() => {
     if (challenge.phase === "question" && current) useChronosStore.getState().setYear(current.year);
-    if (challenge.phase === "done" && campaign && total > best) {
+  }, [challenge.phase, current]);
+
+  const advance = () => {
+    const finishing = challenge.round + 1 >= challenge.queue.length;
+    challenge.next();
+    if (finishing && campaign && total > best) {
       writeBest(campaign.id, total);
-      setBest(total);
+      setBestVersion((version) => version + 1);
     }
-  }, [challenge.phase, current, campaign, total, best]);
+  };
 
   if (!active || !campaign || challenge.phase === "idle") return null;
 
@@ -102,7 +107,7 @@ export function ChallengeCard() {
             {formatKm(last.distanceKm)} away · <span className="text-ochre-soft">+{last.points} points</span>
           </p>
           <p className="mt-3 border-l-2 border-ochre pl-3 font-serif text-[14px] leading-snug text-ink/90">{last.event.whyHere}</p>
-          <button type="button" onClick={() => challenge.next()} className="mt-4 rounded-full bg-ochre/15 px-4 py-1.5 text-[12px] text-ochre-soft hover:bg-ochre/25">
+          <button type="button" onClick={advance} className="mt-4 rounded-full bg-ochre/15 px-4 py-1.5 text-[12px] text-ochre-soft hover:bg-ochre/25">
             {challenge.round + 1 >= challenge.queue.length ? "See your score" : "Next place"}
           </button>
         </>

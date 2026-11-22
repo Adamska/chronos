@@ -30,10 +30,7 @@ export function TourController() {
   const [chapter, setChapter] = useState<{ readonly keyframe: CameraKeyframe; readonly index: number } | null>(null);
 
   useEffect(() => {
-    if (!touring || !campaign) {
-      setChapter(null);
-      return;
-    }
+    if (!touring || !campaign) return;
     const chapters = campaign.chapters;
     const startIndex = Math.max(0, chapters.findIndex((entry) => entry.id === useChronosStore.getState().activeChapterId));
     let cancelled = false;
@@ -65,7 +62,7 @@ export function TourController() {
     const unsubscribe = useChronosStore.subscribe((state, previous) => {
       if (state.cameraMode === "free" && previous.cameraMode !== "free") setTouring(false);
     });
-    play(startIndex);
+    timer = window.setTimeout(() => play(startIndex), 0);
     return () => {
       cancelled = true;
       window.clearTimeout(timer);

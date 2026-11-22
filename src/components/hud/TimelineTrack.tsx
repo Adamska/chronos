@@ -37,6 +37,7 @@ export function ScrubTrack({ range, label, height, needleClass, children }: Trac
   useEffect(() => {
     const place = (year: number) => {
       if (needle.current) needle.current.style.left = `${toFraction(year, range) * 100}%`;
+      track.current?.setAttribute("aria-valuenow", String(Math.round(year)));
     };
     place(useChronosStore.getState().year);
     return useChronosStore.subscribe((state) => place(state.year));
@@ -75,6 +76,7 @@ export function ScrubTrack({ range, label, height, needleClass, children }: Trac
       aria-label={label}
       aria-valuemin={range.start}
       aria-valuemax={range.end}
+      aria-valuenow={range.start}
       tabIndex={-1}
       className={`relative w-full cursor-ew-resize touch-none select-none ${height}`}
       onPointerDown={begin}

@@ -49,11 +49,8 @@ export function RouteSchematic({ arc }: { readonly arc: GeoArc }) {
   const total = legs.reduce((sum, leg) => sum + leg, 0);
   const stops = arc.path.length;
   const x = (index: number) => 24 + (index / Math.max(1, stops - 1)) * 312;
-  let cumulative = 0;
-  const positions = arc.path.map((_, index) => {
-    if (index > 0) cumulative += legs[index - 1] ?? 0;
-    return total > 0 ? 24 + (cumulative / total) * 312 : x(index);
-  });
+  const cumulative = legs.reduce<number[]>((sums, leg) => [...sums, (sums[sums.length - 1] ?? 0) + leg], [0]);
+  const positions = arc.path.map((_, index) => (total > 0 ? 24 + ((cumulative[index] ?? 0) / total) * 312 : x(index)));
 
   return (
     <svg viewBox="0 0 360 88" className="w-full" role="img" aria-label={`${arc.label} route profile`}>

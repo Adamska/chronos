@@ -41,31 +41,25 @@ async function fetchSummary(slug: string, signal: AbortSignal): Promise<Wikipedi
 }
 
 export function useWikipediaSummary(slug: string | undefined): WikipediaState {
-  const cached = slug ? cache.get(slug) : undefined;
-  const [state, setState] = useState<WikipediaState>(() => (cached ? { status: "ready", summary: cached } : { status: "loading" }));
+  const [resolved, setResolved] = useState<{ readonly slug: string; readonly state: WikipediaState } | null>(null);
 
   useEffect(() => {
-    if (!slug) {
-      setState({ status: "unavailable" });
-      return;
-    }
-    const known = cache.get(slug);
-    if (known !== undefined) {
-      setState(known ? { status: "ready", summary: known } : { status: "unavailable" });
-      return;
-    }
+    if (!slug || cache.has(slug)) return;
     const controller = new AbortController();
-    setState({ status: "loading" });
     fetchSummary(slug, controller.signal)
       .then((summary) => {
         cache.set(slug, summary);
-        setState(summary ? { status: "ready", summary } : { status: "unavailable" });
+        setResolved({ slug, state: summary ? { status: "ready", summary } : { status: "unavailable" } });
       })
       .catch(() => {
-        if (!controller.signal.aborted) setState({ status: "unavailable" });
+        if (!controller.signal.aborted) setResolved({ slug, state: { status: "unavailable" } });
       });
     return () => controller.abort();
   }, [slug]);
 
-  return state;
+  if (!slug) return { status: "unavailable" };
+  const cached = cache.get(slug);
+  if (cached !== undefined) return cached ? { status: "ready", summary: cached } : { status: "unavailable" };
+  if (resolved?.slug === slug) return resolved.state;
+  return { status: "loading" };
 }
