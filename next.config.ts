@@ -12,7 +12,6 @@ const nextConfig: NextConfig = {
     config.module.rules.push({ test: /\.(vert|frag|glsl)$/, type: "asset/source" });
     return config;
   },
-  images: { remotePatterns: [{ protocol: "https", hostname: "upload.wikimedia.org" }] },
 };
 
 export default nextConfig;

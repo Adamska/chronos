@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useEffect } from "react";
+import { HudOverlay } from "@/components/hud/HudOverlay";
 import { LabelOverlay } from "@/components/hud/LabelOverlay";
 import { DEFAULT_CAMPAIGN } from "@/data/campaigns";
 import { useChronosStore } from "@/store/useChronosStore";
@@ -24,6 +25,7 @@ export function AtlasShell() {
     <main className="relative h-dvh w-full overflow-hidden bg-abyss">
       <AtlasCanvas />
       <LabelOverlay />
+      <HudOverlay />
     </main>
   );
 }
