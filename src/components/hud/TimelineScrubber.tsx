@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useRef } from "react";
 import { LayerToggles } from "@/components/hud/LayerToggles";
-import { ScrubTrack, TickAxis, toFraction, type YearRange } from "@/components/hud/TimelineTrack";
+import { ClimateBands, ScrubTrack, TickAxis, toFraction, type YearRange } from "@/components/hud/TimelineTrack";
+import { CLIMATE_PERIODS } from "@/data/environment";
 import { eraLabel, formatYear } from "@/data/campaigns/registry";
 import { LAYER_COLORS } from "@/scene/temporal";
 import { useChronosStore } from "@/store/useChronosStore";
@@ -100,6 +101,7 @@ export function TimelineScrubber() {
       <div className="mt-3">
         <ScrubTrack range={focus} label="Campaign timeline" height="h-11" needleClass="w-px bg-ochre shadow-[0_0_12px_2px_rgb(217_164_65/0.55)]">
           <div className="absolute inset-x-0 top-[26px] h-px bg-white/10" />
+          <ClimateBands range={focus} periods={CLIMATE_PERIODS} />
           {campaign?.events.map((event) => (
             <button
               key={event.id}
@@ -143,6 +145,7 @@ export function TimelineScrubber() {
       <div className="mt-2 border-t border-hairline pt-2">
         <ScrubTrack range={OVERVIEW} label="Five thousand year overview" height="h-3" needleClass="w-[2px] bg-ink/80">
           <div className="absolute inset-x-0 top-1/2 h-px bg-white/10" />
+          <ClimateBands range={OVERVIEW} periods={CLIMATE_PERIODS} />
           {campaign ? (
             <div
               className="absolute inset-y-0 rounded-sm bg-ochre/25 ring-1 ring-ochre/40"

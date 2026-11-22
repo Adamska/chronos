@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useChronicleRequest } from "@/components/hud/useChronicleRequest";
-import { CAMPAIGNS } from "@/data/campaigns";
+import { LIBRARY } from "@/data/library";
 import { formatSpan } from "@/data/campaigns/registry";
 import { useChronosStore } from "@/store/useChronosStore";
 import type { ChronicleCampaign } from "@/types/chronicle";
@@ -19,8 +19,8 @@ type PaletteItem =
 
 function rankCampaigns(query: string): ChronicleCampaign[] {
   const terms = query.toLowerCase().split(/\s+/).filter((term) => term.length > 1);
-  if (terms.length === 0) return [...CAMPAIGNS];
-  return CAMPAIGNS.map((campaign) => {
+  if (terms.length === 0) return [...LIBRARY];
+  return LIBRARY.map((campaign) => {
     const haystack = `${campaign.title} ${campaign.subtitle} ${campaign.keywords.join(" ")}`.toLowerCase();
     return { campaign, score: terms.filter((term) => haystack.includes(term)).length };
   })
@@ -119,7 +119,12 @@ export function CampaignPalette() {
                         <span className="block truncate text-[13.5px] text-ink">{item.campaign.title}</span>
                         <span className="block truncate text-[11.5px] text-ink-muted">{item.campaign.subtitle}</span>
                       </span>
-                      <span className="shrink-0 font-mono text-[10px] text-ink-faint">{formatSpan(item.campaign.startYear, item.campaign.endYear)}</span>
+                      <span className="flex shrink-0 flex-col items-end gap-0.5">
+                        <span className="font-mono text-[10px] text-ink-faint">{formatSpan(item.campaign.startYear, item.campaign.endYear)}</span>
+                        {item.campaign.source !== "curated" ? (
+                          <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-teal-chart/80">{item.campaign.source}</span>
+                        ) : null}
+                      </span>
                     </>
                   ) : (
                     <>

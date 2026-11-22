@@ -81,3 +81,22 @@
     transform: translateX(300%);
   }
 }
+
+html:has(.classroom-sheet),
+body:has(.classroom-sheet) {
+  height: auto;
+  overflow: auto;
+  background: #f6f2e8;
+  color: #1d1b17;
+}
+
+@media print {
+  .no-print {
+    display: none;
+  }
+
+  html:has(.classroom-sheet),
+  body:has(.classroom-sheet) {
+    background: #ffffff;
+  }
+}

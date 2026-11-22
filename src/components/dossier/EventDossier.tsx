@@ -8,6 +8,7 @@ import { RouteDossier } from "@/components/dossier/RouteDossier";
 import { TimelineSchematic } from "@/components/dossier/TimelineSchematic";
 import { WikipediaFigure } from "@/components/dossier/WikipediaFigure";
 import { eraLabel, formatSpan, formatYear } from "@/data/campaigns/registry";
+import { uncertaintyFor } from "@/data/uncertainty";
 import { ARC_KIND_COLORS, LAYER_COLORS } from "@/scene/temporal";
 import { useChronosStore } from "@/store/useChronosStore";
 import type { ChronicleCampaign, GeoArc, HistoricalEvent } from "@/types/chronicle";
@@ -19,6 +20,7 @@ function EventBody({ event, campaign }: { readonly event: HistoricalEvent; reado
   const chokepoint = nearestChokepoint(event.coordinates);
   const barrier = nearestBarrier(event.coordinates);
   const routes = campaign.arcs.filter((arc) => arc.eventId === event.id);
+  const uncertainty = uncertaintyFor(event.id);
   const [lon, lat] = event.coordinates;
 
   return (
@@ -28,6 +30,7 @@ function EventBody({ event, campaign }: { readonly event: HistoricalEvent; reado
           <Badge>{eraLabel(event.year)}</Badge>
           <Badge>{event.endYear ? formatSpan(event.year, event.endYear) : formatYear(event.year)}</Badge>
           <Badge color={LAYER_COLORS[event.layer]}>{LAYER_LABELS[event.layer]}</Badge>
+          {uncertainty ? <Badge color={uncertainty.level === "debated" ? "#e0624a" : "#9a9789"}>{uncertainty.level}</Badge> : null}
         </div>
         <h2 className="mt-3 font-serif text-[27px] leading-[1.08] text-ink">{event.title}</h2>
         <p className="mt-2 font-mono text-[11px] text-ink-muted">
@@ -43,6 +46,12 @@ function EventBody({ event, campaign }: { readonly event: HistoricalEvent; reado
       <Section label="Geopolitical context">
         <p className="text-[13px] leading-relaxed text-ink/80">{event.context}</p>
       </Section>
+
+      {uncertainty ? (
+        <Section label={uncertainty.level === "debated" ? "What historians debate" : "How precise is this?"}>
+          <p className="text-[12.5px] leading-relaxed text-ink/75">{uncertainty.note}</p>
+        </Section>
+      ) : null}
 
       <Section label="Why here?">
         <div className="rounded-lg border-l-2 border-ochre bg-ochre/[0.06] px-3.5 py-3">

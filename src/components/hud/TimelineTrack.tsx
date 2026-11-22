@@ -107,3 +107,32 @@ export function TickAxis({ range }: { readonly range: YearRange }) {
     </div>
   );
 }
+
+export function ClimateBands({ range, periods }: { readonly range: YearRange; readonly periods: readonly ClimateBand[] }) {
+  return (
+    <>
+      {periods
+        .filter((period) => period.endYear >= range.start && period.startYear <= range.end)
+        .map((period) => {
+          const left = toFraction(period.startYear, range) * 100;
+          const width = Math.max(0.3, toFraction(period.endYear, range) * 100 - left);
+          return (
+            <div
+              key={period.id}
+              title={period.name}
+              className="pointer-events-none absolute bottom-0 h-[3px] rounded-full"
+              style={{ left: `${left}%`, width: `${width}%`, background: period.tone === "warm" ? "rgb(232 145 90 / 0.45)" : "rgb(111 179 224 / 0.45)" }}
+            />
+          );
+        })}
+    </>
+  );
+}
+
+export interface ClimateBand {
+  readonly id: string;
+  readonly name: string;
+  readonly startYear: number;
+  readonly endYear: number;
+  readonly tone: "warm" | "cold";
+}

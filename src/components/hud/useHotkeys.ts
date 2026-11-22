@@ -28,6 +28,13 @@ export function useHotkeys(): void {
         store.stepChapter(1);
       } else if (event.key === "ArrowLeft") {
         store.stepChapter(-1);
+      } else if (event.key === "]" || event.key === "[") {
+        const events = store.campaign?.events ?? [];
+        const current = events.findIndex((entry) => store.selection?.kind === "event" && entry.id === store.selection.id);
+        const fallback = event.key === "]" ? events.findIndex((entry) => entry.year >= store.year) : events.findLastIndex((entry) => entry.year <= store.year);
+        const index = current >= 0 ? current + (event.key === "]" ? 1 : -1) : fallback;
+        const target = events[Math.min(events.length - 1, Math.max(0, index))];
+        if (target) store.focusEvent(target.id);
       }
     };
     window.addEventListener("keydown", handle);

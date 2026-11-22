@@ -2,11 +2,13 @@
 
 import dynamic from "next/dynamic";
 import { useEffect } from "react";
+import { restoreFromHash, syncHash } from "@/components/atlas/shareState";
 import { CampaignPalette, SearchPill } from "@/components/hud/CampaignPalette";
 import { ChronicleNotice } from "@/components/hud/ChronicleNotice";
 import { HudOverlay } from "@/components/hud/HudOverlay";
 import { LabelOverlay } from "@/components/hud/LabelOverlay";
 import { DEFAULT_CAMPAIGN } from "@/data/campaigns";
+import { useAtlasStore } from "@/store/useAtlasStore";
 import { useChronosStore } from "@/store/useChronosStore";
 
 const AtlasCanvas = dynamic(() => import("@/scene/AtlasCanvas"), {
@@ -20,7 +22,19 @@ const AtlasCanvas = dynamic(() => import("@/scene/AtlasCanvas"), {
 
 export function AtlasShell() {
   useEffect(() => {
-    if (!useChronosStore.getState().campaign) useChronosStore.getState().loadCampaign(DEFAULT_CAMPAIGN);
+    if (!useChronosStore.getState().campaign && !restoreFromHash()) useChronosStore.getState().loadCampaign(DEFAULT_CAMPAIGN);
+    let timer = 0;
+    const schedule = () => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(syncHash, 600);
+    };
+    const unsubscribeChronos = useChronosStore.subscribe(schedule);
+    const unsubscribeAtlas = useAtlasStore.subscribe(schedule);
+    return () => {
+      window.clearTimeout(timer);
+      unsubscribeChronos();
+      unsubscribeAtlas();
+    };
   }, []);
 
   return (
