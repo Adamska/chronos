@@ -30,3 +30,8 @@ CLAUDE.md
 .claude/
 .cursorrules
 AGENTS.md
+
+# test artifacts
+playwright-report
+test-results
+tests/e2e/*-snapshots
