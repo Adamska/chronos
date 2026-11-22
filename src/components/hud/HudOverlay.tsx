@@ -1,6 +1,7 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { type ReactNode, useRef } from "react";
+import { useOutsideClick } from "@/components/atlas/useOutsideClick";
 import { AskPanel } from "@/components/atlas/AskPanel";
 import { ChallengeCard } from "@/components/atlas/ChallengeCard";
 import { IndexPanel } from "@/components/atlas/IndexPanel";
@@ -20,11 +21,15 @@ import { useHotkeys } from "@/components/hud/useHotkeys";
 import { usePlayback } from "@/components/hud/usePlayback";
 import { useAtlasStore } from "@/store/useAtlasStore";
 
+const closePanel = () => useAtlasStore.setState({ panel: "none" });
+
 function ActivePanel() {
   const panel = useAtlasStore((state) => state.panel);
+  const root = useRef<HTMLDivElement>(null);
+  useOutsideClick(root, closePanel, panel !== "none");
   if (panel === "none") return null;
   return (
-    <div data-hud-zone className="w-[min(20rem,calc(100vw-1.5rem))]">
+    <div ref={root} data-hud-zone className="w-[min(20rem,calc(100vw-1.5rem))]">
       {panel === "meanwhile" ? <MeanwhilePanel /> : null}
       {panel === "index" ? <IndexPanel /> : null}
       {panel === "settings" ? <SettingsPanel /> : null}

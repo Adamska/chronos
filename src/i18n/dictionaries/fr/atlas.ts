@@ -63,6 +63,7 @@ export const atlas: Record<keyof typeof en, string> = {
   "lens.compare.rest": " montrent {compare}\u00a0; les couleurs, {year}.",
   "lens.compare.slider": "Année de comparaison",
   "lens.compare.credit": "Frontières\u00a0: Cliopatria, Seshat Global History Databank (CC BY 4.0).",
+  "legend.hide": "Masquer «\u00a0{name}\u00a0»",
   "travel.calculating": "Calcul des temps de trajet…",
   "travel.unreachable": "Inaccessible par terre comme par mer",
   "travel.from": "{duration} depuis {origin}",

@@ -61,6 +61,7 @@ export const atlas = {
   "lens.compare.rest": " show {compare}; colours show {year}.",
   "lens.compare.slider": "Comparison year",
   "lens.compare.credit": "Borders: Cliopatria, Seshat Global History Databank (CC BY 4.0).",
+  "legend.hide": "Hide {name}",
   "travel.calculating": "Calculating travel times…",
   "travel.unreachable": "Unreachable by surface travel",
   "travel.from": "{duration} from {origin}",

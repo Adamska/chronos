@@ -124,7 +124,7 @@ export function ToolRail() {
   }, [open]);
 
   return (
-    <nav ref={root} aria-label={t("rail.nav")} data-hud-zone className="glass-panel pointer-events-auto relative flex gap-1 rounded-2xl p-1 md:flex-col">
+    <nav ref={root} data-outside-ignore aria-label={t("rail.nav")} data-hud-zone className="glass-panel pointer-events-auto relative z-20 flex gap-1 rounded-2xl p-1 md:flex-col">
       {groups.map((group) => {
         const anyActive = group.items.some((item) => item.active);
         return (
