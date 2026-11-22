@@ -34,6 +34,7 @@ const vC = new Vector3();
 const edgeAB = new Vector3();
 const edgeAC = new Vector3();
 const faceNormal = new Vector3();
+const capCentroid = new Vector3();
 const MAX_CHORD_DEGREES = 6;
 
 
@@ -82,16 +83,21 @@ function appendCap(buffers: MeshBuffers, sourceRings: PolygonRings, radius: numb
 
   for (let i = 0; i < refined.length; i += 3) {
     const ia = refined[i] ?? 0;
-    let ib = refined[i + 1] ?? 0;
-    let ic = refined[i + 2] ?? 0;
+    const ib = refined[i + 1] ?? 0;
+    const ic = refined[i + 2] ?? 0;
     const ax = coords[ia * 2] ?? 0, ay = coords[ia * 2 + 1] ?? 0;
     const planarArea = ((coords[ib * 2] ?? 0) - ax) * ((coords[ic * 2 + 1] ?? 0) - ay) - ((coords[ib * 2 + 1] ?? 0) - ay) * ((coords[ic * 2] ?? 0) - ax);
     if (planarArea === 0) continue;
-    if (planarArea < 0) [ib, ic] = [ic, ib];
     lonLatToVector3(ax, ay, radius, vA);
     lonLatToVector3(coords[ib * 2] ?? 0, coords[ib * 2 + 1] ?? 0, radius, vB);
     lonLatToVector3(coords[ic * 2] ?? 0, coords[ic * 2 + 1] ?? 0, radius, vC);
-    pushOrderedTriangle(buffers, vA, vB, vC);
+    edgeAB.subVectors(vB, vA);
+    edgeAC.subVectors(vC, vA);
+    faceNormal.crossVectors(edgeAB, edgeAC);
+    const conditioned = faceNormal.length() > 1e-6 * edgeAB.length() * edgeAC.length();
+    const facing = faceNormal.dot(capCentroid.copy(vA).add(vB).add(vC));
+    const flip = conditioned ? facing < 0 : planarArea < 0;
+    pushOrderedTriangle(buffers, vA, flip ? vC : vB, flip ? vB : vC);
   }
 }
 
@@ -180,8 +186,8 @@ export function buildCoastlineGeometry(topology: Topology, radius: number, objec
 }
 
 export async function loadLandTopology(): Promise<Topology> {
-  const module = await import("world-atlas/land-110m.json");
-  return module.default as unknown as Topology;
+  const atlas = await import("world-atlas/land-110m.json");
+  return atlas.default as unknown as Topology;
 }
 
 export type { PolygonRings } from "@/geo/planarRings";
