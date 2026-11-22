@@ -27,13 +27,15 @@ import { useChronosStore } from "@/store/useChronosStore";
 const BARRIER_TOP = LAND_TOP + 0.02;
 const SHELL_RADIUS = 1.16;
 
-
 function createLandMaterial(base: string, highlight: string, top: number, opacity = 1): ShaderMaterial {
   return new ShaderMaterial({
     vertexShader: landVertex,
     fragmentShader: `${noiseChunk}\n${landFragment}`,
     transparent: opacity < 1,
     side: DoubleSide,
+    polygonOffset: true,
+    polygonOffsetFactor: 1,
+    polygonOffsetUnits: 2,
     uniforms: {
       uSunDirection: sunDirectionUniform,
       uBaseColor: { value: new Color(base) },

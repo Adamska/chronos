@@ -26,6 +26,7 @@ export function SmartLabels() {
   const lastX = useMemo(() => new Float32Array(labels.length).fill(-1), [labels]);
   const lastY = useMemo(() => new Float32Array(labels.length).fill(-1), [labels]);
   const shown = useMemo(() => new Uint8Array(labels.length), [labels]);
+  const incumbent = useMemo(() => new Uint8Array(labels.length), [labels]);
   const rects = useMemo(() => new Float32Array((labels.length + MAX_ZONES) * 4), [labels]);
   const zones = useMemo(() => ({ rects: new Float32Array(MAX_ZONES * 4), count: 0, frame: 0 }), []);
 
@@ -53,9 +54,11 @@ export function SmartLabels() {
     let accepted = zones.count;
 
     const selectedIndex = selectedId ? labels.findIndex((label) => label.id === selectedId) : -1;
-    for (let step = -1; step < labels.length; step += 1) {
-      const index = step < 0 ? selectedIndex : step;
+    incumbent.set(shown);
+    for (let step = -1; step < labels.length * 2; step += 1) {
+      const index = step < 0 ? selectedIndex : step % labels.length;
       if (index < 0 || (step >= 0 && index === selectedIndex)) continue;
+      if (step >= 0 && (step < labels.length) !== (incumbent[index] === 1)) continue;
       const label = labels[index];
       const node = label ? labelNodes.get(label.id) : undefined;
       if (!label || !node) continue;

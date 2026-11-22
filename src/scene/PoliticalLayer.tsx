@@ -6,6 +6,7 @@ import { DataTexture, LinearFilter, LinearMipmapLinearFilter, RGBAFormat, Repeat
 import { renderBorders } from "@/geo/borderClient";
 import { useQualityStore } from "@/scene/quality";
 import { sunDirectionUniform } from "@/scene/solar";
+import { easeToward } from "@/scene/temporal";
 import globeVertex from "@/shaders/globe.vert";
 import politicalFragment from "@/shaders/political.frag";
 import { useAtlasStore } from "@/store/useAtlasStore";
@@ -19,7 +20,8 @@ export function PoliticalLayer() {
   const politicalOn = useAtlasStore((state) => state.showPolitical);
   const lowTier = useQualityStore((state) => state.tier === "low");
   const visible = bordersOn && politicalOn;
-  const [texture, setTexture] = useState<DataTexture | null>(null);
+  const [ready, setReady] = useState(false);
+  const textures = useMemo<{ current: DataTexture | null; previous: DataTexture | null }>(() => ({ current: null, previous: null }), []);
   const geometry = useMemo(() => new SphereGeometry(1.0058, 128, 96), []);
   const material = useMemo(
     () =>
@@ -28,7 +30,7 @@ export function PoliticalLayer() {
         fragmentShader: politicalFragment,
         transparent: true,
         depthWrite: false,
-        uniforms: { uBorders: { value: null }, uSunDirection: sunDirectionUniform, uOpacity: { value: 0 } },
+        uniforms: { uBorders: { value: null }, uPrevious: { value: null }, uMix: { value: 1 }, uSunDirection: sunDirectionUniform, uOpacity: { value: 0 } },
       }),
     [],
   );
@@ -58,7 +60,14 @@ export function PoliticalLayer() {
         next.minFilter = LinearMipmapLinearFilter;
         next.generateMipmaps = true;
         next.needsUpdate = true;
-        setTexture(next);
+        textures.previous?.dispose();
+        textures.previous = textures.current;
+        textures.current = next;
+        const { uBorders, uPrevious, uMix } = material.uniforms;
+        if (uBorders) uBorders.value = next;
+        if (uPrevious) uPrevious.value = textures.previous ?? next;
+        if (uMix) uMix.value = textures.previous ? 0 : 1;
+        setReady(true);
         usePolityStore.getState().setLabels(result.labels);
       }
       if (live && queued) {
@@ -81,28 +90,24 @@ export function PoliticalLayer() {
       unsubscribe();
       usePolityStore.getState().setLabels([]);
     };
-  }, [visible, lowTier]);
+  }, [visible, lowTier, material, textures]);
 
-  useEffect(() => () => texture?.dispose(), [texture]);
   useEffect(
     () => () => {
       geometry.dispose();
       material.dispose();
+      textures.current?.dispose();
+      textures.previous?.dispose();
     },
-    [geometry, material],
+    [geometry, material, textures],
   );
-  useEffect(() => {
-    const uniform = material.uniforms.uBorders;
-    if (uniform) uniform.value = texture;
-  }, [material, texture]);
 
   useFrame((_, delta) => {
-    const opacity = material.uniforms.uOpacity;
-    if (!opacity) return;
-    const target = visible && texture ? 1 : 0;
-    opacity.value += (target - (opacity.value as number)) * Math.min(1, delta * 5);
+    const { uOpacity, uMix } = material.uniforms;
+    if (uMix) uMix.value = Math.min(1, (uMix.value as number) + delta * 1.6);
+    if (uOpacity) uOpacity.value = easeToward(uOpacity.value as number, visible && ready ? 1 : 0, delta);
   });
 
-  if (!texture) return null;
+  if (!ready) return null;
   return <mesh geometry={geometry} material={material} renderOrder={2} visible={visible} />;
 }

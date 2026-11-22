@@ -8,12 +8,13 @@ export interface QualitySettings {
   readonly grain: boolean;
   readonly stars: number;
   readonly particleScale: number;
+  readonly smaa: boolean;
 }
 
 export const QUALITY_SETTINGS: Record<QualityTier, QualitySettings> = {
-  high: { dpr: [1, 2], bloom: true, grain: true, stars: 2600, particleScale: 1 },
-  balanced: { dpr: [1, 1.5], bloom: true, grain: false, stars: 1500, particleScale: 0.75 },
-  low: { dpr: [0.85, 1], bloom: false, grain: false, stars: 700, particleScale: 0.45 },
+  high: { dpr: [1, 2], bloom: true, grain: true, stars: 2600, particleScale: 1, smaa: true },
+  balanced: { dpr: [1, 1.5], bloom: true, grain: false, stars: 1500, particleScale: 0.75, smaa: true },
+  low: { dpr: [0.85, 1], bloom: false, grain: false, stars: 700, particleScale: 0.45, smaa: false },
 };
 
 const ORDER: readonly QualityTier[] = ["low", "balanced", "high"];

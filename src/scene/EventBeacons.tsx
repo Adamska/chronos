@@ -18,7 +18,7 @@ import {
   Vector3,
 } from "three";
 import { lonLatToVector3 } from "@/geo/sphericalMath";
-import { LAYER_COLORS, campaignFade, eventPresence, eventSpotlight } from "@/scene/temporal";
+import { LAYER_COLORS, campaignFade, easeToward, eventPresence, eventSpotlight } from "@/scene/temporal";
 import beaconFragment from "@/shaders/beacon.frag";
 import beaconVertex from "@/shaders/beacon.vert";
 import { revealFactor } from "@/scene/transition";
@@ -150,7 +150,7 @@ export function EventBeacons() {
     const pillarPresence = pillarAttributes.presence.array as Float32Array;
 
     events.forEach((event, index) => {
-      const base = concealed ? 0 : eventPresence(event, year, fade, layers) * reveal;
+      const base = easeToward(presence[index] ?? 0, concealed ? 0 : eventPresence(event, year, fade, layers) * reveal, delta);
       const focus = event.id === selectedId ? 1.5 : 0.55 + 0.6 * eventSpotlight(event, year, fade);
       presence[index] = base;
       for (let copy = 0; copy < RINGS_PER_EVENT; copy += 1) ringPresence[index * RINGS_PER_EVENT + copy] = base * focus;

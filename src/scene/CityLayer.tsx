@@ -6,6 +6,7 @@ import { CircleGeometry, Color, type InstancedMesh, Matrix4, MeshBasicMaterial, 
 import { CITIES } from "@/data/cities";
 import { lonLatToVector3 } from "@/geo/sphericalMath";
 import { populationAt } from "@/scene/cityMetrics";
+import { easeToward } from "@/scene/temporal";
 import { useAtlasStore } from "@/store/useAtlasStore";
 import { useChronosStore } from "@/store/useChronosStore";
 
@@ -29,7 +30,8 @@ export function CityLayer() {
       }),
     [],
   );
-  const state = useMemo(() => ({ lastYear: Number.NaN, leader: -1 }), []);
+  const state = useMemo(() => ({ lastYear: Number.NaN, leader: -1, settled: false }), []);
+  const radii = useMemo(() => ({ target: new Float32Array(CITIES.length), current: new Float32Array(CITIES.length) }), []);
 
   useEffect(
     () => () => {
@@ -42,33 +44,44 @@ export function CityLayer() {
   useLayoutEffect(() => {
     state.lastYear = Number.NaN;
     state.leader = -2;
-  }, [visible, state]);
+    radii.current.fill(0);
+  }, [visible, state, radii]);
 
-  useFrame(() => {
+  useFrame((_, delta) => {
     const instances = mesh.current;
     if (!instances || !visible) return;
     const year = Math.round(useChronosStore.getState().year);
-    if (year === state.lastYear) return;
-    state.lastYear = year;
-    let leader = -1;
-    let best = 0;
-    CITIES.forEach((city, index) => {
-      const population = populationAt(city, year);
-      if (population > best) {
-        best = population;
-        leader = index;
+    if (year !== state.lastYear) {
+      state.lastYear = year;
+      state.settled = false;
+      let leader = -1;
+      let best = 0;
+      CITIES.forEach((city, index) => {
+        const population = populationAt(city, year);
+        if (population > best) {
+          best = population;
+          leader = index;
+        }
+        radii.target[index] = population > 0 ? 0.0028 + Math.sqrt(population) * 0.00042 : 0;
+      });
+      if (leader !== state.leader) {
+        CITIES.forEach((_, index) => instances.setColorAt(index, index === leader ? CROWN : INK));
+        if (instances.instanceColor) instances.instanceColor.needsUpdate = true;
+        state.leader = leader;
       }
-      const radius = population > 0 ? 0.0028 + Math.sqrt(population) * 0.00042 : 0;
-      const anchor = anchors[index];
-      if (!anchor) return;
-      matrix.compose(anchor.position, anchor.orientation, scale.set(radius, radius, radius));
+    }
+    if (state.settled) return;
+    let moving = false;
+    anchors.forEach((anchor, index) => {
+      const target = radii.target[index] ?? 0;
+      const radius = easeToward(radii.current[index] ?? 0, target, delta, 6);
+      const settledRadius = Math.abs(radius - target) < 1e-5 ? target : radius;
+      if (settledRadius !== target) moving = true;
+      radii.current[index] = settledRadius;
+      matrix.compose(anchor.position, anchor.orientation, scale.set(settledRadius, settledRadius, settledRadius));
       instances.setMatrixAt(index, matrix);
     });
-    if (leader !== state.leader) {
-      CITIES.forEach((_, index) => instances.setColorAt(index, index === leader ? CROWN : INK));
-      if (instances.instanceColor) instances.instanceColor.needsUpdate = true;
-      state.leader = leader;
-    }
+    state.settled = !moving;
     instances.instanceMatrix.needsUpdate = true;
   });
 

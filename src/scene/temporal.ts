@@ -49,3 +49,7 @@ export const LAYER_COLORS: Record<LayerKind, string> = {
   conflict: "#e0624a",
   science: "#7cc7b8",
 };
+
+export function easeToward(current: number, target: number, delta: number, rate = 5): number {
+  return current + (target - current) * (1 - Math.exp(-delta * rate));
+}

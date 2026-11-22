@@ -8,6 +8,12 @@ import { useChronosStore } from "@/store/useChronosStore";
 const IDLE_AFTER_MS = 6000;
 const IDLE_FPS = 30;
 const WAKE_EVENTS = ["pointermove", "pointerdown", "wheel", "keydown", "touchstart"] as const;
+const SETTLE_MS = 2500;
+const throttle = { idle: false, wokeAt: 0 };
+
+export function isMeasuringFrames(now: number = performance.now()): boolean {
+  return !throttle.idle && now - throttle.wokeAt > SETTLE_MS;
+}
 
 export function IdleThrottle() {
   const setFrameloop = useThree((state) => state.setFrameloop);
@@ -24,6 +30,7 @@ export function IdleThrottle() {
         return;
       }
       idle = true;
+      throttle.idle = true;
       setFrameloop("demand");
       ticker = window.setInterval(() => invalidate(), 1000 / IDLE_FPS);
     };
@@ -31,6 +38,8 @@ export function IdleThrottle() {
     const wake = () => {
       if (idle) {
         idle = false;
+        throttle.idle = false;
+        throttle.wokeAt = performance.now();
         window.clearInterval(ticker);
         setFrameloop("always");
       }
@@ -51,6 +60,7 @@ export function IdleThrottle() {
       unsubscribeAtlas();
       window.clearTimeout(idleTimer);
       window.clearInterval(ticker);
+      throttle.idle = false;
       setFrameloop("always");
     };
   }, [setFrameloop, invalidate]);

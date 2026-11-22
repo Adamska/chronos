@@ -2,7 +2,7 @@
 
 import { PerformanceMonitor, Stars } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, useState } from "react";
 import { ACESFilmicToneMapping, SRGBColorSpace } from "three";
 import { CameraDirector } from "@/scene/CameraDirector";
 import { ChallengeMarkers } from "@/scene/ChallengeMarkers";
@@ -17,7 +17,8 @@ import { PoliticalLayer } from "@/scene/PoliticalLayer";
 import { PosterCapture } from "@/scene/PosterCapture";
 import { MeanwhileMarkers } from "@/scene/MeanwhileMarkers";
 import { NightLights } from "@/scene/NightLights";
-import { IdleThrottle } from "@/scene/IdleThrottle";
+import { DepthRange } from "@/scene/DepthRange";
+import { IdleThrottle, isMeasuringFrames } from "@/scene/IdleThrottle";
 import { useQuality, useQualityStore } from "@/scene/quality";
 import { useAtlasStore } from "@/store/useAtlasStore";
 import { SmartLabels } from "@/scene/SmartLabels";
@@ -36,6 +37,7 @@ function watchContext(canvas: HTMLCanvasElement): void {
 export default function AtlasCanvas() {
   const quality = useQuality();
   const step = useQualityStore((state) => state.step);
+  const [starCount] = useState(quality.stars);
 
   return (
     <Canvas
@@ -48,9 +50,14 @@ export default function AtlasCanvas() {
         watchContext(gl.domElement);
       }}
     >
-      <PerformanceMonitor bounds={() => [42, 58]} flipflops={4} onDecline={() => step(-1)} onIncline={() => step(1)} />
+      <PerformanceMonitor
+        bounds={(refreshRate) => (refreshRate > 90 ? [50, refreshRate - 12] : [40, refreshRate - 4])}
+        flipflops={2}
+        onDecline={() => isMeasuringFrames() && step(-1)}
+        onIncline={() => isMeasuringFrames() && step(1)}
+      />
       <color attach="background" args={["#05070a"]} />
-      <Stars key={quality.stars} radius={60} depth={40} count={quality.stars} factor={2.4} saturation={0} fade speed={0.25} />
+      <Stars radius={60} depth={40} count={starCount} factor={2.4} saturation={0} fade speed={0.25} />
       <EarthGlobe />
       <PoliticalLayer />
       <CompareLayer />
@@ -65,6 +72,7 @@ export default function AtlasCanvas() {
       <ChallengeMarkers />
       <SmartLabels />
       <CameraDirector />
+      <DepthRange />
       <IdleThrottle />
       <PosterCapture />
       <Suspense fallback={null}>

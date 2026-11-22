@@ -39,7 +39,7 @@ export function LabelOverlay() {
             if (node) labelNodes.set(label.id, node);
             else labelNodes.delete(label.id);
           }}
-          className="absolute left-0 top-0 opacity-0 transition-opacity duration-300 will-change-transform"
+          className="absolute left-0 top-0 opacity-0 transition-opacity duration-500 will-change-transform"
           style={{ pointerEvents: "none" }}
           onClick={() => label.event && select({ kind: "event", id: label.event.id })}
         >

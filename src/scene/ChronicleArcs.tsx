@@ -15,7 +15,7 @@ import {
 import { ARC_SAMPLES, MAX_ARCS, buildArcBundle } from "@/scene/arcGeometry";
 import { createCometGeometry, seedParticles, writeBasis } from "@/scene/particleField";
 import { useQuality } from "@/scene/quality";
-import { arcPresence, campaignFade } from "@/scene/temporal";
+import { arcPresence, campaignFade, easeToward } from "@/scene/temporal";
 import arcFragment from "@/shaders/arc.frag";
 import arcVertex from "@/shaders/arc.vert";
 import { revealFactor } from "@/scene/transition";
@@ -92,7 +92,7 @@ export function ChronicleArcs() {
     const concealed = isConcealed();
     const reveal = revealFactor();
     arcs.forEach((arc, index) => {
-      presence[index] = concealed ? 0 : arcPresence(arc, year, fade, layers) * reveal;
+      presence[index] = easeToward(presence[index] ?? 0, concealed ? 0 : arcPresence(arc, year, fade, layers) * reveal, delta);
     });
 
     const uniforms = tubeMaterial.uniforms;
