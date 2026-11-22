@@ -6,13 +6,13 @@ import type { MultiLineString, MultiPolygon, Polygon, Position } from "geojson";
 import {
   densifyPath,
   interiorGrid,
-  planarRing,
+  planarPolygon,
+  refineTriangles,
   signedArea,
-  subdivideTriangle,
   unwrapPath,
   type PolygonRings,
 } from "@/geo/planarRings";
-import { GLOBE_RADIUS, lonLatToVector3 } from "@/geo/sphericalMath";
+import { lonLatToVector3 } from "@/geo/sphericalMath";
 import type { LonLat } from "@/types/chronicle";
 
 
@@ -35,6 +35,7 @@ const edgeAB = new Vector3();
 const edgeAC = new Vector3();
 const faceNormal = new Vector3();
 const capOutward = new Vector3();
+const MAX_CHORD_DEGREES = 6;
 
 
 function pushTriangle(
@@ -62,7 +63,7 @@ function pushTriangle(
 }
 
 function appendCap(buffers: MeshBuffers, sourceRings: PolygonRings, radius: number, maxEdge: number): void {
-  const rings = sourceRings.map(planarRing);
+  const rings = planarPolygon(sourceRings);
   const coords: number[] = [];
   const holes: number[] = [];
   rings.forEach((ring, index) => {
@@ -76,10 +77,7 @@ function appendCap(buffers: MeshBuffers, sourceRings: PolygonRings, radius: numb
   }
 
   const triangles = earcut(coords, holes.length > 0 ? holes : null, 2);
-  const refined: number[] = [];
-  for (let i = 0; i < triangles.length; i += 3) {
-    subdivideTriangle(coords, triangles[i] ?? 0, triangles[i + 1] ?? 0, triangles[i + 2] ?? 0, maxEdge * 2, refined, 0);
-  }
+  const refined = refineTriangles(coords, triangles, MAX_CHORD_DEGREES);
 
   for (let i = 0; i < refined.length; i += 3) {
     const ia = refined[i] ?? 0, ib = refined[i + 1] ?? 0, ic = refined[i + 2] ?? 0;
@@ -93,8 +91,8 @@ function appendCap(buffers: MeshBuffers, sourceRings: PolygonRings, radius: numb
 function appendWalls(buffers: MeshBuffers, rings: PolygonRings, base: number, top: number, maxEdge: number): void {
   const b0 = new Vector3(), b1 = new Vector3(), t0 = new Vector3(), t1 = new Vector3();
   const outward = new Vector3();
-  rings.forEach((ring, ringIndex) => {
-    const dense = densifyPath(planarRing(ring), maxEdge, false);
+  planarPolygon(rings).forEach((ring, ringIndex) => {
+    const dense = densifyPath(ring, maxEdge, false);
     const side = (signedArea(dense) > 0 ? 1 : -1) * (ringIndex === 0 ? 1 : -1);
     for (let i = 0; i < dense.length; i += 1) {
       const p = dense[i];
@@ -173,5 +171,4 @@ export async function loadLandTopology(): Promise<Topology> {
   return module.default as unknown as Topology;
 }
 
-export const LAND_RADIUS = GLOBE_RADIUS * 1.004;
 export type { PolygonRings } from "@/geo/planarRings";
