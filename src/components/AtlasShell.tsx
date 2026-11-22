@@ -26,6 +26,7 @@ export function AtlasShell() {
   return (
     <main className="relative h-dvh w-full overflow-hidden bg-abyss">
       <AtlasCanvas />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_55%,rgb(0_0_0/0.55)_100%)]" />
       <LabelOverlay />
       <HudOverlay search={<SearchPill />} />
       <ChronicleNotice />

@@ -12,6 +12,7 @@ import {
   ShaderMaterial,
 } from "three";
 import { ARC_SAMPLES, MAX_ARCS, buildArcBundle } from "@/scene/arcGeometry";
+import { useQuality } from "@/scene/quality";
 import { arcPresence, campaignFade } from "@/scene/temporal";
 import arcFragment from "@/shaders/arc.frag";
 import arcVertex from "@/shaders/arc.vert";
@@ -28,11 +29,11 @@ interface ParticleField {
   readonly speed: Float32Array;
 }
 
-function seedParticles(arcs: readonly GeoArc[]): ParticleField {
-  const perArc = arcs.map((arc) => Math.round(28 + arc.intensity * 84));
+function seedParticles(arcs: readonly GeoArc[], scale: number): ParticleField {
+  const perArc = arcs.map((arc) => Math.round((28 + arc.intensity * 84) * scale));
   const budget = perArc.reduce((sum, value) => sum + value, 0);
-  const scale = budget > MAX_PARTICLES ? MAX_PARTICLES / budget : 1;
-  const counts = perArc.map((value) => Math.max(8, Math.floor(value * scale)));
+  const fit = budget > MAX_PARTICLES ? MAX_PARTICLES / budget : 1;
+  const counts = perArc.map((value) => Math.max(8, Math.floor(value * fit)));
   const count = counts.reduce((sum, value) => sum + value, 0);
   const arcIndex = new Uint16Array(count);
   const offset = new Float32Array(count);
@@ -57,7 +58,8 @@ export function ChronicleArcs() {
   const select = useChronosStore((state) => state.select);
   const arcs = useMemo(() => (campaign?.arcs ?? []).slice(0, MAX_ARCS), [campaign]);
   const bundle = useMemo(() => buildArcBundle(arcs), [arcs]);
-  const particles = useMemo(() => seedParticles(arcs), [arcs]);
+  const { particleScale } = useQuality();
+  const particles = useMemo(() => seedParticles(arcs, particleScale), [arcs, particleScale]);
   const presence = useMemo(() => new Float32Array(MAX_ARCS), []);
   const particleMesh = useRef<InstancedMesh>(null);
 
@@ -163,7 +165,7 @@ export function ChronicleArcs() {
     <group>
       <mesh geometry={bundle.tubes} material={tubeMaterial} renderOrder={4} frustumCulled={false} />
       <instancedMesh
-        key={campaign?.id}
+        key={`${campaign?.id}-${particles.count}`}
         ref={particleMesh}
         args={[particleGeometry, particleMaterial, particles.count]}
         renderOrder={5}

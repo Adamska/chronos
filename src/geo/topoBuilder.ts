@@ -23,7 +23,7 @@ export interface ExtrusionOptions {
   readonly walls?: boolean;
 }
 
-interface MeshBuffers {
+export interface MeshBuffers {
   positions: number[];
   normals: number[];
 }
@@ -109,14 +109,20 @@ function appendWalls(buffers: MeshBuffers, rings: PolygonRings, base: number, to
   });
 }
 
-export function buildExtrudedGeometry(polygons: readonly PolygonRings[], options: ExtrusionOptions): BufferGeometry {
+export function appendExtrudedPolygon(buffers: MeshBuffers, rings: PolygonRings, options: ExtrusionOptions): void {
   const { baseRadius, topRadius, maxEdgeDegrees = 2.5, walls = true } = options;
+  if (rings.length === 0) return;
+  appendCap(buffers, rings, topRadius, maxEdgeDegrees);
+  if (walls && topRadius > baseRadius) appendWalls(buffers, rings, baseRadius, topRadius, maxEdgeDegrees);
+}
+
+export function buildExtrudedGeometry(polygons: readonly PolygonRings[], options: ExtrusionOptions): BufferGeometry {
   const buffers: MeshBuffers = { positions: [], normals: [] };
-  for (const rings of polygons) {
-    if (rings.length === 0) continue;
-    appendCap(buffers, rings, topRadius, maxEdgeDegrees);
-    if (walls && topRadius > baseRadius) appendWalls(buffers, rings, baseRadius, topRadius, maxEdgeDegrees);
-  }
+  for (const rings of polygons) appendExtrudedPolygon(buffers, rings, options);
+  return geometryFromBuffers(buffers);
+}
+
+export function geometryFromBuffers(buffers: MeshBuffers): BufferGeometry {
   const geometry = new BufferGeometry();
   geometry.setAttribute("position", new Float32BufferAttribute(buffers.positions, 3));
   geometry.setAttribute("normal", new Float32BufferAttribute(buffers.normals, 3));

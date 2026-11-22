@@ -12,16 +12,9 @@ import {
   SphereGeometry,
   type Texture,
 } from "three";
-import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
-import { TERRAIN_BARRIERS } from "@/data/geography";
 import { createShelfTexture } from "@/geo/bathymetry";
-import {
-  buildCoastlineGeometry,
-  buildExtrudedGeometry,
-  extractLandPolygons,
-  loadLandTopology,
-  polygonFromLonLat,
-} from "@/geo/topoBuilder";
+import { LAND_BASE, LAND_TOP } from "@/geo/landBuild";
+import { loadLandPayload } from "@/geo/landClient";
 import { advanceSun, sunDirectionUniform } from "@/scene/solar";
 import atmosphereFragment from "@/shaders/atmosphere.frag";
 import atmosphereVertex from "@/shaders/atmosphere.vert";
@@ -32,8 +25,6 @@ import landVertex from "@/shaders/land.vert";
 import noiseChunk from "@/shaders/noise.glsl";
 import { useChronosStore } from "@/store/useChronosStore";
 
-const LAND_BASE = 1.0;
-const LAND_TOP = 1.0045;
 const BARRIER_TOP = LAND_TOP + 0.02;
 const SHELL_RADIUS = 1.16;
 
@@ -68,27 +59,13 @@ function useLandLayers(): LandLayers | null {
     let cancelled = false;
     let built: LandLayers | null = null;
 
-    void loadLandTopology().then((topology) => {
+    void loadLandPayload().then((payload) => {
       if (cancelled) return;
-      const land = buildExtrudedGeometry(extractLandPolygons(topology), {
-        baseRadius: LAND_BASE,
-        topRadius: LAND_TOP,
-        maxEdgeDegrees: 3.5,
-      });
-      const barrierParts = TERRAIN_BARRIERS.map((barrier) =>
-        buildExtrudedGeometry([polygonFromLonLat(barrier.polygon)], {
-          baseRadius: LAND_TOP - 0.001,
-          topRadius: LAND_TOP + barrier.height,
-          maxEdgeDegrees: 1,
-        }),
-      );
-      const barriers = mergeGeometries(barrierParts, false);
-      barrierParts.forEach((part) => part.dispose());
       built = {
-        land,
-        coastline: buildCoastlineGeometry(topology, LAND_TOP + 0.0004),
-        barriers,
-        shelf: createShelfTexture(topology),
+        land: payload.land,
+        barriers: payload.barriers,
+        coastline: payload.coastline,
+        shelf: createShelfTexture(payload.shelf),
       };
       setLayers(built);
     });
