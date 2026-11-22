@@ -1,5 +1,6 @@
 import { synthesizeChapters } from "@/ai/normalizeCampaign";
 import { CAMPAIGNS, DEFAULT_CAMPAIGN } from "@/data/campaigns";
+import { LIBRARY } from "@/data/library";
 import type { ChronicleCampaign, HistoricalEvent } from "@/types/chronicle";
 
 export interface EncyclopediaMatch {
@@ -164,9 +165,16 @@ export function matchEncyclopedia(query: string): EncyclopediaMatch {
   const terms = expandTerms(query);
   const window = parseYearWindow(query);
   const scored = rankEncyclopediaEvents(query);
+  const ranked = LIBRARY.map((campaign) => ({ campaign, score: scoreCampaign(campaign, terms, window) })).sort((a, b) => b.score - a.score);
+  const best = ranked[0];
+  const focusFor = (campaign: ChronicleCampaign) => scored.find((entry) => campaign.events.includes(entry.event))?.event.id ?? null;
+
+  if (best && hasDirectHit(best.campaign.title, terms)) {
+    return { campaign: best.campaign, notice: `Matched the chronicle ${best.campaign.title}.`, focusEventId: focusFor(best.campaign) };
+  }
+
   const cutoff = Math.max(5, (scored[0]?.score ?? 0) * 0.3);
   const rankedEvents = scored.filter((entry) => entry.score >= cutoff).slice(0, 18);
-
   if (rankedEvents.length >= 4) {
     return {
       campaign: assembleChronicle(query, rankedEvents.map((entry) => entry.event), terms),
@@ -175,10 +183,8 @@ export function matchEncyclopedia(query: string): EncyclopediaMatch {
     };
   }
 
-  const [best] = CAMPAIGNS.map((campaign) => ({ campaign, score: scoreCampaign(campaign, terms, window) })).sort((a, b) => b.score - a.score);
   if (best && best.score > 1) {
-    const focus = scored.find((entry) => best.campaign.events.includes(entry.event));
-    return { campaign: best.campaign, notice: `Closest curated chronicle: ${best.campaign.title}.`, focusEventId: focus?.event.id ?? null };
+    return { campaign: best.campaign, notice: `Closest curated chronicle: ${best.campaign.title}.`, focusEventId: focusFor(best.campaign) };
   }
   return { campaign: DEFAULT_CAMPAIGN, notice: "No close match in the encyclopedia. Showing the default chronicle.", focusEventId: null };
 }
