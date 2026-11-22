@@ -36,16 +36,18 @@ interface WikipediaFigureProps {
   readonly slug: string;
   readonly title: string;
   readonly coordinates: LonLat;
+  readonly variant?: "card" | "hero";
 }
 
-export function WikipediaFigure({ slug, title, coordinates }: WikipediaFigureProps) {
+export function WikipediaFigure({ slug, title, coordinates, variant = "card" }: WikipediaFigureProps) {
   const state = useWikipediaSummary(slug);
   const thumbnail = state.status === "ready" ? state.summary.thumbnail : undefined;
   const href = state.status === "ready" ? state.summary.pageUrl : wikipediaArticleUrl(slug);
 
+  const hero = variant === "hero";
   return (
-    <figure className="overflow-hidden rounded-xl border border-hairline bg-slate-deep">
-      <div className="relative aspect-[16/9] w-full">
+    <figure className={hero ? "relative overflow-hidden bg-slate-deep" : "overflow-hidden rounded-xl border border-hairline bg-slate-deep"}>
+      <div className={`relative w-full ${hero ? "aspect-[16/10]" : "aspect-[16/9]"}`}>
         {state.status === "loading" ? <div className="absolute inset-0 animate-pulse bg-white/[0.03]" /> : null}
         {thumbnail ? (
           <img
@@ -60,8 +62,9 @@ export function WikipediaFigure({ slug, title, coordinates }: WikipediaFigurePro
             <CartographicPlate title={title} coordinates={coordinates} />
           </div>
         ) : null}
+        {hero ? <div aria-hidden className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#0b1016]" /> : null}
       </div>
-      <figcaption className="flex items-center justify-between gap-3 px-3 py-2">
+      <figcaption className={`flex items-center justify-between gap-3 px-3 py-2 ${hero ? "absolute inset-x-0 top-0 bg-gradient-to-b from-black/60 to-transparent pr-14" : ""}`}>
         <span className="truncate font-mono text-[10px] uppercase tracking-[0.14em] text-ink-faint">
           {state.status === "ready" ? state.summary.description ?? "Archival summary" : state.status === "loading" ? "Retrieving archive" : "Archive offline"}
         </span>

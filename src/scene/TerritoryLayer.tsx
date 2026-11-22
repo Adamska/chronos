@@ -17,8 +17,10 @@ import { lonLatToVector3 } from "@/geo/sphericalMath";
 import { buildExtrudedGeometry, polygonFromLonLat } from "@/geo/topoBuilder";
 import { sunDirectionUniform } from "@/scene/solar";
 import { campaignFade, territoryPresence } from "@/scene/temporal";
+import { revealFactor } from "@/scene/transition";
 import landVertex from "@/shaders/land.vert";
 import territoryFragment from "@/shaders/territory.frag";
+import { useAtlasStore } from "@/store/useAtlasStore";
 import { useChronosStore } from "@/store/useChronosStore";
 import type { LonLat, TerritoryZone } from "@/types/chronicle";
 
@@ -105,10 +107,11 @@ export function TerritoryLayer() {
     if (!campaign) return;
     const { year, layers } = useChronosStore.getState();
     const fade = campaignFade(campaign) * 1.5;
+    const fill = useAtlasStore.getState().showPolitical ? 0.3 : 1;
     for (const { zone, mesh, outline } of visuals) {
-      const presence = territoryPresence(zone, year, fade, layers);
+      const presence = territoryPresence(zone, year, fade, layers) * revealFactor();
       const opacity = mesh.material.uniforms.uOpacity;
-      if (opacity) opacity.value = presence;
+      if (opacity) opacity.value = presence * fill;
       outline.material.opacity = presence * 0.55;
       mesh.visible = presence > 0.004;
       outline.visible = mesh.visible;

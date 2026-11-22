@@ -12,7 +12,9 @@ import { EarthGlobe } from "@/scene/EarthGlobe";
 import { EnvironmentLayer } from "@/scene/EnvironmentLayer";
 import { EventBeacons } from "@/scene/EventBeacons";
 import { LensOverlay } from "@/scene/LensOverlay";
+import { PoliticalLayer } from "@/scene/PoliticalLayer";
 import { MeanwhileMarkers } from "@/scene/MeanwhileMarkers";
+import { NightLights } from "@/scene/NightLights";
 import { IdleThrottle } from "@/scene/IdleThrottle";
 import { useQuality, useQualityStore } from "@/scene/quality";
 import { useAtlasStore } from "@/store/useAtlasStore";
@@ -48,10 +50,12 @@ export default function AtlasCanvas() {
       <color attach="background" args={["#05070a"]} />
       <Stars key={quality.stars} radius={60} depth={40} count={quality.stars} factor={2.4} saturation={0} fade speed={0.25} />
       <EarthGlobe />
+      <PoliticalLayer />
       <TerritoryLayer />
       <LensOverlay />
       <EnvironmentLayer />
       <CityLayer />
+      <NightLights />
       <ChronicleArcs />
       <EventBeacons />
       <MeanwhileMarkers />

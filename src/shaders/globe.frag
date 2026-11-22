@@ -1,5 +1,7 @@
 uniform vec3 uSunDirection;
 uniform sampler2D uShelf;
+uniform sampler2D uRelief;
+uniform float uHasRelief;
 uniform vec3 uOceanDeep;
 uniform vec3 uOceanShallow;
 uniform vec3 uGraticule;
@@ -26,7 +28,12 @@ void main() {
 
   vec2 uv = vec2(longitude / (2.0 * PI) + 0.5, latitude / PI + 0.5);
   float shelf = texture2D(uShelf, uv).r;
-  float relief = fbm(n * 6.0) * 0.18;
+  if (uHasRelief > 0.5) {
+    float code = texture2D(uRelief, vec2(uv.x, 1.0 - uv.y)).r * 255.0;
+    float trench = clamp((127.0 - min(code, 127.0)) / 127.0, 0.0, 1.0);
+    shelf = 1.0 - trench;
+  }
+  float relief = fbm(n * 6.0) * (uHasRelief > 0.5 ? 0.05 : 0.18);
   float depth = clamp(shelf + relief - 0.09, 0.0, 1.0);
 
   vec3 ocean = mix(uOceanDeep, uOceanShallow, pow(smoothstep(0.0, 0.95, depth), 1.6));

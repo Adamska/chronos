@@ -1,20 +1,18 @@
 "use client";
 
 import { useFrame } from "@react-three/fiber";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import {
   AdditiveBlending,
   BackSide,
-  BufferGeometry,
+  DoubleSide,
   Color,
   LineBasicMaterial,
   ShaderMaterial,
   SphereGeometry,
-  type Texture,
 } from "three";
-import { createShelfTexture } from "@/geo/bathymetry";
 import { LAND_BASE, LAND_TOP } from "@/geo/landBuild";
-import { loadLandPayload } from "@/geo/landClient";
+import { useLandLayers, useReliefTexture } from "@/scene/useGlobeAssets";
 import { handleGlobeClick, handleGlobeHover, handleGlobeLeave } from "@/scene/globeInteraction";
 import { advanceSun, sunDirectionUniform } from "@/scene/solar";
 import atmosphereFragment from "@/shaders/atmosphere.frag";
@@ -29,18 +27,13 @@ import { useChronosStore } from "@/store/useChronosStore";
 const BARRIER_TOP = LAND_TOP + 0.02;
 const SHELL_RADIUS = 1.16;
 
-interface LandLayers {
-  readonly land: readonly BufferGeometry[];
-  readonly coastline: BufferGeometry;
-  readonly barriers: readonly BufferGeometry[];
-  readonly shelf: Texture;
-}
 
 function createLandMaterial(base: string, highlight: string, top: number, opacity = 1): ShaderMaterial {
   return new ShaderMaterial({
     vertexShader: landVertex,
     fragmentShader: `${noiseChunk}\n${landFragment}`,
     transparent: opacity < 1,
+    side: DoubleSide,
     uniforms: {
       uSunDirection: sunDirectionUniform,
       uBaseColor: { value: new Color(base) },
@@ -49,44 +42,15 @@ function createLandMaterial(base: string, highlight: string, top: number, opacit
       uBaseRadius: { value: LAND_BASE },
       uTopRadius: { value: top },
       uOpacity: { value: opacity },
+      uRelief: { value: null },
+      uHasRelief: { value: 0 },
     },
   });
 }
 
-function useLandLayers(): LandLayers | null {
-  const [layers, setLayers] = useState<LandLayers | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    let built: LandLayers | null = null;
-
-    void loadLandPayload().then((payload) => {
-      if (cancelled) return;
-      built = {
-        land: payload.land,
-        barriers: payload.barriers,
-        coastline: payload.coastline,
-        shelf: createShelfTexture(payload.shelf),
-      };
-      setLayers(built);
-    });
-
-    return () => {
-      cancelled = true;
-      if (built) {
-        built.land.forEach((geometry) => geometry.dispose());
-        built.coastline.dispose();
-        built.barriers.forEach((geometry) => geometry.dispose());
-        built.shelf.dispose();
-      }
-    };
-  }, []);
-
-  return layers;
-}
-
 export function EarthGlobe() {
   const layers = useLandLayers();
+  const relief = useReliefTexture();
 
   const oceanGeometry = useMemo(() => new SphereGeometry(1, 160, 120), []);
   const shellGeometry = useMemo(() => new SphereGeometry(SHELL_RADIUS, 128, 96), []);
@@ -100,8 +64,10 @@ export function EarthGlobe() {
         uniforms: {
           uSunDirection: sunDirectionUniform,
           uShelf: { value: null },
+          uRelief: { value: null },
+          uHasRelief: { value: 0 },
           uOceanDeep: { value: new Color("#05090f") },
-          uOceanShallow: { value: new Color("#1d3442") },
+          uOceanShallow: { value: new Color("#173040") },
           uGraticule: { value: new Color("#b9c4cc") },
           uRayleigh: { value: new Color("#4f86c6") },
           uAccent: { value: new Color("#d9a441") },
@@ -140,6 +106,14 @@ export function EarthGlobe() {
   );
 
   useEffect(() => {
+    for (const material of [oceanMaterial, landMaterial, barrierMaterial]) {
+      const { uRelief, uHasRelief } = material.uniforms;
+      if (uRelief) uRelief.value = relief;
+      if (uHasRelief) uHasRelief.value = relief ? 1 : 0;
+    }
+  }, [relief, oceanMaterial, landMaterial, barrierMaterial]);
+
+  useEffect(() => {
     const shelf = oceanMaterial.uniforms.uShelf;
     if (shelf) shelf.value = layers?.shelf ?? null;
   }, [layers, oceanMaterial]);
@@ -172,7 +146,7 @@ export function EarthGlobe() {
           {layers.land.map((geometry) => (
             <mesh key={geometry.uuid} geometry={geometry} material={landMaterial} renderOrder={1} />
           ))}
-          {layers.barriers.map((geometry) => (
+          {(relief ? [] : layers.barriers).map((geometry) => (
             <mesh key={geometry.uuid} geometry={geometry} material={barrierMaterial} renderOrder={1} />
           ))}
           <lineSegments geometry={layers.coastline} material={coastlineMaterial} renderOrder={2} />

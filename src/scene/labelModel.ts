@@ -3,10 +3,11 @@ import type { Vector3 } from "three";
 import { CITIES } from "@/data/cities";
 import { CHOKEPOINTS } from "@/data/geography";
 import { lonLatToVector3 } from "@/geo/sphericalMath";
+import type { PolityLabel } from "@/geo/borderRaster";
 import type { CityRecord } from "@/types/atlas";
 import type { ChronicleCampaign, HistoricalEvent, TerritoryZone } from "@/types/chronicle";
 
-export type LabelKind = "event" | "territory" | "chokepoint" | "city";
+export type LabelKind = "event" | "territory" | "chokepoint" | "city" | "polity";
 
 export interface LabelSpec {
   readonly id: string;
@@ -66,4 +67,34 @@ export function labelsFor(campaign: ChronicleCampaign | null, withCities = false
   const labels = withCities ? [...build(campaign), ...cityLabels] : build(campaign);
   store.set(campaign, labels);
   return labels;
+}
+
+const polityCache = new WeakMap<readonly PolityLabel[], readonly LabelSpec[]>();
+
+export function polityLabelsFor(labels: readonly PolityLabel[]): readonly LabelSpec[] {
+  const cached = polityCache.get(labels);
+  if (cached) return cached;
+  const specs = labels.map((label) => ({
+    id: `polity-${label.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
+    kind: "polity" as const,
+    text: label.name,
+    priority: 34 + Math.log10(Math.max(10, label.area)) * 3,
+    anchor: lonLatToVector3(label.lon, label.lat, 1.012),
+  }));
+  polityCache.set(labels, specs);
+  return specs;
+}
+
+const combined = new WeakMap<readonly LabelSpec[], WeakMap<readonly LabelSpec[], readonly LabelSpec[]>>();
+
+export function combineLabels(base: readonly LabelSpec[], extra: readonly LabelSpec[]): readonly LabelSpec[] {
+  if (extra.length === 0) return base;
+  const inner = combined.get(base) ?? new WeakMap<readonly LabelSpec[], readonly LabelSpec[]>();
+  combined.set(base, inner);
+  const cached = inner.get(extra);
+  if (cached) return cached;
+  const seen = new Set(base.map((label) => label.id));
+  const merged = [...base, ...extra.filter((label) => !seen.has(label.id))].sort((a, b) => b.priority - a.priority);
+  inner.set(extra, merged);
+  return merged;
 }

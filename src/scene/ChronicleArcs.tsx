@@ -6,49 +6,28 @@ import {
   AdditiveBlending,
   Color,
   DynamicDrawUsage,
-  IcosahedronGeometry,
+
   type InstancedMesh,
   MeshBasicMaterial,
   ShaderMaterial,
+  Vector3,
 } from "three";
 import { ARC_SAMPLES, MAX_ARCS, buildArcBundle } from "@/scene/arcGeometry";
+import { createCometGeometry, seedParticles, writeBasis } from "@/scene/particleField";
 import { useQuality } from "@/scene/quality";
 import { arcPresence, campaignFade } from "@/scene/temporal";
 import arcFragment from "@/shaders/arc.frag";
 import arcVertex from "@/shaders/arc.vert";
+import { revealFactor } from "@/scene/transition";
 import { isConcealed } from "@/store/useChallengeStore";
 import { useChronosStore } from "@/store/useChronosStore";
 import type { GeoArc } from "@/types/chronicle";
 
-const MAX_PARTICLES = 4000;
-const PARTICLE_SIZE = 0.0042;
-
-interface ParticleField {
-  readonly count: number;
-  readonly arcIndex: Uint16Array;
-  readonly offset: Float32Array;
-  readonly speed: Float32Array;
-}
-
-function seedParticles(arcs: readonly GeoArc[], scale: number): ParticleField {
-  const perArc = arcs.map((arc) => Math.round((28 + arc.intensity * 84) * scale));
-  const budget = perArc.reduce((sum, value) => sum + value, 0);
-  const fit = budget > MAX_PARTICLES ? MAX_PARTICLES / budget : 1;
-  const counts = perArc.map((value) => Math.max(8, Math.floor(value * fit)));
-  const count = counts.reduce((sum, value) => sum + value, 0);
-  const arcIndex = new Uint16Array(count);
-  const offset = new Float32Array(count);
-  const speed = new Float32Array(count);
-  let cursor = 0;
-  counts.forEach((amount, index) => {
-    for (let i = 0; i < amount; i += 1, cursor += 1) {
-      arcIndex[cursor] = index;
-      offset[cursor] = (i + Math.random() * 0.6) / amount;
-      speed[cursor] = 0.05 + Math.random() * 0.035;
-    }
-  });
-  return { count, arcIndex, offset, speed };
-}
+const head = new Vector3();
+const tangent = new Vector3();
+const radial = new Vector3();
+const side = new Vector3();
+const PARTICLE_SIZE = 0.0034;
 
 function setCursor(cursor: "pointer" | "auto"): void {
   document.body.style.cursor = cursor;
@@ -76,9 +55,9 @@ export function ChronicleArcs() {
       }),
     [presence],
   );
-  const particleGeometry = useMemo(() => new IcosahedronGeometry(1, 1), []);
+  const particleGeometry = useMemo(() => createCometGeometry(), []);
   const particleMaterial = useMemo(
-    () => new MeshBasicMaterial({ transparent: true, depthWrite: false, blending: AdditiveBlending, toneMapped: false }),
+    () => new MeshBasicMaterial({ transparent: true, depthWrite: false, blending: AdditiveBlending, toneMapped: false, vertexColors: true }),
     [],
   );
 
@@ -105,14 +84,15 @@ export function ChronicleArcs() {
     if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
   }, [bundle, particles]);
 
-  useFrame((_, delta) => {
+  useFrame(({ camera }, delta) => {
     const mesh = particleMesh.current;
     if (!campaign || !bundle || !mesh) return;
     const { year, layers, selection } = useChronosStore.getState();
     const fade = campaignFade(campaign);
     const concealed = isConcealed();
+    const reveal = revealFactor();
     arcs.forEach((arc, index) => {
-      presence[index] = concealed ? 0 : arcPresence(arc, year, fade, layers);
+      presence[index] = concealed ? 0 : arcPresence(arc, year, fade, layers) * reveal;
     });
 
     const uniforms = tubeMaterial.uniforms;
@@ -122,6 +102,7 @@ export function ChronicleArcs() {
     }
 
     const time = uniforms.uTime?.value as number;
+    const zoom = Math.min(1.3, Math.max(0.5, camera.position.length() / 2.8));
     const matrices = mesh.instanceMatrix.array;
     for (let i = 0; i < particles.count; i += 1) {
       const arc = particles.arcIndex[i] ?? 0;
@@ -141,14 +122,12 @@ export function ChronicleArcs() {
       const a = lower * 3;
       const b = Math.min(ARC_SAMPLES - 1, lower + 1) * 3;
       const taper = Math.min(1, travel * 12, (1 - travel) * 12);
-      const scale = PARTICLE_SIZE * visibility * (0.45 + 0.55 * taper);
-      matrices[base] = scale;
-      matrices[base + 5] = scale;
-      matrices[base + 10] = scale;
-      matrices[base + 12] = (table[a] ?? 0) + ((table[b] ?? 0) - (table[a] ?? 0)) * blend;
-      matrices[base + 13] = (table[a + 1] ?? 0) + ((table[b + 1] ?? 0) - (table[a + 1] ?? 0)) * blend;
-      matrices[base + 14] = (table[a + 2] ?? 0) + ((table[b + 2] ?? 0) - (table[a + 2] ?? 0)) * blend;
-      matrices[base + 15] = 1;
+      const scale = PARTICLE_SIZE * visibility * (0.45 + 0.55 * taper) * zoom;
+      head.set((table[a] ?? 0) + ((table[b] ?? 0) - (table[a] ?? 0)) * blend, (table[a + 1] ?? 0) + ((table[b + 1] ?? 0) - (table[a + 1] ?? 0)) * blend, (table[a + 2] ?? 0) + ((table[b + 2] ?? 0) - (table[a + 2] ?? 0)) * blend);
+      tangent.set((table[b] ?? 0) - (table[a] ?? 0), (table[b + 1] ?? 0) - (table[a + 1] ?? 0), (table[b + 2] ?? 0) - (table[a + 2] ?? 0)).normalize();
+      radial.copy(head).normalize();
+      side.crossVectors(tangent, radial).normalize();
+      writeBasis(matrices, base, side, tangent, radial, head, scale);
     }
     mesh.instanceMatrix.needsUpdate = true;
   });

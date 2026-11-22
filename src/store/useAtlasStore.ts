@@ -26,6 +26,7 @@ interface AtlasState {
   knownPerspective: string;
   showEnvironment: boolean;
   showCities: boolean;
+  showPolitical: boolean;
   season: Season;
   hover: HoverPoint | null;
   reducedMotion: boolean;
@@ -39,6 +40,7 @@ interface AtlasState {
   setKnownPerspective: (id: string) => void;
   toggleEnvironment: () => void;
   toggleCities: () => void;
+  togglePolitical: () => void;
   setSeason: (season: Season) => void;
   setHover: (hover: HoverPoint | null) => void;
   setReducedMotion: (value: boolean) => void;
@@ -55,6 +57,7 @@ export const useAtlasStore = create<AtlasState>()((set, get) => ({
   knownPerspective: "latin-europe",
   showEnvironment: false,
   showCities: false,
+  showPolitical: true,
   season: "summer",
   hover: null,
   reducedMotion: prefersReducedMotion(),
@@ -68,6 +71,7 @@ export const useAtlasStore = create<AtlasState>()((set, get) => ({
   setKnownPerspective: (knownPerspective) => set({ knownPerspective }),
   toggleEnvironment: () => set({ showEnvironment: !get().showEnvironment }),
   toggleCities: () => set({ showCities: !get().showCities }),
+  togglePolitical: () => set({ showPolitical: !get().showPolitical }),
   setSeason: (season) => set({ season }),
   setHover: (hover) => set({ hover }),
   setReducedMotion: (reducedMotion) => set({ reducedMotion }),

@@ -25,23 +25,22 @@ function EventBody({ event, campaign }: { readonly event: HistoricalEvent; reado
 
   return (
     <>
-      <header className="px-5 pb-4 pt-5">
+      <WikipediaFigure slug={event.wikipediaSlug} title={event.title} coordinates={event.coordinates} variant="hero" />
+      <header className="relative -mt-14 px-5 pb-4">
         <div className="flex flex-wrap gap-1.5">
           <Badge>{eraLabel(event.year)}</Badge>
           <Badge>{event.endYear ? formatSpan(event.year, event.endYear) : formatYear(event.year)}</Badge>
           <Badge color={LAYER_COLORS[event.layer]}>{LAYER_LABELS[event.layer]}</Badge>
           {uncertainty ? <Badge color={uncertainty.level === "debated" ? "#e0624a" : "#9a9789"}>{uncertainty.level}</Badge> : null}
         </div>
-        <h2 className="mt-3 font-serif text-[27px] leading-[1.08] text-ink">{event.title}</h2>
+        <h2 tabIndex={-1} className="mt-3 font-serif text-[29px] leading-[1.05] text-ink outline-none [text-shadow:0_2px_18px_rgb(0_0_0/0.85)]">{event.title}</h2>
         <p className="mt-2 font-mono text-[11px] text-ink-muted">
           {event.place} · {Math.abs(lat).toFixed(2)}°{lat >= 0 ? "N" : "S"} {Math.abs(lon).toFixed(2)}°{lon >= 0 ? "E" : "W"}
         </p>
-        <p className="mt-3 text-[13.5px] leading-relaxed text-ink/85">{event.summary}</p>
+        <p className="mt-4 text-[14px] leading-relaxed text-ink/85 first-letter:float-left first-letter:mr-2 first-letter:mt-1 first-letter:font-serif first-letter:text-[46px] first-letter:leading-[0.78] first-letter:text-ochre-soft">
+          {event.summary}
+        </p>
       </header>
-
-      <div className="px-5 pb-4">
-        <WikipediaFigure slug={event.wikipediaSlug} title={event.title} coordinates={event.coordinates} />
-      </div>
 
       <Section label="Geopolitical context">
         <p className="text-[13px] leading-relaxed text-ink/80">{event.context}</p>
@@ -86,12 +85,11 @@ function EventBody({ event, campaign }: { readonly event: HistoricalEvent; reado
       </Section>
 
       {event.primarySource ? (
-        <Section label="Primary source">
-          <blockquote className="font-serif text-[15.5px] italic leading-snug text-ink/90">
-            “{event.primarySource.excerpt}”
-          </blockquote>
-          <p className="mt-2 font-mono text-[10.5px] text-ink-muted">— {event.primarySource.attribution}</p>
-        </Section>
+        <figure className="border-t border-hairline px-5 py-6">
+          <span aria-hidden className="block font-serif text-[64px] leading-[0.5] text-ochre/60">“</span>
+          <blockquote className="mt-2 font-serif text-[19px] italic leading-snug text-ink">{event.primarySource.excerpt}</blockquote>
+          <figcaption className="mt-3 font-mono text-[10.5px] uppercase tracking-[0.12em] text-ink-muted">{event.primarySource.attribution}</figcaption>
+        </figure>
       ) : null}
 
       {event.schematic ? (
