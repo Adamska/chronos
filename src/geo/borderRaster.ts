@@ -51,7 +51,9 @@ export function activeKey(polities: readonly PolityFeature[]): string {
     .join("|");
 }
 
-export function rasterizeBorders(polities: readonly PolityFeature[], context: Context2D, width: number, height: number): BorderRaster {
+export type BorderStyle = "fill" | "outline";
+
+export function rasterizeBorders(polities: readonly PolityFeature[], context: Context2D, width: number, height: number, style: BorderStyle = "fill"): BorderRaster {
   const projection = geoEquirectangular()
     .scale(width / (2 * Math.PI))
     .translate([width / 2, height / 2]);
@@ -59,23 +61,25 @@ export function rasterizeBorders(polities: readonly PolityFeature[], context: Co
   context.clearRect(0, 0, width, height);
   const ordered = [...polities].sort((a, b) => b.properties.area - a.properties.area);
 
-  for (const polity of ordered) {
-    context.beginPath();
-    path(polity);
-    context.fillStyle = colorFor(polity.properties.name);
-    context.globalAlpha = 0.36;
-    context.fill();
+  if (style === "fill") {
+    for (const polity of ordered) {
+      context.beginPath();
+      path(polity);
+      context.fillStyle = colorFor(polity.properties.name);
+      context.globalAlpha = 0.36;
+      context.fill();
+    }
   }
   context.globalAlpha = 1;
-  context.lineWidth = width / 2048;
-  context.strokeStyle = "rgba(238, 228, 208, 0.75)";
+  context.lineWidth = style === "fill" ? width / 2048 : (width / 2048) * 2.2;
+  context.strokeStyle = style === "fill" ? "rgba(238, 228, 208, 0.75)" : "rgba(126, 214, 236, 0.95)";
   for (const polity of ordered) {
     context.beginPath();
     path(polity);
     context.stroke();
   }
 
-  const labels = ordered.slice(0, LABEL_COUNT).map((polity) => {
+  const labels = (style === "fill" ? ordered.slice(0, LABEL_COUNT) : []).map((polity) => {
     const [lon, lat] = geoCentroid(polity);
     return { name: polity.properties.name, lon, lat, area: polity.properties.area || geoArea(polity) * 40_589_641 };
   });

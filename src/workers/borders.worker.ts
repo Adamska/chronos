@@ -1,5 +1,5 @@
 import type { Topology } from "topojson-specification";
-import { activeKey, activePolities, rasterizeBorders } from "@/geo/borderRaster";
+import { type BorderStyle, activeKey, activePolities, rasterizeBorders } from "@/geo/borderRaster";
 
 interface BorderRequest {
   readonly id: number;
@@ -8,6 +8,7 @@ interface BorderRequest {
   readonly width: number;
   readonly height: number;
   readonly previousKey: string;
+  readonly style: BorderStyle;
 }
 
 interface WorkerScope {
@@ -25,7 +26,7 @@ function loadBin(url: string): Promise<Topology> {
 }
 
 scope.onmessage = (event) => {
-  const { id, url, year, width, height, previousKey } = event.data;
+  const { id, url, year, width, height, previousKey, style } = event.data;
   void loadBin(url)
     .then((topology) => {
       const polities = activePolities(topology, year);
@@ -35,7 +36,7 @@ scope.onmessage = (event) => {
       }
       const context = new OffscreenCanvas(width, height).getContext("2d", { willReadFrequently: true });
       if (!context) throw new Error("No 2D context in worker");
-      const raster = rasterizeBorders(polities, context, width, height);
+      const raster = rasterizeBorders(polities, context, width, height, style);
       scope.postMessage({ id, raster }, [raster.pixels.buffer]);
     })
     .catch((error: unknown) => scope.postMessage({ id, error: String(error) }));

@@ -1,5 +1,5 @@
 import type { Topology } from "topojson-specification";
-import { type BorderRaster, activeKey, activePolities, rasterizeBorders } from "@/geo/borderRaster";
+import { type BorderRaster, type BorderStyle, activeKey, activePolities, rasterizeBorders } from "@/geo/borderRaster";
 
 const INDEX_URL = "/data/borders/index.json";
 
@@ -51,7 +51,7 @@ function ensureWorker(): Worker | null {
   }
 }
 
-async function rasterizeOnMainThread(url: string, year: number, width: number, height: number, previousKey: string): Promise<BorderRaster | "unchanged"> {
+async function rasterizeOnMainThread(url: string, year: number, width: number, height: number, previousKey: string, style: BorderStyle): Promise<BorderRaster | "unchanged"> {
   const topology = (await (await fetch(url)).json()) as Topology;
   const polities = activePolities(topology, year);
   if (activeKey(polities) === previousKey) return "unchanged";
@@ -60,10 +60,10 @@ async function rasterizeOnMainThread(url: string, year: number, width: number, h
   canvas.height = height;
   const context = canvas.getContext("2d", { willReadFrequently: true });
   if (!context) throw new Error("No 2D context");
-  return rasterizeBorders(polities, context, width, height);
+  return rasterizeBorders(polities, context, width, height, style);
 }
 
-export async function renderBorders(year: number, width: number, height: number, previousKey: string): Promise<BorderRaster | "unchanged" | null> {
+export async function renderBorders(year: number, width: number, height: number, previousKey: string, style: BorderStyle = "fill"): Promise<BorderRaster | "unchanged" | null> {
   const borderIndex = await loadBorderIndex();
   const url = borderIndex ? binUrlFor(borderIndex, year) : null;
   if (!url) return null;
@@ -73,10 +73,10 @@ export async function renderBorders(year: number, width: number, height: number,
     const id = requestId;
     const reply = await new Promise<Reply>((resolve) => {
       pending.set(id, resolve);
-      instance.postMessage({ id, url, year, width, height, previousKey });
+      instance.postMessage({ id, url, year, width, height, previousKey, style });
     });
     if (reply.unchanged) return "unchanged";
     if (reply.raster) return reply.raster;
   }
-  return rasterizeOnMainThread(url, year, width, height, previousKey).catch(() => null);
+  return rasterizeOnMainThread(url, year, width, height, previousKey, style).catch(() => null);
 }

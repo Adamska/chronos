@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useEffect } from "react";
+import { AmbientSound } from "@/components/atlas/AmbientSound";
 import { GraphicsNotice } from "@/components/atlas/GraphicsNotice";
 import { restoreSharedView, syncUrl } from "@/components/atlas/shareState";
 import { CampaignPalette, SearchPill } from "@/components/hud/CampaignPalette";
@@ -60,6 +61,7 @@ export function AtlasShell() {
       <CampaignPalette />
       <Landing />
       <GraphicsNotice />
+      <AmbientSound />
     </main>
   );
 }

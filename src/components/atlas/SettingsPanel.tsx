@@ -31,6 +31,8 @@ export function SettingsPanel() {
   const narration = useAtlasStore((state) => state.narration);
   const setNarration = useAtlasStore((state) => state.setNarration);
   const speechAvailable = typeof window !== "undefined" && "speechSynthesis" in window;
+  const ambientSound = useAtlasStore((state) => state.ambientSound);
+  const setAmbientSound = useAtlasStore((state) => state.setAmbientSound);
 
   return (
     <section aria-label="Display and accessibility" className="glass-panel pointer-events-auto rounded-2xl px-4 py-3">
@@ -55,6 +57,7 @@ export function SettingsPanel() {
       <p className="mt-1.5 text-[11px] text-ink-muted">Currently rendering at {tier} quality{pinned ? "" : ", adjusted to your device's frame rate"}.</p>
       <div className="mt-2 divide-y divide-white/[0.06] border-t border-hairline">
         <Toggle label="Reduce motion" hint="Cut camera flights and keep the globe still between chapters." checked={reducedMotion} onChange={setReducedMotion} />
+        <Toggle label="Ambient sound" hint="Wind, sea and caravan bells synthesised live, never stored." checked={ambientSound} onChange={setAmbientSound} />
         {speechAvailable ? (
           <Toggle label="Narrate tours" hint="Read chapter captions aloud with your system voice." checked={narration} onChange={setNarration} />
         ) : null}

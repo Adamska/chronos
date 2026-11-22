@@ -7,12 +7,14 @@ import { ACESFilmicToneMapping, SRGBColorSpace } from "three";
 import { CameraDirector } from "@/scene/CameraDirector";
 import { ChallengeMarkers } from "@/scene/ChallengeMarkers";
 import { ChronicleArcs } from "@/scene/ChronicleArcs";
+import { CompareLayer } from "@/scene/CompareLayer";
 import { CityLayer } from "@/scene/CityLayer";
 import { EarthGlobe } from "@/scene/EarthGlobe";
 import { EnvironmentLayer } from "@/scene/EnvironmentLayer";
 import { EventBeacons } from "@/scene/EventBeacons";
 import { LensOverlay } from "@/scene/LensOverlay";
 import { PoliticalLayer } from "@/scene/PoliticalLayer";
+import { PosterCapture } from "@/scene/PosterCapture";
 import { MeanwhileMarkers } from "@/scene/MeanwhileMarkers";
 import { NightLights } from "@/scene/NightLights";
 import { IdleThrottle } from "@/scene/IdleThrottle";
@@ -51,6 +53,7 @@ export default function AtlasCanvas() {
       <Stars key={quality.stars} radius={60} depth={40} count={quality.stars} factor={2.4} saturation={0} fade speed={0.25} />
       <EarthGlobe />
       <PoliticalLayer />
+      <CompareLayer />
       <TerritoryLayer />
       <LensOverlay />
       <EnvironmentLayer />
@@ -63,6 +66,7 @@ export default function AtlasCanvas() {
       <SmartLabels />
       <CameraDirector />
       <IdleThrottle />
+      <PosterCapture />
       <Suspense fallback={null}>
         <Effects />
       </Suspense>

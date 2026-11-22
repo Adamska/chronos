@@ -140,17 +140,50 @@ function CitiesCard() {
   );
 }
 
+function CompareCard() {
+  const compareYear = useAtlasStore((state) => state.compareYear);
+  const setCompareYear = useAtlasStore((state) => state.setCompareYear);
+  const year = useChronosStore((state) => Math.round(state.year));
+  if (compareYear === null) return null;
+  return (
+    <Card title="Compare two years">
+      <p className="text-[12.5px] text-ink">
+        <span className="text-[#7ed6ec]">Outlines</span> show {formatYear(compareYear)}; colours show {formatYear(year)}.
+      </p>
+      <input
+        type="range"
+        min={-3000}
+        max={2024}
+        value={compareYear}
+        aria-label="Comparison year"
+        onChange={(event) => setCompareYear(Number(event.target.value))}
+        className="mt-3 w-full accent-[#7ed6ec]"
+      />
+      <div className="mt-1 flex gap-1">
+        {[-100, -50, 50, 100].map((step) => (
+          <button key={step} type="button" onClick={() => setCompareYear(Math.max(-3000, Math.min(2024, compareYear + step)))} className="flex-1 rounded-full border border-hairline py-0.5 font-mono text-[10px] text-ink-muted hover:text-ink">
+            {step > 0 ? `+${step}` : step}
+          </button>
+        ))}
+      </div>
+      <p className="mt-2 text-[10.5px] text-ink-faint">Borders: Cliopatria, Seshat Global History Databank (CC BY 4.0).</p>
+    </Card>
+  );
+}
+
 export function LensPanel() {
   const lens = useAtlasStore((state) => state.lens);
   const environment = useAtlasStore((state) => state.showEnvironment);
   const cities = useAtlasStore((state) => state.showCities);
-  if (lens === "none" && !environment && !cities) return null;
+  const comparing = useAtlasStore((state) => state.compareYear !== null);
+  if (lens === "none" && !environment && !cities && !comparing) return null;
   return (
     <div data-hud-zone className="flex w-[min(20rem,calc(100vw-1.5rem))] flex-col gap-2">
       {lens === "travel" ? <TravelCard /> : null}
       {lens === "known" ? <KnownCard /> : null}
       {environment ? <EnvironmentCard /> : null}
       {cities ? <CitiesCard /> : null}
+      <CompareCard />
     </div>
   );
 }
