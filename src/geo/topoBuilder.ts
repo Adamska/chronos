@@ -34,9 +34,16 @@ const vC = new Vector3();
 const edgeAB = new Vector3();
 const edgeAC = new Vector3();
 const faceNormal = new Vector3();
-const capOutward = new Vector3();
 const MAX_CHORD_DEGREES = 6;
 
+
+function pushOrderedTriangle(buffers: MeshBuffers, a: Vector3, b: Vector3, c: Vector3): void {
+  for (const vertex of [a, b, c]) {
+    buffers.positions.push(vertex.x, vertex.y, vertex.z);
+    const length = vertex.length() || 1;
+    buffers.normals.push(vertex.x / length, vertex.y / length, vertex.z / length);
+  }
+}
 
 function pushTriangle(
   buffers: MeshBuffers,
@@ -44,7 +51,6 @@ function pushTriangle(
   b: Vector3,
   c: Vector3,
   outward: Vector3,
-  radialNormals: boolean,
 ): void {
   faceNormal.crossVectors(edgeAB.subVectors(b, a), edgeAC.subVectors(c, a));
   const flip = faceNormal.dot(outward) < 0;
@@ -53,12 +59,7 @@ function pushTriangle(
   if (flip) faceNormal.negate();
   for (const vertex of ordered) {
     buffers.positions.push(vertex.x, vertex.y, vertex.z);
-    if (radialNormals) {
-      const length = vertex.length() || 1;
-      buffers.normals.push(vertex.x / length, vertex.y / length, vertex.z / length);
-    } else {
-      buffers.normals.push(faceNormal.x, faceNormal.y, faceNormal.z);
-    }
+    buffers.normals.push(faceNormal.x, faceNormal.y, faceNormal.z);
   }
 }
 
@@ -80,11 +81,17 @@ function appendCap(buffers: MeshBuffers, sourceRings: PolygonRings, radius: numb
   const refined = refineTriangles(coords, triangles, MAX_CHORD_DEGREES);
 
   for (let i = 0; i < refined.length; i += 3) {
-    const ia = refined[i] ?? 0, ib = refined[i + 1] ?? 0, ic = refined[i + 2] ?? 0;
-    lonLatToVector3(coords[ia * 2] ?? 0, coords[ia * 2 + 1] ?? 0, radius, vA);
+    const ia = refined[i] ?? 0;
+    let ib = refined[i + 1] ?? 0;
+    let ic = refined[i + 2] ?? 0;
+    const ax = coords[ia * 2] ?? 0, ay = coords[ia * 2 + 1] ?? 0;
+    const planarArea = ((coords[ib * 2] ?? 0) - ax) * ((coords[ic * 2 + 1] ?? 0) - ay) - ((coords[ib * 2 + 1] ?? 0) - ay) * ((coords[ic * 2] ?? 0) - ax);
+    if (planarArea === 0) continue;
+    if (planarArea < 0) [ib, ic] = [ic, ib];
+    lonLatToVector3(ax, ay, radius, vA);
     lonLatToVector3(coords[ib * 2] ?? 0, coords[ib * 2 + 1] ?? 0, radius, vB);
     lonLatToVector3(coords[ic * 2] ?? 0, coords[ic * 2 + 1] ?? 0, radius, vC);
-    pushTriangle(buffers, vA, vB, vC, capOutward.copy(vA).add(vB).add(vC), true);
+    pushOrderedTriangle(buffers, vA, vB, vC);
   }
 }
 
@@ -103,8 +110,8 @@ function appendWalls(buffers: MeshBuffers, rings: PolygonRings, base: number, to
       lonLatToVector3(p[0] ?? 0, p[1] ?? 0, top, t0);
       lonLatToVector3(q[0] ?? 0, q[1] ?? 0, top, t1);
       outward.subVectors(b1, b0).cross(b0).multiplyScalar(side);
-      pushTriangle(buffers, b0, b1, t1, outward, false);
-      pushTriangle(buffers, b0, t1, t0, outward, false);
+      pushTriangle(buffers, b0, b1, t1, outward);
+      pushTriangle(buffers, b0, t1, t0, outward);
     }
   });
 }
