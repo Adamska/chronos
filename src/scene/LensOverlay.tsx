@@ -7,7 +7,8 @@ import { perspectiveFor, snapshotFor } from "@/data/knownWorld";
 import { KNOWN_HEIGHT, KNOWN_WIDTH, rasterizeKnownWorld } from "@/geo/knownWorld";
 import { MASK_HEIGHT, MASK_WIDTH } from "@/geo/landBuild";
 import { onLandMask } from "@/geo/landClient";
-import { lastSolveMs, solveTravelTimes, travelModelFor } from "@/geo/travelTime";
+import { solveTravelTimes } from "@/geo/travelClient";
+import { travelModelFor } from "@/geo/travelModels";
 import { encodeTravelField, publishTravel } from "@/scene/lensField";
 import globeVertex from "@/shaders/globe.vert";
 import lensFragment from "@/shaders/lens.frag";
@@ -59,7 +60,6 @@ export function LensOverlay() {
   useEffect(() => {
     if (lens !== "travel" || !mask || !origin) {
       publishTravel(null);
-      setTravelTexture(null);
       return;
     }
     let stale = false;
@@ -67,7 +67,6 @@ export function LensOverlay() {
     void solveTravelTimes(mask, origin.coordinates, model, () => stale).then((days) => {
       if (stale || !days) return;
       publishTravel({ days, origin: origin.coordinates, modelLabel: model.label });
-      document.documentElement.dataset.travelSolveMs = String(Math.round(lastSolveMs));
       setTravelTexture(makeTexture(encodeTravelField(days), MASK_WIDTH, MASK_HEIGHT));
     });
     return () => {

@@ -3,7 +3,7 @@
 import { CLIMATE_PERIODS, FLOW_KIND_LABELS, type FlowKind } from "@/data/environment";
 import { KNOWN_PERSPECTIVES, perspectiveFor, snapshotFor } from "@/data/knownWorld";
 import { formatYear } from "@/data/campaigns/registry";
-import { travelModelFor } from "@/geo/travelTime";
+import { travelModelFor } from "@/geo/travelModels";
 import { formatPopulation, largestCities } from "@/scene/cityMetrics";
 import { useAtlasStore } from "@/store/useAtlasStore";
 import { useChronosStore } from "@/store/useChronosStore";

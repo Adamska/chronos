@@ -1,5 +1,5 @@
 import { MASK_HEIGHT, MASK_WIDTH } from "@/geo/landBuild";
-import { MAX_DAYS, cellIndexFor } from "@/geo/travelTime";
+import { MAX_DAYS, cellIndexFor } from "@/geo/travelModels";
 import type { LonLat } from "@/types/chronicle";
 
 export interface TravelSnapshot {
