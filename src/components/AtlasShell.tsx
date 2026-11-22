@@ -2,6 +2,8 @@
 
 import dynamic from "next/dynamic";
 import { useEffect } from "react";
+import { CampaignPalette, SearchPill } from "@/components/hud/CampaignPalette";
+import { ChronicleNotice } from "@/components/hud/ChronicleNotice";
 import { HudOverlay } from "@/components/hud/HudOverlay";
 import { LabelOverlay } from "@/components/hud/LabelOverlay";
 import { DEFAULT_CAMPAIGN } from "@/data/campaigns";
@@ -25,7 +27,9 @@ export function AtlasShell() {
     <main className="relative h-dvh w-full overflow-hidden bg-abyss">
       <AtlasCanvas />
       <LabelOverlay />
-      <HudOverlay />
+      <HudOverlay search={<SearchPill />} />
+      <ChronicleNotice />
+      <CampaignPalette />
     </main>
   );
 }
