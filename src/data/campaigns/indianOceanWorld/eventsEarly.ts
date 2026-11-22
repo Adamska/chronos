@@ -24,7 +24,7 @@ export const earlyEvents: readonly HistoricalEvent[] = [
     },
     schematic: {
       kind: "causal",
-      steps: ["Winds reverse twice a year", "Pilots leave the coastal route", "Summer wind carries ships east", "Winter wind brings them home"],
+      steps: ["Winds reverse by season", "Pilots cross open sea", "Summer wind blows east", "Winter wind blows home"],
     },
   },
   {
@@ -81,7 +81,7 @@ export const earlyEvents: readonly HistoricalEvent[] = [
     significance: 4,
     wikipediaSlug: "Muziris",
     summary:
-      "A loan contract written in Egypt in the mid-second century records a shipment from Muziris aboard the Hermapollon, carrying Gangetic nard, ivory and textiles valued at nearly seven million drachmas. It shows how much capital a single monsoon voyage could carry.",
+      "A mid-second-century papyrus from Egypt records a loan for a voyage to Muziris and the homeward cargo of the ship Hermapollon: Gangetic nard, ivory and textiles valued at nearly seven million drachmas. It shows how much capital a single monsoon voyage could carry.",
     context:
       "Pliny the Elder called Muziris the first emporium of India, and Tamil poems of the Sangam age describe foreign ships arriving with gold and leaving with pepper. Excavations at Pattanam since 2007 have found Roman amphorae and glass at what may be the ancient port.",
     whyHere:
@@ -105,7 +105,7 @@ export const earlyEvents: readonly HistoricalEvent[] = [
     significance: 3,
     wikipediaSlug: "Óc_Eo",
     summary:
-      "In the mid-third century the envoys Kang Tai and Zhu Ying of the Chinese state of Wu visited Funan, whose main port was Oc Eo. Excavations there have yielded Indian seals, Persian and Chinese goods and a gold medallion of the Roman emperor Antoninus Pius dated 152.",
+      "In the mid-third century the envoys Kang Tai and Zhu Ying of the Chinese state of Wu visited Funan, whose main port was Oc Eo. Excavations there have yielded Indian seals, Chinese bronze mirrors and Roman gold, including a medallion of Antoninus Pius dated 152.",
     context:
       "Funan was the first great trading state of mainland Southeast Asia, and Chinese records say its ruler Fan Shiman built a fleet and subdued his neighbours. Its rulers adopted Indian royal titles, Sanskrit and Hindu and Buddhist cults.",
     whyHere:
@@ -139,7 +139,7 @@ export const earlyEvents: readonly HistoricalEvent[] = [
     significance: 5,
     wikipediaSlug: "Srivijaya",
     summary:
-      "The Kedukan Bukit inscription of 682 records a sacred expedition by the ruler Dapunta Hyang with an army of twenty thousand. Within a few years Srivijaya had brought the ports on both sides of the Strait of Malacca under its control.",
+      "The Kedukan Bukit inscription of 682 records a sacred expedition by the ruler Dapunta Hyang with an army of twenty thousand. Within a few years Srivijaya had absorbed the rival port of Malayu in Jambi and reached Bangka, commanding the approaches to the Strait of Malacca and the Sunda Strait.",
     context:
       "The Chinese monk Yijing stopped at Srivijaya in 671 on his way to India and later spent years there copying and translating Buddhist texts. Srivijaya sent tribute to China and kept the straits open and policed, drawing shipping to its harbours.",
     whyHere:
@@ -172,7 +172,7 @@ export const earlyEvents: readonly HistoricalEvent[] = [
       westLabel: "Abbasid Gulf",
       eastLabel: "Tang China",
       eastbound: ["frankincense", "pearls", "glassware", "ivory"],
-      westbound: ["Changsha bowls", "celadon", "gold cups", "bronze mirrors", "star anise"],
+      westbound: ["Changsha bowls", "celadon", "gold cups", "star anise"],
     },
   },
   {
@@ -188,9 +188,9 @@ export const earlyEvents: readonly HistoricalEvent[] = [
     summary:
       "A collection of merchants' reports compiled in 851 described the sea route from Siraf to Guangzhou, by way of Muscat, Quilon and Kalah on the Malay Peninsula. Around 916 Abu Zayd of Siraf added that the massacre of foreign merchants at Guangzhou in 878–879 had cut the direct voyages short.",
     context:
-      "Siraf grew rich as the Gulf's main outlet for Abbasid Iraq, and its merchants built houses of teak brought from India. After a great earthquake in 977 and the shift of trade to Kish and Hormuz, the city declined.",
+      "Siraf grew rich as the Gulf's main outlet for Abbasid Iraq, and its merchants built houses several storeys high of imported timber. After a great earthquake in 977 and the shift of trade to Kish and Hormuz, the city declined.",
     whyHere:
-      "Siraf had almost no water or farmland, but deep anchorage close inshore let large ships load there instead of entering the shallow head of the Gulf at Basra. A voyage to China and back took about two years, because every leg had to wait for its monsoon.",
+      "Siraf had almost no water or farmland, but deep anchorage close inshore let large ships load there instead of entering the shallow head of the Gulf at Basra. A voyage to China and back took a year and a half or more, because every leg had to wait for its monsoon.",
     keyFigures: ["Abu Zayd al-Sirafi", "Sulaiman al-Tajir", "Huang Chao"],
   },
   {
@@ -205,13 +205,13 @@ export const earlyEvents: readonly HistoricalEvent[] = [
     summary:
       "Rajendra I's fleet crossed the Bay of Bengal and sacked Kadaram and other Srivijayan ports, capturing the king Sangrama Vijayatunggavarman. A Tamil inscription at Thanjavur lists more than a dozen places taken, from the Nicobars to Sumatra.",
     context:
-      "The raid's motive is debated, but it probably aimed to break Srivijaya's grip on the lucrative China trade. Relations had been friendly: a Srivijayan king had endowed a Buddhist monastery at Nagapattinam only a few years earlier.",
+      "The raid's motive is debated, but it probably aimed to break Srivijaya's grip on the lucrative China trade. Relations had been friendly: a Srivijayan king had endowed a Buddhist monastery at Nagapattinam about two decades earlier.",
     whyHere:
       "Kedah was the first landfall for ships crossing the Bay of Bengal from India, guided by the 1,200-metre peak of Gunung Jerai. Taking it put the western mouth of the Strait of Malacca within Chola reach.",
     keyFigures: ["Rajendra I", "Sangrama Vijayatunggavarman"],
     schematic: {
       kind: "causal",
-      steps: ["Song China's trade booms", "Srivijaya taxes the straits", "Chola fleet crosses the Bay", "Kadaram sacked, king captured"],
+      steps: ["Song trade booms", "Srivijaya taxes the straits", "Chola fleet sails east", "Kadaram sacked"],
     },
   },
 ];

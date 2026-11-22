@@ -17,6 +17,15 @@ export const earlyEvents: readonly HistoricalEvent[] = [
     whyHere:
       "The Onon rises in the Khentii Mountains, where forest meets open grassland, and this upland was Temüjin's home ground. From here the steppe runs almost unbroken west to Hungary and east to Manchuria, so a united army of mounted archers could strike in any direction while its herds grazed along the way.",
     keyFigures: ["Genghis Khan", "Muqali", "Bo'orchu", "Shigi Qutuqu"],
+    schematic: {
+      kind: "causal",
+      steps: [
+        "Temüjin defeats rival steppe tribes",
+        "Kurultai proclaims Genghis Khan",
+        "Decimal units replace clan loyalties",
+        "United army turns on settled states",
+      ],
+    },
   },
   {
     id: "mongol-western-xia",
@@ -71,8 +80,8 @@ export const earlyEvents: readonly HistoricalEvent[] = [
       "Otrar stood where the Arys River joins the Syr Darya, the first great oasis city a caravan reached after crossing the steppe from the east. As Khwarazm's frontier post on the road to Mongolia, it was both the gate of the trade and the first target of the war.",
     keyFigures: ["Genghis Khan", "Inalchuq", "Muhammad II of Khwarazm", "Chagatai Khan"],
     primarySource: {
-      excerpt: "O would that my mother had not borne me, or that I had died and become a forgotten thing ere this befell!",
-      attribution: "Ibn al-Athir, The Complete History, on the Mongol invasion of 1220, trans. E. G. Browne",
+      excerpt: "O would that my mother had not born me or that I had died and become a forgotten thing ere this befell!",
+      attribution: "Ibn al-Athir, The Complete History, on the Tatars, trans. E. G. Browne",
     },
   },
   {
@@ -115,8 +124,8 @@ export const earlyEvents: readonly HistoricalEvent[] = [
     keyFigures: ["Subutai", "Jebe", "Mstislav Mstislavich", "Mstislav III of Kyiv"],
     primarySource: {
       excerpt:
-        "The same year, for our sins, there came unknown tribes. No one exactly knows who they are, nor whence they came out, nor what their language is, nor of what race they are, nor what their faith is.",
-      attribution: "The Chronicle of Novgorod, trans. Robert Michell and Nevill Forbes (1914)",
+        "The same year, for our sins, unknown tribes came, whom no one exactly knows, who they are, nor whence they came out, nor what their language is, nor of what race they are, nor what their faith is.",
+      attribution: "The Chronicle of Novgorod, entry for 1224, trans. Robert Michell and Nevill Forbes (1914)",
     },
   },
   {
@@ -154,7 +163,7 @@ export const earlyEvents: readonly HistoricalEvent[] = [
     keyFigures: ["Ögedei Khan", "Marco Polo"],
     primarySource: {
       excerpt:
-        "The messengers of the Emperor in travelling from Cambaluc, be the road whichsoever it may, find at every twenty-five miles of the journey a station which they call Yamb, or, as we should say, the 'Horse-Post-House.'",
+        "The messengers of the Emperor in travelling from Cambaluc, be the road whichsoever they will, find at every twenty-five miles of the journey a station which they call Yamb, or, as we should say, the 'Horse-Post-House.'",
       attribution: "Marco Polo, The Travels (c. 1298), Book II, trans. Henry Yule",
     },
   },
@@ -174,11 +183,6 @@ export const earlyEvents: readonly HistoricalEvent[] = [
     whyHere:
       "The Mongols struck the forest principalities in winter, when frozen rivers became highways through woods and marshes that cavalry could not otherwise cross. Kyiv stood on bluffs above the Dnieper at the edge of the forest-steppe, exposed to an army based on the open grassland to the south.",
     keyFigures: ["Batu Khan", "Subutai", "Möngke Khan"],
-    primarySource: {
-      excerpt:
-        "Kiev had been a very large and thickly populated town, but now it has been reduced almost to nothing, for there are at the present time scarce two hundred houses there.",
-      attribution: "John of Plano Carpini, History of the Mongols (1247), trans. in Christopher Dawson, The Mongol Mission",
-    },
   },
   {
     id: "mongol-mohi",

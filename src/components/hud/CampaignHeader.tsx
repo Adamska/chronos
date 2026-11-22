@@ -8,6 +8,8 @@ const SOURCE_LABEL: Record<CampaignSource, string> = {
   curated: "Curated campaign",
   generated: "AI chronicle",
   encyclopedia: "Encyclopedia match",
+  thread: "Thread through time",
+  journey: "A traveller's journey",
 };
 
 export function CampaignHeader() {

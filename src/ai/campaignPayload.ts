@@ -76,7 +76,7 @@ export const CampaignPayloadSchema = z.object({
   endYear: z.number(),
   accent: z.string(),
   keywords: z.array(z.string()),
-  source: z.enum(["curated", "generated", "encyclopedia"]),
+  source: z.enum(["curated", "generated", "encyclopedia", "thread", "journey"]),
   chapters: z.array(Chapter),
   events: z.array(Event).min(1),
   arcs: z.array(Arc),

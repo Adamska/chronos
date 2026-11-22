@@ -12,7 +12,7 @@ export type ArcKind =
 
 export type Significance = 1 | 2 | 3 | 4 | 5;
 
-export type CampaignSource = "curated" | "generated" | "encyclopedia";
+export type CampaignSource = "curated" | "generated" | "encyclopedia" | "thread" | "journey";
 
 export interface PrimarySource {
   readonly excerpt: string;
