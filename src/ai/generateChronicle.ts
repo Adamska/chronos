@@ -21,11 +21,16 @@ export function isGenerationAvailable(): boolean {
   return Boolean(process.env.OPENAI_API_KEY);
 }
 
-export async function generateChronicle(query: string): Promise<ChronicleCampaign> {
+const LANGUAGE_RULES: Readonly<Record<"en" | "fr", string>> = {
+  en: "",
+  fr: "\nWrite every text field in idiomatic French with French typography (non-breaking spaces before ; : ! ?, « » quotes, av. J.-C.). Keep ids, slugs and English Wikipedia titles unchanged.",
+};
+
+export async function generateChronicle(query: string, locale: "en" | "fr" = "en"): Promise<ChronicleCampaign> {
   const provider = createOpenAI({ apiKey: process.env.OPENAI_API_KEY });
   const { output } = await generateText({
     model: provider(process.env.CHRONICLE_MODEL ?? DEFAULT_MODEL),
-    system: SYSTEM_PROMPT,
+    system: SYSTEM_PROMPT + LANGUAGE_RULES[locale],
     prompt: `Topic: ${query}`,
     output: Output.object({
       schema: ChronicleCampaignSchema,
@@ -51,11 +56,11 @@ export function progressFrom(partial: Partial<GeneratedCampaign> | undefined): C
   return { title: partial?.title, events, arcs: partial?.arcs?.length ?? 0 };
 }
 
-export async function streamChronicle(query: string, onProgress: (progress: ChronicleProgress) => void): Promise<ChronicleCampaign> {
+export async function streamChronicle(query: string, onProgress: (progress: ChronicleProgress) => void, locale: "en" | "fr" = "en"): Promise<ChronicleCampaign> {
   const provider = createOpenAI({ apiKey: process.env.OPENAI_API_KEY });
   const result = streamText({
     model: provider(process.env.CHRONICLE_MODEL ?? DEFAULT_MODEL),
-    system: SYSTEM_PROMPT,
+    system: SYSTEM_PROMPT + LANGUAGE_RULES[locale],
     prompt: `Topic: ${query}`,
     output: Output.object({ schema: ChronicleCampaignSchema, name: "chronicle_campaign" }),
     abortSignal: AbortSignal.timeout(GENERATION_TIMEOUT_MS),

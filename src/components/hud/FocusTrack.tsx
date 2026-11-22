@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ClimateBands, ScrubTrack, TickAxis, toFraction, type YearRange } from "@/components/hud/TimelineTrack";
 import { formatYear } from "@/data/campaigns/registry";
 import { CLIMATE_PERIODS } from "@/data/environment";
+import { useT } from "@/i18n/I18nProvider";
 import { LAYER_COLORS } from "@/scene/temporal";
 import { useChronosStore } from "@/store/useChronosStore";
 import type { ChronicleCampaign, HistoricalEvent } from "@/types/chronicle";
@@ -33,6 +34,7 @@ export function FocusTrack({ campaign }: { readonly campaign: ChronicleCampaign 
   const goToChapter = useChronosStore((state) => state.goToChapter);
   const select = useChronosStore((state) => state.select);
   const setYear = useChronosStore((state) => state.setYear);
+  const t = useT();
   const full = useMemo(() => campaignRange(campaign), [campaign]);
   const [range, setRange] = useState<YearRange>(full);
   const [hovered, setHovered] = useState<HistoricalEvent | null>(null);
@@ -78,7 +80,7 @@ export function FocusTrack({ campaign }: { readonly campaign: ChronicleCampaign 
           <p className="mt-0.5 truncate text-[11px] text-ink-muted">{hovered.place}</p>
         </div>
       ) : null}
-      <ScrubTrack range={range} label="Campaign timeline" height="h-11" needleClass="w-px bg-ochre shadow-[0_0_12px_2px_rgb(217_164_65/0.55)]">
+      <ScrubTrack range={range} label={t("timeline.campaign")} height="h-11" needleClass="w-px bg-ochre shadow-[0_0_12px_2px_rgb(217_164_65/0.55)]">
         <svg viewBox="0 0 100 10" preserveAspectRatio="none" className="pointer-events-none absolute inset-x-0 top-[18px] h-[10px] w-full" aria-hidden>
           <path d={densityPath(campaign.events, range)} fill="rgb(217 164 65 / 0.14)" />
         </svg>
@@ -89,7 +91,7 @@ export function FocusTrack({ campaign }: { readonly campaign: ChronicleCampaign 
             key={event.id}
             type="button"
             data-track-control
-            aria-label={`${formatYear(event.year)}: ${event.title}`}
+            aria-label={t("timeline.eventMarker", { year: formatYear(event.year), title: event.title })}
             onMouseEnter={() => setHovered(event)}
             onMouseLeave={() => setHovered(null)}
             onFocus={() => setHovered(event)}
@@ -108,7 +110,7 @@ export function FocusTrack({ campaign }: { readonly campaign: ChronicleCampaign 
               key={chapter.id}
               type="button"
               data-track-control
-              aria-label={`Chapter ${index + 1}: ${chapter.title}`}
+              aria-label={t("timeline.chapterMarker", { index: index + 1, title: chapter.title })}
               onClick={() => goToChapter(chapter.id)}
               className={`absolute top-0 flex size-[17px] -translate-x-1/2 items-center justify-center rounded-[5px] border font-mono text-[9px] transition ${
                 chapter.id === activeChapterId ? "border-ochre bg-ochre text-abyss" : "border-white/15 bg-slate-deep text-ink-muted hover:border-ochre/60 hover:text-ink"
@@ -126,7 +128,7 @@ export function FocusTrack({ campaign }: { readonly campaign: ChronicleCampaign 
         </div>
         {zoomed ? (
           <button type="button" onClick={() => setRange(full)} className="shrink-0 font-mono text-[9.5px] text-ochre-soft hover:underline">
-            Reset zoom
+            {t("timeline.resetZoom")}
           </button>
         ) : null}
       </div>

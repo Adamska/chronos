@@ -12,17 +12,20 @@ import { LabelOverlay } from "@/components/hud/LabelOverlay";
 import { Landing, hasSeenLanding } from "@/components/landing/Landing";
 import { pushRecent } from "@/components/hud/recent";
 import { DEFAULT_CHRONICLE_ID, findCatalogEntry, loadChronicle } from "@/data/catalog";
+import { useT } from "@/i18n/I18nProvider";
 import { useAtlasStore } from "@/store/useAtlasStore";
 import { useChronosStore } from "@/store/useChronosStore";
 
-const AtlasCanvas = dynamic(() => import("@/scene/AtlasCanvas"), {
-  ssr: false,
-  loading: () => (
+function LoadingGlobe() {
+  const t = useT();
+  return (
     <div className="absolute inset-0 flex items-center justify-center">
-      <p className="eyebrow animate-pulse">Triangulating the world</p>
+      <p className="eyebrow animate-pulse">{t("shell.loading")}</p>
     </div>
-  ),
-});
+  );
+}
+
+const AtlasCanvas = dynamic(() => import("@/scene/AtlasCanvas"), { ssr: false, loading: () => <LoadingGlobe /> });
 
 export function AtlasShell() {
   useEffect(() => {

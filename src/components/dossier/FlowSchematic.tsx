@@ -1,3 +1,4 @@
+import { useT } from "@/i18n/I18nProvider";
 import type { CausalSchematic, DossierSchematic, ExchangeSchematic } from "@/types/chronicle";
 
 const INK = "rgb(233 228 216 / 0.85)";
@@ -12,9 +13,10 @@ function ExchangeDiagram({ schematic }: { readonly schematic: ExchangeSchematic 
   const top = 34;
   const middle = top + east.length * laneHeight + 14;
   const height = middle + 14 + west.length * laneHeight + 22;
+  const t = useT();
 
   return (
-    <svg viewBox={`0 0 360 ${height}`} className="w-full" role="img" aria-label={`Exchange between ${schematic.westLabel} and ${schematic.eastLabel}`}>
+    <svg viewBox={`0 0 360 ${height}`} className="w-full" role="img" aria-label={t("schematic.exchangeAria", { west: schematic.westLabel, east: schematic.eastLabel })}>
       {[{ x: 8, label: schematic.westLabel }, { x: 272, label: schematic.eastLabel }].map((node) => (
         <g key={node.label}>
           <rect x={node.x} y={middle - 22} width="80" height="44" rx="8" fill="#0b1016" stroke="rgb(233 228 216 / 0.16)" />
@@ -27,14 +29,14 @@ function ExchangeDiagram({ schematic }: { readonly schematic: ExchangeSchematic 
       <path d={`M 272 ${middle + 10} C 210 ${height - 14}, 150 ${height - 14}, 88 ${middle + 10}`} fill="none" stroke={TEAL} strokeWidth="1.4" className="flow-dash" />
       <path d={`M 266 ${middle - 16} l 6 6 l -8 2`} fill="none" stroke={OCHRE} strokeWidth="1.4" />
       <path d={`M 94 ${middle + 16} l -6 -6 l 8 -2`} fill="none" stroke={TEAL} strokeWidth="1.4" />
-      <text x="180" y={top - 12} textAnchor="middle" fontSize="8.5" letterSpacing="1.6" fill={OCHRE} fontFamily="var(--font-plex-mono)">EASTBOUND</text>
+      <text x="180" y={top - 12} textAnchor="middle" fontSize="8.5" letterSpacing="1.6" fill={OCHRE} fontFamily="var(--font-plex-mono)">{t("schematic.eastbound")}</text>
       {east.map((item, index) => (
         <text key={item} x="180" y={top + 6 + index * laneHeight} textAnchor="middle" fontSize="10.5" fill={INK} fontFamily="var(--font-inter)">{item}</text>
       ))}
       {west.map((item, index) => (
         <text key={item} x="180" y={middle + 26 + index * laneHeight} textAnchor="middle" fontSize="10.5" fill={INK} fontFamily="var(--font-inter)">{item}</text>
       ))}
-      <text x="180" y={height - 4} textAnchor="middle" fontSize="8.5" letterSpacing="1.6" fill={TEAL} fontFamily="var(--font-plex-mono)">WESTBOUND</text>
+      <text x="180" y={height - 4} textAnchor="middle" fontSize="8.5" letterSpacing="1.6" fill={TEAL} fontFamily="var(--font-plex-mono)">{t("schematic.westbound")}</text>
     </svg>
   );
 }
@@ -43,8 +45,9 @@ function CausalChain({ schematic }: { readonly schematic: CausalSchematic }) {
   const steps = schematic.steps.slice(0, 6);
   const rowHeight = 44;
   const height = steps.length * rowHeight - 12;
+  const t = useT();
   return (
-    <svg viewBox={`0 0 360 ${height}`} className="w-full" role="img" aria-label="Causal impact chain">
+    <svg viewBox={`0 0 360 ${height}`} className="w-full" role="img" aria-label={t("schematic.causalAria")}>
       {steps.map((step, index) => {
         const y = index * rowHeight;
         const last = index === steps.length - 1;

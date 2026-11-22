@@ -8,12 +8,15 @@ import { type PaletteItem, usePaletteResults } from "@/components/hud/usePalette
 import { useFocusTrap } from "@/components/useFocusTrap";
 import { loadChronicle } from "@/data/catalog";
 import { formatSpan, formatYear } from "@/data/campaigns/registry";
+import { pluralForm } from "@/i18n/dictionaries";
+import { useLocale, useT } from "@/i18n/I18nProvider";
 import { useChronosStore } from "@/store/useChronosStore";
 import { useGenerationStore } from "@/store/useGenerationStore";
 
 export function SearchPill() {
   const setPaletteOpen = useChronosStore((state) => state.setPaletteOpen);
   const status = useChronosStore((state) => state.chronicleStatus);
+  const t = useT();
   return (
     <button
       type="button"
@@ -22,19 +25,20 @@ export function SearchPill() {
       className="glass-panel pointer-events-auto flex w-[22rem] items-center gap-3 rounded-full px-4 py-2 text-left text-[12.5px] text-ink-muted transition hover:text-ink"
     >
       <svg viewBox="0 0 16 16" className="size-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.6"><circle cx="7" cy="7" r="4.5" /><path d="m10.5 10.5 3 3" /></svg>
-      <span className="flex-1 truncate">{status === "loading" ? "Directing your chronicle…" : "Chronicle any moment in history"}</span>
+      <span className="flex-1 truncate">{status === "loading" ? t("palette.pill.loading") : t("palette.pill.idle")}</span>
       <kbd className="rounded border border-white/10 px-1.5 py-0.5 font-mono text-[10px] text-ink-faint">⌘K</kbd>
     </button>
   );
 }
 
 function ItemRow({ item, active }: { readonly item: PaletteItem; readonly active: boolean }) {
+  const t = useT();
   if (item.kind === "query") {
     return (
       <>
         <svg viewBox="0 0 10 10" className="size-2.5 shrink-0 text-ochre" fill="currentColor" aria-hidden><path d="M5 0 6.2 3.8 10 5 6.2 6.2 5 10 3.8 6.2 0 5 3.8 3.8Z" /></svg>
-        <span className="min-w-0 flex-1 truncate text-[13.5px] text-ink/90">{item.suggested ? item.query : <>Chronicle “{item.query}”</>}</span>
-        <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.14em] text-ochre/80">{item.suggested ? "Try" : "Generate"}</span>
+        <span className="min-w-0 flex-1 truncate text-[13.5px] text-ink/90">{item.suggested ? item.query : t("palette.query.generate", { query: item.query })}</span>
+        <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.14em] text-ochre/80">{item.suggested ? t("palette.query.try") : t("palette.query.generateTag")}</span>
       </>
     );
   }
@@ -60,6 +64,8 @@ export function CampaignPalette() {
   const message = useChronosStore((state) => state.chronicleMessage);
   const request = useChronicleRequest();
   const progress = useGenerationStore((state) => state.progress);
+  const t = useT();
+  const locale = useLocale();
   const [query, setQuery] = useState("");
   const [cursor, setCursor] = useState(0);
   const dialog = useRef<HTMLDivElement>(null);
@@ -92,14 +98,14 @@ export function CampaignPalette() {
   const offsets = sections.map((_, sectionIndex) => sections.slice(0, sectionIndex).reduce((total, section) => total + section.items.length, 0));
   return (
     <div className="pointer-events-auto fixed inset-0 z-40 flex items-start justify-center bg-abyss/55 px-4 pt-[10vh] backdrop-blur-[3px]" onMouseDown={() => setPaletteOpen(false)}>
-      <div ref={dialog} role="dialog" aria-modal="true" aria-label="Chronicle palette" className="glass-panel flex w-full max-w-[860px] overflow-hidden rounded-2xl" onMouseDown={(event) => event.stopPropagation()}>
+      <div ref={dialog} role="dialog" aria-modal="true" aria-label={t("palette.dialog")} className="glass-panel flex w-full max-w-[860px] overflow-hidden rounded-2xl" onMouseDown={(event) => event.stopPropagation()}>
         <div className="flex min-w-0 flex-1 flex-col">
           <div className="flex items-center gap-3 border-b border-hairline px-5 py-4">
             <svg viewBox="0 0 16 16" className="size-4 shrink-0 text-ochre" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden><circle cx="7" cy="7" r="4.5" /><path d="m10.5 10.5 3 3" /></svg>
             <input
               ref={input}
               value={query}
-              aria-label="Search chronicles and events"
+              aria-label={t("palette.input")}
               onChange={(event) => {
                 setQuery(event.target.value);
                 setCursor(0);
@@ -111,7 +117,7 @@ export function CampaignPalette() {
                 else return;
                 event.preventDefault();
               }}
-              placeholder="Search events and chronicles, or ask any historical question"
+              placeholder={t("palette.placeholder")}
               className="flex-1 bg-transparent font-serif text-[18px] text-ink outline-none placeholder:text-ink-faint"
             />
             {status === "loading" ? <span className="size-4 animate-spin rounded-full border-2 border-ochre/30 border-t-ochre" /> : null}
@@ -119,10 +125,11 @@ export function CampaignPalette() {
           {status === "error" && message ? <p className="border-b border-hairline px-5 py-2.5 text-[12px] text-vermilion">{message}</p> : null}
           {status === "loading" && progress ? (
             <div aria-live="polite" className="border-b border-hairline px-5 py-3">
-              <p className="eyebrow">Directing your chronicle</p>
-              <p className="mt-1 font-serif text-[16px] text-ink">{progress.title ?? "Researching the story…"}</p>
+              <p className="eyebrow">{t("palette.progress.title")}</p>
+              <p className="mt-1 font-serif text-[16px] text-ink">{progress.title ?? t("palette.progress.researching")}</p>
               <p className="mt-1 font-mono text-[10.5px] text-ink-muted">
-                {progress.events.length} events · {progress.arcs} routes
+                {t(`palette.progress.events.${pluralForm(progress.events.length, locale)}`, { count: progress.events.length })} ·{" "}
+                {t(`palette.progress.routes.${pluralForm(progress.arcs, locale)}`, { count: progress.arcs })}
               </p>
               <ul className="mt-2 space-y-0.5">
                 {progress.events.slice(-4).map((title) => (
@@ -158,11 +165,11 @@ export function CampaignPalette() {
             ))}
           </div>
           <div className="flex items-center justify-between border-t border-hairline px-5 py-2.5 font-mono text-[10px] text-ink-faint">
-            <span>↑↓ navigate · ↵ open · esc close</span>
-            <span>Structured AI chronicles with an offline encyclopedia</span>
+            <span>{t("palette.footer.keys")}</span>
+            <span>{t("palette.footer.note")}</span>
           </div>
         </div>
-        <aside className="hidden w-[300px] shrink-0 border-l border-hairline md:block" aria-label="Preview">
+        <aside className="hidden w-[300px] shrink-0 border-l border-hairline md:block" aria-label={t("palette.preview")}>
           <PalettePreview item={items[cursor]} />
         </aside>
       </div>

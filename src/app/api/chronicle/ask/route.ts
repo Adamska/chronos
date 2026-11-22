@@ -15,14 +15,14 @@ export async function POST(request: Request): Promise<NextResponse> {
   const body: unknown = await request.json().catch(() => null);
   const parsed = AskRequestSchema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid request." }, { status: 400 });
-  const { question, campaignTitle, events } = parsed.data;
+  const { question, campaignTitle, events, locale } = parsed.data;
 
   if (process.env.OPENAI_API_KEY) {
     try {
       const provider = createOpenAI({ apiKey: process.env.OPENAI_API_KEY });
       const { output } = await generateText({
         model: provider(process.env.CHRONICLE_MODEL ?? "gpt-5.4-mini"),
-        system: SYSTEM,
+        system: locale === "fr" ? `${SYSTEM}\nAnswer in idiomatic French with French typography.` : SYSTEM,
         prompt: `Chronicle: ${campaignTitle}\nEvents:\n${events
           .map((event) => `- [${event.id}] ${event.year}: ${event.title} at ${event.place} (${event.coordinates.join(", ")}). ${event.whyHere}`)
           .join("\n")}\n\nQuestion: ${question}`,
@@ -35,5 +35,5 @@ export async function POST(request: Request): Promise<NextResponse> {
       console.error("Follow-up generation failed, answering offline.", error);
     }
   }
-  return NextResponse.json<AskResponse>(answerOffline(question, events));
+  return NextResponse.json<AskResponse>(answerOffline(question, events, locale));
 }

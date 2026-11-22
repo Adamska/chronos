@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-async function openAtlas(page: Page, path = "/") {
+async function openAtlas(page: Page, path = "/en") {
   await page.addInitScript(() => window.localStorage.setItem("chronos.landing.seen", "1"));
   await page.goto(path);
   await expect(page.getByRole("heading", { level: 1 })).not.toBeEmpty();
@@ -34,7 +34,7 @@ test.describe("atlas", () => {
   });
 
   test("restores a shared view from the URL", async ({ page }) => {
-    await openAtlas(page, "/?c=age-of-sail&y=1500");
+    await openAtlas(page, "/en?c=age-of-sail&y=1500");
     await expect(page.getByRole("heading", { level: 1 })).toContainText("Age of Sail");
   });
 
@@ -51,14 +51,33 @@ test.describe("atlas", () => {
   });
 
   test("renders a printable classroom sheet", async ({ page }) => {
-    await page.goto("/classroom/thread-plague");
+    await page.goto("/en/classroom/thread-plague");
     await expect(page.getByRole("heading", { level: 1 })).toContainText("Plague");
     await expect(page.getByRole("button", { name: "Print this sheet" })).toBeVisible();
   });
+
+  test("renders the atlas in French", async ({ page }) => {
+    await openAtlas(page, "/fr");
+    await expect(page.locator("html")).toHaveAttribute("lang", "fr");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("La route de la soie");
+    await expect(page.getByRole("button", { name: "Lancer la chronologie" })).toBeVisible();
+    await expect(page.getByRole("slider", { name: "Frise de la campagne" })).toBeVisible();
+  });
+
+  test("renders a French classroom sheet", async ({ page }) => {
+    await page.goto("/fr/classroom/silk-road");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("La route de la soie");
+    await expect(page.getByRole("button", { name: "Imprimer cette fiche" })).toBeVisible();
+  });
+});
+
+test("redirects bare paths to a locale", async ({ page }) => {
+  await page.goto("/");
+  await expect(page).toHaveURL(/\/(en|fr)$/);
 });
 
 test("shows the landing screen on a first visit", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/en");
   await expect(page.getByRole("dialog", { name: "Welcome to Chronos" })).toBeVisible();
   await page.getByRole("button", { name: /Explore the atlas/ }).click();
   await expect(page.getByRole("dialog", { name: "Welcome to Chronos" })).toBeHidden();
@@ -90,7 +109,7 @@ test.describe("api", () => {
       data: { name: "Ada", score: 2400, rounds: [{ eventId: "silk-zhang-qian", distanceKm: 320, points: 850 }] },
     });
     expect(submitted.ok()).toBe(true);
-    await page.goto(`/classroom/results/${code}`);
+    await page.goto(`/en/classroom/results/${code}`);
     await expect(page.getByRole("cell", { name: "Ada" })).toBeVisible();
   });
 

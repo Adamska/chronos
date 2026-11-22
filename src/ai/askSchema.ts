@@ -14,6 +14,7 @@ export const AskRequestSchema = z.object({
   question: z.string().trim().min(3, "Ask a question in a few words.").max(300),
   campaignTitle: z.string().max(200),
   events: z.array(AskEventSchema).min(1).max(30),
+  locale: z.enum(["en", "fr"]).default("en"),
 });
 
 export const AskAnswerSchema = z.object({

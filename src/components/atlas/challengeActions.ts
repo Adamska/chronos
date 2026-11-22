@@ -1,4 +1,6 @@
 import { formatKm } from "@/components/dossier/geoInsights";
+import { getActiveLocale } from "@/i18n/config";
+import { numberTag, translate } from "@/i18n/dictionaries";
 import { DIFFICULTY_SCALE_KM, type ChallengeResult, type Difficulty } from "@/store/useChallengeStore";
 import { useChronosStore } from "@/store/useChronosStore";
 import type { ChronicleCampaign, HistoricalEvent } from "@/types/chronicle";
@@ -48,8 +50,14 @@ export function frameAnswer(result: ChallengeResult): void {
 }
 
 export function resultText(campaign: ChronicleCampaign, difficulty: Difficulty, results: readonly ChallengeResult[]): string {
+  const locale = getActiveLocale();
   const total = results.reduce((sum, result) => sum + result.points, 0);
-  const url = `${window.location.origin}/?c=${campaign.id}&challenge=${difficulty}`;
-  const lines = results.map((result, index) => `${index + 1}. ${result.event.title}: ${formatKm(result.distanceKm)} off, ${result.points} points`);
-  return [`Chronos · Why here? · ${campaign.title} (${difficulty}, ${DIFFICULTY_SCALE_KM[difficulty]} km scale)`, `${total} / ${results.length * 1000}`, ...lines, url].join("\n");
+  const url = `${window.location.origin}/${locale}/?c=${campaign.id}&challenge=${difficulty}`;
+  const lines = results.map((result, index) =>
+    translate("challenge.share.line", { index: index + 1, title: result.event.title, distance: formatKm(result.distanceKm), points: result.points }),
+  );
+  const difficultyName = translate(`difficulty.${difficulty}`).toLowerCase();
+  const scale = DIFFICULTY_SCALE_KM[difficulty].toLocaleString(numberTag(locale));
+  const header = translate("challenge.share.header", { title: campaign.title, difficulty: difficultyName, scale });
+  return [header, `${total.toLocaleString(numberTag(locale))} / ${(results.length * 1000).toLocaleString(numberTag(locale))}`, ...lines, url].join("\n");
 }

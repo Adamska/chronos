@@ -1,4 +1,6 @@
 import { CITIES } from "@/data/cities";
+import { type Locale, getActiveLocale } from "@/i18n/config";
+import { numberTag } from "@/i18n/dictionaries";
 import type { CityRecord } from "@/types/atlas";
 
 export function populationAt(city: CityRecord, year: number): number {
@@ -28,7 +30,10 @@ export function largestCities(year: number, count = 5): CityRanking[] {
     .slice(0, count);
 }
 
-export function formatPopulation(thousands: number): string {
-  if (thousands >= 1000) return `${(thousands / 1000).toFixed(thousands >= 10000 ? 0 : 1)} million`;
-  return `${Math.round(thousands / 10) * 10},000`;
+export function formatPopulation(thousands: number, locale: Locale = getActiveLocale()): string {
+  const tag = numberTag(locale);
+  if (thousands < 1000) return (Math.round(thousands / 10) * 10000).toLocaleString(tag);
+  const digits = thousands >= 10000 ? 0 : 1;
+  const millions = (thousands / 1000).toLocaleString(tag, { minimumFractionDigits: digits, maximumFractionDigits: digits });
+  return locale === "fr" ? `${millions}\u00a0million${thousands >= 2000 ? "s" : ""}` : `${millions} million`;
 }

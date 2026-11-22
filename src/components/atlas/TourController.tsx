@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { formatYear } from "@/data/campaigns/registry";
+import { getActiveLocale } from "@/i18n/config";
+import { useT } from "@/i18n/I18nProvider";
 import { useAtlasStore } from "@/store/useAtlasStore";
 import { useChronosStore } from "@/store/useChronosStore";
 import type { CameraKeyframe } from "@/types/chronicle";
@@ -15,7 +17,7 @@ function speak(text: string, onEnd: () => void): () => void {
     return () => undefined;
   }
   const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = "en-GB";
+  utterance.lang = getActiveLocale() === "fr" ? "fr-FR" : "en-GB";
   utterance.rate = 0.98;
   utterance.onend = onEnd;
   utterance.onerror = onEnd;
@@ -27,6 +29,7 @@ export function TourController() {
   const touring = useAtlasStore((state) => state.touring);
   const setTouring = useAtlasStore((state) => state.setTouring);
   const campaign = useChronosStore((state) => state.campaign);
+  const t = useT();
   const [chapter, setChapter] = useState<{ readonly keyframe: CameraKeyframe; readonly index: number } | null>(null);
 
   useEffect(() => {
@@ -76,12 +79,12 @@ export function TourController() {
   return (
     <section aria-live="polite" data-hud-zone className="glass-panel pointer-events-auto w-[min(34rem,calc(100vw-1.5rem))] rounded-2xl px-5 py-4 text-center">
       <p className="eyebrow">
-        Tour · chapter {chapter.index + 1} of {campaign.chapters.length} · {formatYear(chapter.keyframe.year)}
+        {t("tour.status", { index: chapter.index + 1, total: campaign.chapters.length, year: formatYear(chapter.keyframe.year) })}
       </p>
       <h2 className="mt-1.5 font-serif text-[22px] leading-tight text-ink">{chapter.keyframe.title}</h2>
       <p className="mt-2 font-serif text-[15px] italic leading-snug text-ink/85">{chapter.keyframe.caption}</p>
       <button type="button" onClick={() => setTouring(false)} className="mt-3 text-[11px] text-ink-muted hover:text-ink">
-        Stop tour
+        {t("tour.stop")}
       </button>
     </section>
   );

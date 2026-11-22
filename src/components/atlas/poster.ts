@@ -1,4 +1,5 @@
 import { formatYear } from "@/data/campaigns/registry";
+import { translate } from "@/i18n/dictionaries";
 import type { ChronicleCampaign } from "@/types/chronicle";
 
 const WIDTH = 2400;
@@ -68,7 +69,7 @@ export async function composePoster(globe: string, campaign: ChronicleCampaign |
   }
   context.font = `400 22px ${mono}`;
   context.fillStyle = "rgba(233, 228, 216, 0.45)";
-  context.fillText("Borders: Cliopatria (CC BY 4.0) · Relief: NOAA ETOPO 2022 · Land: Natural Earth", left, HEIGHT - 70);
+  context.fillText(translate("poster.credit"), left, HEIGHT - 70);
 
   return new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
 }

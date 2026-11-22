@@ -1,9 +1,11 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
+import { LanguageSwitch } from "@/components/hud/LanguageSwitch";
 import { useFocusTrap } from "@/components/useFocusTrap";
-import { CATALOG, type CatalogEntry, loadChronicle } from "@/data/catalog";
+import { CATALOG, type CatalogEntry, loadChronicle, localizedEntry } from "@/data/catalog";
 import { formatSpan } from "@/data/campaigns/registry";
+import { useLocale, useT } from "@/i18n/I18nProvider";
 import { useAtlasStore } from "@/store/useAtlasStore";
 import { useChronosStore } from "@/store/useChronosStore";
 
@@ -25,9 +27,12 @@ function rememberLanding(): void {
   }
 }
 
-const KIND_LABEL: Record<string, string> = { curated: "Campaign", thread: "Thread", journey: "Journey" };
+const FILTERS = ["all", "curated", "thread", "journey"] as const;
+const KINDS: ReadonlySet<string> = new Set(["curated", "thread", "journey"]);
+const isKind = (source: string): source is "curated" | "thread" | "journey" => KINDS.has(source);
 
 function ChronicleCard({ entry, onOpen }: { readonly entry: CatalogEntry; readonly onOpen: (entry: CatalogEntry) => void }) {
+  const t = useT();
   return (
     <button
       type="button"
@@ -36,7 +41,7 @@ function ChronicleCard({ entry, onOpen }: { readonly entry: CatalogEntry; readon
     >
       <span className="flex items-center justify-between gap-2">
         <span className="h-1 w-8 rounded-full" style={{ background: entry.accent }} />
-        <span className="font-mono text-[9.5px] uppercase tracking-[0.16em] text-ink-faint">{KIND_LABEL[entry.source] ?? entry.source}</span>
+        <span className="font-mono text-[9.5px] uppercase tracking-[0.16em] text-ink-faint">{isKind(entry.source) ? t(`landing.kind.${entry.source}`) : entry.source}</span>
       </span>
       <span className="font-serif text-[16px] leading-snug text-ink group-hover:text-ochre-soft">{entry.title}</span>
       <span className="line-clamp-2 text-[12px] leading-snug text-ink-muted">{entry.subtitle}</span>
@@ -48,8 +53,11 @@ function ChronicleCard({ entry, onOpen }: { readonly entry: CatalogEntry; readon
 export function Landing() {
   const open = useAtlasStore((state) => state.landingOpen);
   const setLandingOpen = useAtlasStore((state) => state.setLandingOpen);
-  const [filter, setFilter] = useState<"all" | "curated" | "thread" | "journey">("all");
+  const [filter, setFilter] = useState<(typeof FILTERS)[number]>("all");
   const dialog = useRef<HTMLDivElement>(null);
+  const t = useT();
+  const locale = useLocale();
+  const catalog = useMemo(() => CATALOG.map((entry) => localizedEntry(entry, locale)), [locale]);
   useFocusTrap(dialog, open);
   if (!open) return null;
 
@@ -64,19 +72,22 @@ export function Landing() {
     });
   };
   const doors = [
-    { title: "Explore the atlas", body: "Scrub five thousand years, open dossiers and switch on lenses.", act: close },
-    { title: "Play “Why here?”", body: "Place events on a blank globe and learn the geography behind them.", act: () => (close(), useAtlasStore.getState().setChallengeActive(true)) },
-    { title: "Watch a guided tour", body: "Sit back while the camera narrates the current chronicle.", act: () => (close(), useAtlasStore.getState().setTouring(true)) },
+    { title: t("landing.explore.title"), body: t("landing.explore.body"), act: close },
+    { title: t("landing.play.title"), body: t("landing.play.body"), act: () => (close(), useAtlasStore.getState().setChallengeActive(true)) },
+    { title: t("landing.tour.title"), body: t("landing.tour.body"), act: () => (close(), useAtlasStore.getState().setTouring(true)) },
   ];
-  const entries = CATALOG.filter((entry) => filter === "all" || entry.source === filter);
+  const entries = catalog.filter((entry) => filter === "all" || entry.source === filter);
 
   return (
-    <div ref={dialog} role="dialog" aria-modal="true" aria-label="Welcome to Chronos" className="pointer-events-auto absolute inset-0 z-40 overflow-y-auto bg-gradient-to-b from-abyss/70 via-abyss/85 to-abyss">
+    <div ref={dialog} role="dialog" aria-modal="true" aria-label={t("landing.aria")} className="pointer-events-auto absolute inset-0 z-40 overflow-y-auto bg-gradient-to-b from-abyss/70 via-abyss/85 to-abyss">
       <div className="mx-auto flex min-h-full max-w-6xl flex-col px-5 py-10 sm:px-8 sm:py-14">
-        <p className="eyebrow">A temporal and geopolitical atlas</p>
+        <div className="flex items-center justify-between gap-3">
+          <p className="eyebrow">{t("landing.eyebrow")}</p>
+          <LanguageSwitch />
+        </div>
         <h1 className="mt-3 font-serif text-[52px] leading-none text-ink sm:text-[76px]">Chronos</h1>
         <p className="mt-4 max-w-2xl font-serif text-[19px] leading-snug text-ink/85 sm:text-[22px]">
-          History happened somewhere. Follow trade winds, mountain passes and narrow straits to see why empires rose where they did.
+          {t("landing.lede")}
         </p>
         <div className="mt-8 grid gap-3 sm:grid-cols-3">
           {doors.map((door, index) => (
@@ -93,9 +104,9 @@ export function Landing() {
           ))}
         </div>
         <div className="mt-10 flex flex-wrap items-center justify-between gap-3">
-          <h2 className="eyebrow">Chronicles</h2>
-          <div className="flex gap-1 rounded-full bg-white/[0.04] p-0.5 text-[11.5px]" role="group" aria-label="Filter chronicles">
-            {(["all", "curated", "thread", "journey"] as const).map((value) => (
+          <h2 className="eyebrow">{t("landing.chronicles")}</h2>
+          <div className="flex gap-1 rounded-full bg-white/[0.04] p-0.5 text-[11.5px]" role="group" aria-label={t("landing.filter")}>
+            {FILTERS.map((value) => (
               <button
                 key={value}
                 type="button"
@@ -103,7 +114,7 @@ export function Landing() {
                 onClick={() => setFilter(value)}
                 className={`rounded-full px-3 py-1 transition ${filter === value ? "bg-white/10 text-ink" : "text-ink-muted hover:text-ink"}`}
               >
-                {value === "all" ? "All" : `${KIND_LABEL[value]}s`}
+                {t(`landing.filter.${value}`)}
               </button>
             ))}
           </div>
@@ -114,7 +125,7 @@ export function Landing() {
           ))}
         </div>
         <button type="button" onClick={close} className="mx-auto mt-10 text-[12px] text-ink-muted underline-offset-4 hover:text-ink hover:underline">
-          Skip to the globe
+          {t("landing.skip")}
         </button>
       </div>
     </div>

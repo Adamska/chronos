@@ -1,6 +1,9 @@
 import { synthesizeChapters } from "@/ai/normalizeCampaign";
 import { CAMPAIGNS, DEFAULT_CAMPAIGN } from "@/data/campaigns";
 import { LIBRARY } from "@/data/library";
+import type { Locale } from "@/i18n/config";
+import { FR_CATALOG } from "@/i18n/content/fr/catalog";
+import { translate } from "@/i18n/dictionaries";
 import type { ChronicleCampaign, HistoricalEvent } from "@/types/chronicle";
 
 export interface EncyclopediaMatch {
@@ -161,7 +164,8 @@ export function rankEncyclopediaEvents(query: string): { readonly event: Histori
     .sort((a, b) => b.score - a.score);
 }
 
-export function matchEncyclopedia(query: string): EncyclopediaMatch {
+export function matchEncyclopedia(query: string, locale: Locale = "en"): EncyclopediaMatch {
+  const title = (campaign: ChronicleCampaign) => (locale === "fr" ? (FR_CATALOG[campaign.id]?.title ?? campaign.title) : campaign.title);
   const terms = expandTerms(query);
   const window = parseYearWindow(query);
   const scored = rankEncyclopediaEvents(query);
@@ -170,7 +174,7 @@ export function matchEncyclopedia(query: string): EncyclopediaMatch {
   const focusFor = (campaign: ChronicleCampaign) => scored.find((entry) => campaign.events.includes(entry.event))?.event.id ?? null;
 
   if (best && hasDirectHit(best.campaign.title, terms)) {
-    return { campaign: best.campaign, notice: `Matched the chronicle ${best.campaign.title}.`, focusEventId: focusFor(best.campaign) };
+    return { campaign: best.campaign, notice: translate("encyclopedia.matched", { title: title(best.campaign) }, locale), focusEventId: focusFor(best.campaign) };
   }
 
   const cutoff = Math.max(5, (scored[0]?.score ?? 0) * 0.3);
@@ -178,13 +182,13 @@ export function matchEncyclopedia(query: string): EncyclopediaMatch {
   if (rankedEvents.length >= 4) {
     return {
       campaign: assembleChronicle(query, rankedEvents.map((entry) => entry.event), terms),
-      notice: `Composed offline from ${rankedEvents.length} matching encyclopedia entries.`,
+      notice: translate("encyclopedia.composed", { count: rankedEvents.length }, locale),
       focusEventId: null,
     };
   }
 
   if (best && best.score > 1) {
-    return { campaign: best.campaign, notice: `Closest curated chronicle: ${best.campaign.title}.`, focusEventId: focusFor(best.campaign) };
+    return { campaign: best.campaign, notice: translate("encyclopedia.closest", { title: title(best.campaign) }, locale), focusEventId: focusFor(best.campaign) };
   }
-  return { campaign: DEFAULT_CAMPAIGN, notice: "No close match in the encyclopedia. Showing the default chronicle.", focusEventId: null };
+  return { campaign: DEFAULT_CAMPAIGN, notice: translate("encyclopedia.none", undefined, locale), focusEventId: null };
 }

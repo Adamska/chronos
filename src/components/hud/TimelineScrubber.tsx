@@ -6,6 +6,7 @@ import { LayerToggles } from "@/components/hud/LayerToggles";
 import { ClimateBands, ScrubTrack, TickAxis, toFraction, type YearRange } from "@/components/hud/TimelineTrack";
 import { CLIMATE_PERIODS } from "@/data/environment";
 import { eraLabel, formatYear } from "@/data/campaigns/registry";
+import { useT } from "@/i18n/I18nProvider";
 import { useChronosStore } from "@/store/useChronosStore";
 import { TIMELINE_MAX_YEAR, TIMELINE_MIN_YEAR } from "@/types/chronicle";
 
@@ -35,11 +36,12 @@ function YearReadout() {
 function PlayButton() {
   const isPlaying = useChronosStore((state) => state.isPlaying);
   const togglePlaying = useChronosStore((state) => state.togglePlaying);
+  const t = useT();
   return (
     <button
       type="button"
       onClick={togglePlaying}
-      aria-label={isPlaying ? "Pause chronology" : "Play chronology"}
+      aria-label={isPlaying ? t("timeline.pause") : t("timeline.play")}
       className="flex size-10 shrink-0 items-center justify-center rounded-full border border-ochre/40 bg-ochre/10 text-ochre-soft transition hover:bg-ochre/20"
     >
       {isPlaying ? (
@@ -55,20 +57,21 @@ function ChapterStepper() {
   const campaign = useChronosStore((state) => state.campaign);
   const activeChapterId = useChronosStore((state) => state.activeChapterId);
   const stepChapter = useChronosStore((state) => state.stepChapter);
+  const t = useT();
   const chapters = campaign?.chapters ?? [];
   const index = chapters.findIndex((chapter) => chapter.id === activeChapterId);
   const active = chapters[index];
   const arrow = "flex size-7 items-center justify-center rounded-full text-ink-muted transition hover:bg-white/5 hover:text-ink disabled:opacity-30";
   return (
     <div className="hidden min-w-0 flex-1 items-center gap-2 md:flex">
-      <button type="button" className={arrow} disabled={index <= 0} onClick={() => stepChapter(-1)} aria-label="Previous chapter">
+      <button type="button" className={arrow} disabled={index <= 0} onClick={() => stepChapter(-1)} aria-label={t("timeline.previousChapter")}>
         <svg viewBox="0 0 16 16" className="size-3" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M10 3 5 8l5 5" /></svg>
       </button>
       <div className="min-w-0">
-        <p className="eyebrow">Chapter {index + 1} of {chapters.length}</p>
-        <p className="truncate font-serif text-[15px] text-ink">{active?.title ?? "Prologue"}</p>
+        <p className="eyebrow">{t("timeline.chapterOf", { index: index + 1, total: chapters.length })}</p>
+        <p className="truncate font-serif text-[15px] text-ink">{active?.title ?? t("timeline.prologue")}</p>
       </div>
-      <button type="button" className={arrow} disabled={index >= chapters.length - 1} onClick={() => stepChapter(1)} aria-label="Next chapter">
+      <button type="button" className={arrow} disabled={index >= chapters.length - 1} onClick={() => stepChapter(1)} aria-label={t("timeline.nextChapter")}>
         <svg viewBox="0 0 16 16" className="size-3" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="m6 3 5 5-5 5" /></svg>
       </button>
     </div>
@@ -77,6 +80,7 @@ function ChapterStepper() {
 
 export function TimelineScrubber() {
   const campaign = useChronosStore((state) => state.campaign);
+  const t = useT();
 
   return (
     <section data-hud-zone className="glass-panel pointer-events-auto w-full rounded-2xl px-4 pb-3 pt-3.5 sm:px-5">
@@ -90,7 +94,7 @@ export function TimelineScrubber() {
       {campaign ? <FocusTrack key={campaign.id} campaign={campaign} /> : null}
 
       <div className="mt-2 border-t border-hairline pt-2">
-        <ScrubTrack range={OVERVIEW} label="Five thousand year overview" height="h-3" needleClass="w-[2px] bg-ink/80">
+        <ScrubTrack range={OVERVIEW} label={t("timeline.overview")} height="h-3" needleClass="w-[2px] bg-ink/80">
           <div className="absolute inset-x-0 top-1/2 h-px bg-white/10" />
           <ClimateBands range={OVERVIEW} periods={CLIMATE_PERIODS} />
           {campaign ? (

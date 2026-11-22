@@ -14,6 +14,7 @@ import { TravelReadout } from "@/components/atlas/TravelReadout";
 import { EventDossier } from "@/components/dossier/EventDossier";
 import { CameraStatus, CampaignHeader } from "@/components/hud/CampaignHeader";
 import { ChapterAnnouncer } from "@/components/hud/ChapterAnnouncer";
+import { LanguageSwitch } from "@/components/hud/LanguageSwitch";
 import { TimelineScrubber } from "@/components/hud/TimelineScrubber";
 import { useHotkeys } from "@/components/hud/useHotkeys";
 import { usePlayback } from "@/components/hud/usePlayback";
@@ -44,7 +45,10 @@ export function HudOverlay({ search }: { readonly search?: ReactNode }) {
       <div className="absolute inset-x-3 top-3 flex items-start justify-between gap-4 sm:inset-x-4 sm:top-4">
         <CampaignHeader />
         <div className="absolute left-1/2 top-0 hidden -translate-x-1/2 md:block">{search}</div>
-        <CameraStatus />
+        <div className="flex shrink-0 items-center gap-2">
+          <CameraStatus />
+          <LanguageSwitch />
+        </div>
       </div>
 
       <div className="absolute bottom-[13.5rem] left-4 top-[14.5rem] hidden items-start gap-2 md:flex">

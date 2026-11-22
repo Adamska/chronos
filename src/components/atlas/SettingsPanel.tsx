@@ -1,14 +1,10 @@
 "use client";
 
+import { useT } from "@/i18n/I18nProvider";
 import { type QualityTier, useQualityStore } from "@/scene/quality";
 import { useAtlasStore } from "@/store/useAtlasStore";
 
-const TIERS: readonly { readonly id: QualityTier | "auto"; readonly label: string }[] = [
-  { id: "auto", label: "Auto" },
-  { id: "high", label: "High" },
-  { id: "balanced", label: "Balanced" },
-  { id: "low", label: "Battery" },
-];
+const TIERS: readonly (QualityTier | "auto")[] = ["auto", "high", "balanced", "low"];
 
 function Toggle({ label, hint, checked, onChange }: { label: string; hint: string; checked: boolean; onChange: (value: boolean) => void }) {
   return (
@@ -33,33 +29,37 @@ export function SettingsPanel() {
   const speechAvailable = typeof window !== "undefined" && "speechSynthesis" in window;
   const ambientSound = useAtlasStore((state) => state.ambientSound);
   const setAmbientSound = useAtlasStore((state) => state.setAmbientSound);
+  const t = useT();
 
   return (
-    <section aria-label="Display and accessibility" className="glass-panel pointer-events-auto rounded-2xl px-4 py-3">
-      <h2 className="eyebrow mb-2">Display and accessibility</h2>
-      <p className="text-[12.5px] text-ink">Rendering quality</p>
+    <section aria-label={t("rail.settings.label")} className="glass-panel pointer-events-auto rounded-2xl px-4 py-3">
+      <h2 className="eyebrow mb-2">{t("rail.settings.label")}</h2>
+      <p className="text-[12.5px] text-ink">{t("settings.quality")}</p>
       <div className="mt-1.5 grid grid-cols-4 gap-1 rounded-full bg-white/[0.04] p-0.5 text-[11px]">
         {TIERS.map((option) => {
-          const active = option.id === "auto" ? !pinned : pinned && tier === option.id;
+          const active = option === "auto" ? !pinned : pinned && tier === option;
           return (
             <button
-              key={option.id}
+              key={option}
               type="button"
               aria-pressed={active}
-              onClick={() => pin(option.id === "auto" ? null : option.id)}
+              onClick={() => pin(option === "auto" ? null : option)}
               className={`rounded-full px-2 py-1 transition ${active ? "bg-white/10 text-ink" : "text-ink-muted hover:text-ink"}`}
             >
-              {option.label}
+              {t(`settings.tier.${option}`)}
             </button>
           );
         })}
       </div>
-      <p className="mt-1.5 text-[11px] text-ink-muted">Currently rendering at {tier} quality{pinned ? "" : ", adjusted to your device's frame rate"}.</p>
+      <p className="mt-1.5 text-[11px] text-ink-muted">
+        {t(`settings.current.${tier}`)}
+        {pinned ? "" : t("settings.adaptive")}.
+      </p>
       <div className="mt-2 divide-y divide-white/[0.06] border-t border-hairline">
-        <Toggle label="Reduce motion" hint="Cut camera flights and keep the globe still between chapters." checked={reducedMotion} onChange={setReducedMotion} />
-        <Toggle label="Ambient sound" hint="Wind, sea and caravan bells synthesised live, never stored." checked={ambientSound} onChange={setAmbientSound} />
+        <Toggle label={t("settings.motion.label")} hint={t("settings.motion.hint")} checked={reducedMotion} onChange={setReducedMotion} />
+        <Toggle label={t("settings.sound.label")} hint={t("settings.sound.hint")} checked={ambientSound} onChange={setAmbientSound} />
         {speechAvailable ? (
-          <Toggle label="Narrate tours" hint="Read chapter captions aloud with your system voice." checked={narration} onChange={setNarration} />
+          <Toggle label={t("settings.narration.label")} hint={t("settings.narration.hint")} checked={narration} onChange={setNarration} />
         ) : null}
       </div>
     </section>

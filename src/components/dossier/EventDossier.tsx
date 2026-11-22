@@ -9,10 +9,11 @@ import { TimelineSchematic } from "@/components/dossier/TimelineSchematic";
 import { WikipediaFigure } from "@/components/dossier/WikipediaFigure";
 import { eraLabel, formatSpan, formatYear } from "@/data/campaigns/registry";
 import { uncertaintyFor } from "@/data/uncertainty";
+import { useT } from "@/i18n/I18nProvider";
+import { localUncertainty } from "@/i18n/reference";
 import { ARC_KIND_COLORS, LAYER_COLORS } from "@/scene/temporal";
 import { useChronosStore } from "@/store/useChronosStore";
 import type { ChronicleCampaign, GeoArc, HistoricalEvent } from "@/types/chronicle";
-import { LAYER_LABELS } from "@/types/chronicle";
 
 type Sheet = "peek" | "half" | "full";
 const SHEET_HEIGHTS: Record<Sheet, string> = { peek: "30dvh", half: "56dvh", full: "92dvh" };
@@ -21,6 +22,7 @@ const NEXT_SHEET: Record<Sheet, Sheet> = { peek: "half", half: "full", full: "pe
 function EventBody({ event, campaign }: { readonly event: HistoricalEvent; readonly campaign: ChronicleCampaign }) {
   const select = useChronosStore((state) => state.select);
   const requestCamera = useChronosStore((state) => state.requestCamera);
+  const t = useT();
   const chokepoint = nearestChokepoint(event.coordinates);
   const barrier = nearestBarrier(event.coordinates);
   const routes = campaign.arcs.filter((arc) => arc.eventId === event.id);
@@ -34,43 +36,43 @@ function EventBody({ event, campaign }: { readonly event: HistoricalEvent; reado
         <div className="flex flex-wrap gap-1.5">
           <Badge>{eraLabel(event.year)}</Badge>
           <Badge>{event.endYear ? formatSpan(event.year, event.endYear) : formatYear(event.year)}</Badge>
-          <Badge color={LAYER_COLORS[event.layer]}>{LAYER_LABELS[event.layer]}</Badge>
-          {uncertainty ? <Badge color={uncertainty.level === "debated" ? "#e0624a" : "#9a9789"}>{uncertainty.level}</Badge> : null}
+          <Badge color={LAYER_COLORS[event.layer]}>{t(`layer.${event.layer}`)}</Badge>
+          {uncertainty ? <Badge color={uncertainty.level === "debated" ? "#e0624a" : "#9a9789"}>{t(`uncertainty.${uncertainty.level}`)}</Badge> : null}
         </div>
         <h2 tabIndex={-1} className="mt-3 font-serif text-[29px] leading-[1.05] text-ink outline-none [text-shadow:0_2px_18px_rgb(0_0_0/0.85)]">{event.title}</h2>
         <p className="mt-2 font-mono text-[11px] text-ink-muted">
-          {event.place} · {Math.abs(lat).toFixed(2)}°{lat >= 0 ? "N" : "S"} {Math.abs(lon).toFixed(2)}°{lon >= 0 ? "E" : "W"}
+          {event.place} · {Math.abs(lat).toFixed(2)}°{t(lat >= 0 ? "compass.n" : "compass.s")} {Math.abs(lon).toFixed(2)}°{t(lon >= 0 ? "compass.e" : "compass.w")}
         </p>
         <p className="mt-4 text-[14px] leading-relaxed text-ink/85 first-letter:float-left first-letter:mr-2 first-letter:mt-1 first-letter:font-serif first-letter:text-[46px] first-letter:leading-[0.78] first-letter:text-ochre-soft">
           {event.summary}
         </p>
       </header>
 
-      <Section label="Geopolitical context">
+      <Section label={t("dossier.context")}>
         <p className="text-[13px] leading-relaxed text-ink/80">{event.context}</p>
       </Section>
 
       {uncertainty ? (
-        <Section label={uncertainty.level === "debated" ? "What historians debate" : "How precise is this?"}>
-          <p className="text-[12.5px] leading-relaxed text-ink/75">{uncertainty.note}</p>
+        <Section label={uncertainty.level === "debated" ? t("dossier.debated") : t("dossier.precision")}>
+          <p className="text-[12.5px] leading-relaxed text-ink/75">{localUncertainty(event.id, uncertainty.note)}</p>
         </Section>
       ) : null}
 
-      <Section label="Why here?">
+      <Section label={t("dossier.whyHere")}>
         <div className="rounded-lg border-l-2 border-ochre bg-ochre/[0.06] px-3.5 py-3">
           <p className="font-serif text-[15px] leading-snug text-ink">{event.whyHere}</p>
         </div>
         <dl className="mt-3 grid grid-cols-2 gap-2">
           {chokepoint ? (
             <div className="rounded-lg border border-hairline px-3 py-2">
-              <dt className="eyebrow">Nearest chokepoint</dt>
+              <dt className="eyebrow">{t("dossier.chokepoint")}</dt>
               <dd className="mt-1 text-[12px] text-ink">{chokepoint.name}</dd>
               <dd className="font-mono text-[10.5px] text-ink-muted">{formatKm(chokepoint.distanceKm)}</dd>
             </div>
           ) : null}
           {barrier ? (
             <div className="rounded-lg border border-hairline px-3 py-2">
-              <dt className="eyebrow">Nearest barrier</dt>
+              <dt className="eyebrow">{t("dossier.barrier")}</dt>
               <dd className="mt-1 text-[12px] text-ink">{barrier.name}</dd>
               <dd className="font-mono text-[10.5px] text-ink-muted">{formatKm(barrier.distanceKm)}</dd>
             </div>
@@ -78,7 +80,7 @@ function EventBody({ event, campaign }: { readonly event: HistoricalEvent; reado
         </dl>
       </Section>
 
-      <Section label="Key figures">
+      <Section label={t("dossier.figures")}>
         <ul className="flex flex-wrap gap-1.5">
           {event.keyFigures.map((figure) => (
             <li key={figure} className="rounded-md border border-hairline bg-white/[0.03] px-2 py-1 text-[12px] text-ink/85">
@@ -97,17 +99,17 @@ function EventBody({ event, campaign }: { readonly event: HistoricalEvent; reado
       ) : null}
 
       {event.schematic ? (
-        <Section label={event.schematic.kind === "exchange" ? "Exchange schematic" : "Causal chain"}>
+        <Section label={event.schematic.kind === "exchange" ? t("dossier.exchange") : t("dossier.causal")}>
           <FlowSchematic schematic={event.schematic} />
         </Section>
       ) : null}
 
-      <Section label="Position in the chronicle">
+      <Section label={t("dossier.position")}>
         <TimelineSchematic campaign={campaign} event={event} />
       </Section>
 
       {routes.length > 0 ? (
-        <Section label="Connected routes">
+        <Section label={t("dossier.routes")}>
           <div className="flex flex-col gap-1.5">
             {routes.map((arc) => (
               <button
@@ -130,7 +132,7 @@ function EventBody({ event, campaign }: { readonly event: HistoricalEvent; reado
             requestCamera({ id: `focus-${event.id}`, year: event.year, title: event.title, caption: event.summary, target: event.coordinates, altitude: 0.85, tilt: 28 })
           }
         >
-          Fly to this site
+          {t("dossier.fly")}
         </ActionButton>
       </div>
     </>
@@ -154,6 +156,7 @@ export function EventDossier() {
   const panel = useRef<HTMLElement>(null);
   const dragStart = useRef(0);
   const [sheet, setSheet] = useState<Sheet>("half");
+  const t = useT();
 
   useEffect(() => {
     if (open) panel.current?.querySelector<HTMLElement>("h2")?.focus({ preventScroll: true });
@@ -163,7 +166,7 @@ export function EventDossier() {
     <aside
       ref={panel}
       aria-hidden={!open}
-      aria-label="Dossier"
+      aria-label={t("dossier.aria")}
       data-hud-zone
       style={{ "--sheet-height": SHEET_HEIGHTS[sheet] } as CSSProperties}
       className={`pointer-events-auto absolute inset-x-0 bottom-0 z-20 h-[var(--sheet-height)] transition-[transform,opacity,height] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] md:inset-x-auto md:right-4 md:top-4 md:bottom-[13.5rem] md:h-auto md:w-[min(420px,calc(100vw-24px))] ${
@@ -172,7 +175,7 @@ export function EventDossier() {
     >
       <button
         type="button"
-        aria-label="Resize dossier"
+        aria-label={t("dossier.resize")}
         onClick={() => setSheet(NEXT_SHEET[sheet])}
         onPointerDown={(event) => (dragStart.current = event.clientY)}
         onPointerUp={(event) => {
@@ -188,7 +191,7 @@ export function EventDossier() {
           <button
             type="button"
             onClick={() => select(null)}
-            aria-label="Close dossier"
+            aria-label={t("dossier.close")}
             className="absolute right-3 top-3 flex size-8 items-center justify-center rounded-full border border-hairline bg-abyss/70 text-ink-muted backdrop-blur transition hover:text-ink"
           >
             <svg viewBox="0 0 16 16" className="size-3" stroke="currentColor" strokeWidth="1.8"><path d="m3 3 10 10M13 3 3 13" /></svg>

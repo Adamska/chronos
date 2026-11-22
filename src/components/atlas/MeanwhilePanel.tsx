@@ -3,6 +3,8 @@
 import { contemporaryEvents, meanwhileWindow } from "@/data/contemporaries";
 import { formatYear } from "@/data/campaigns/registry";
 import { useLibrary } from "@/data/useLibrary";
+import { pluralForm } from "@/i18n/dictionaries";
+import { useLocale, useT } from "@/i18n/I18nProvider";
 import { useChronosStore } from "@/store/useChronosStore";
 
 export function MeanwhilePanel() {
@@ -10,6 +12,8 @@ export function MeanwhilePanel() {
   const year = useChronosStore((state) => Math.round(state.year / 5) * 5);
   const window = meanwhileWindow(campaign);
   const library = useLibrary();
+  const t = useT();
+  const locale = useLocale();
   const entries = library ? contemporaryEvents(library, year, campaign?.id, window) : [];
 
   const open = (campaignId: string, eventId: string) => {
@@ -21,15 +25,15 @@ export function MeanwhilePanel() {
   };
 
   return (
-    <section aria-label="Meanwhile elsewhere" className="glass-panel pointer-events-auto flex max-h-[60vh] flex-col rounded-2xl">
+    <section aria-label={t("rail.meanwhile.label")} className="glass-panel pointer-events-auto flex max-h-[60vh] flex-col rounded-2xl">
       <header className="border-b border-hairline px-4 py-3">
-        <h2 className="eyebrow">Meanwhile elsewhere</h2>
+        <h2 className="eyebrow">{t("rail.meanwhile.label")}</h2>
         <p className="mt-1 text-[12.5px] text-ink/85">
-          Within {window} years of {formatYear(year)}, in other chronicles
+          {t("meanwhile.window", { window, year: formatYear(year) })}
         </p>
       </header>
       <ol className="scrollbar-quiet overflow-y-auto p-2">
-        {entries.length === 0 ? <li className="px-2 py-3 text-[12px] text-ink-muted">No other chronicle has an event this close in time.</li> : null}
+        {entries.length === 0 ? <li className="px-2 py-3 text-[12px] text-ink-muted">{t("meanwhile.empty")}</li> : null}
         {entries.map(({ campaign: source, event, offset }) => (
           <li key={event.id}>
             <button
@@ -41,7 +45,9 @@ export function MeanwhilePanel() {
               <span className="min-w-0">
                 <span className="block text-[12.5px] leading-snug text-ink">{event.title}</span>
                 <span className="block font-mono text-[10px] text-ink-muted">
-                  {formatYear(event.year)} · {event.place.split(",")[0]} · {offset === 0 ? (event.endYear && event.endYear - event.year > 10 ? "ongoing" : "same moment") : `${offset} yr ${event.year > year ? "later" : "earlier"}`}
+                  {formatYear(event.year)} · {event.place.split(",")[0]} · {offset === 0
+                    ? t(event.endYear && event.endYear - event.year > 10 ? "meanwhile.ongoing" : "meanwhile.same")
+                    : t(`meanwhile.${event.year > year ? "later" : "earlier"}.${pluralForm(offset, locale)}`, { count: offset })}
                 </span>
               </span>
             </button>

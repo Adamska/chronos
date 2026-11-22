@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { buildShareUrl } from "@/components/atlas/shareState";
+import { translate } from "@/i18n/dictionaries";
 
 export function useShareLink(): { readonly copied: boolean; readonly copy: () => void } {
   const [copied, setCopied] = useState(false);
@@ -11,8 +12,9 @@ export function useShareLink(): { readonly copied: boolean; readonly copy: () =>
       setCopied(true);
       window.setTimeout(() => setCopied(false), 2200);
     };
-    if (navigator.clipboard) void navigator.clipboard.writeText(url).then(done, () => window.prompt("Copy this link", url));
-    else window.prompt("Copy this link", url);
+    const fallback = () => window.prompt(translate("share.prompt"), url);
+    if (navigator.clipboard) void navigator.clipboard.writeText(url).then(done, fallback);
+    else fallback();
   }, []);
   return { copied, copy };
 }

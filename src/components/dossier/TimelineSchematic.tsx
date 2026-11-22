@@ -1,5 +1,6 @@
 import { formatKm, routeLegs } from "@/components/dossier/geoInsights";
 import { formatYear } from "@/data/campaigns/registry";
+import { useT } from "@/i18n/I18nProvider";
 import { LAYER_COLORS } from "@/scene/temporal";
 import type { ChronicleCampaign, GeoArc, HistoricalEvent, LonLat } from "@/types/chronicle";
 
@@ -16,9 +17,10 @@ export function TimelineSchematic({ campaign, event }: { readonly campaign: Chro
   const previous = ordered[index - 1];
   const next = ordered[index + 1];
   const markerX = x(event.year);
+  const t = useT();
 
   return (
-    <svg viewBox="0 0 360 96" className="w-full" role="img" aria-label={`${event.title} within ${campaign.title}`}>
+    <svg viewBox="0 0 360 96" className="w-full" role="img" aria-label={t("schematic.timelineAria", { event: event.title, campaign: campaign.title })}>
       <line x1="16" x2="344" y1="44" y2="44" stroke="rgb(233 228 216 / 0.16)" />
       {ordered.map((entry) => (
         <circle key={entry.id} cx={x(entry.year)} cy="44" r={entry.id === event.id ? 0 : 1.6 + entry.significance * 0.35} fill={LAYER_COLORS[entry.layer]} opacity="0.55" />
@@ -42,7 +44,8 @@ export function TimelineSchematic({ campaign, event }: { readonly campaign: Chro
   );
 }
 
-const formatPoint = ([lon, lat]: LonLat) => `${Math.abs(lat).toFixed(0)}°${lat >= 0 ? "N" : "S"} ${Math.abs(lon).toFixed(0)}°${lon >= 0 ? "E" : "W"}`;
+const formatPoint = ([lon, lat]: LonLat, t: ReturnType<typeof useT>) =>
+  `${Math.abs(lat).toFixed(0)}°${t(lat >= 0 ? "compass.n" : "compass.s")} ${Math.abs(lon).toFixed(0)}°${t(lon >= 0 ? "compass.e" : "compass.w")}`;
 
 export function RouteSchematic({ arc }: { readonly arc: GeoArc }) {
   const legs = routeLegs(arc.path);
@@ -51,9 +54,10 @@ export function RouteSchematic({ arc }: { readonly arc: GeoArc }) {
   const x = (index: number) => 24 + (index / Math.max(1, stops - 1)) * 312;
   const cumulative = legs.reduce<number[]>((sums, leg) => [...sums, (sums[sums.length - 1] ?? 0) + leg], [0]);
   const positions = arc.path.map((_, index) => (total > 0 ? 24 + ((cumulative[index] ?? 0) / total) * 312 : x(index)));
+  const t = useT();
 
   return (
-    <svg viewBox="0 0 360 88" className="w-full" role="img" aria-label={`${arc.label} route profile`}>
+    <svg viewBox="0 0 360 88" className="w-full" role="img" aria-label={t("schematic.routeAria", { route: arc.label })}>
       <path d={`M 24 46 H 336`} stroke="#d9a441" strokeWidth="1.5" className="flow-dash" fill="none" />
       {arc.path.map((point, index) => {
         const px = positions[index] ?? x(index);
@@ -63,7 +67,7 @@ export function RouteSchematic({ arc }: { readonly arc: GeoArc }) {
             <circle cx={px} cy="46" r={endpoint ? 5 : 3.5} fill={endpoint ? "#d9a441" : "#0b1016"} stroke="#d9a441" strokeWidth="1.5" />
             {endpoint ? (
               <text x={px} y="70" textAnchor={index === 0 ? "start" : "end"} dx={index === 0 ? -6 : 6} fontSize="8.5" fill={MUTED} fontFamily="var(--font-plex-mono)">
-                {formatPoint(point)}
+                {formatPoint(point, t)}
               </text>
             ) : null}
           </g>
@@ -75,7 +79,7 @@ export function RouteSchematic({ arc }: { readonly arc: GeoArc }) {
           <text key={index} x={mid} y="34" textAnchor="middle" fontSize="9.5" fill={INK} fontFamily="var(--font-plex-mono)">{formatKm(leg)}</text>
         ) : null;
       })}
-      <text x="24" y="14" fontSize="8.5" letterSpacing="1.4" fill={MUTED} fontFamily="var(--font-plex-mono)">GREAT-CIRCLE DISTANCE</text>
+      <text x="24" y="14" fontSize="8.5" letterSpacing="1.4" fill={MUTED} fontFamily="var(--font-plex-mono)">{t("schematic.greatCircle")}</text>
       <text x="336" y="14" textAnchor="end" fontSize="11" fill="#e8c47a" fontFamily="var(--font-plex-mono)">{formatKm(total)}</text>
     </svg>
   );

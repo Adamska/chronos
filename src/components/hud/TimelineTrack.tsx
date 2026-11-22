@@ -2,6 +2,7 @@
 
 import { type PointerEvent as ReactPointerEvent, type ReactNode, useEffect, useRef } from "react";
 import { formatYear } from "@/data/campaigns/registry";
+import { localClimatePeriod } from "@/i18n/reference";
 import { useChronosStore } from "@/store/useChronosStore";
 
 export interface YearRange {
@@ -121,7 +122,7 @@ export function ClimateBands({ range, periods }: { readonly range: YearRange; re
           return (
             <div
               key={period.id}
-              title={period.name}
+              title={localClimatePeriod(period.id, { name: period.name, note: "" }).name}
               className="pointer-events-none absolute bottom-0 h-[3px] rounded-full"
               style={{ left: `${left}%`, width: `${width}%`, background: period.tone === "warm" ? "rgb(232 145 90 / 0.45)" : "rgb(111 179 224 / 0.45)" }}
             />

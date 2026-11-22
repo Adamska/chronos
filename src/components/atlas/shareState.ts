@@ -3,6 +3,7 @@ import { CampaignPayloadSchema } from "@/ai/campaignPayload";
 import { ClassChallengeSchema } from "@/classroom/schema";
 import { findCatalogEntry, loadChronicle } from "@/data/catalog";
 import { vector3ToLonLat } from "@/geo/sphericalMath";
+import { translate } from "@/i18n/dictionaries";
 import { currentCamera } from "@/scene/cameraRef";
 import { type Lens, useAtlasStore } from "@/store/useAtlasStore";
 import { useChallengeStore } from "@/store/useChallengeStore";
@@ -110,7 +111,7 @@ export async function restoreSharedView(): Promise<boolean> {
   const cameraPoint = params.get("cam");
   const [lon, lat, distance] = (cameraPoint ?? "").split(",").map(Number);
   if (cameraPoint && lon !== undefined && lat !== undefined && distance !== undefined && [lon, lat, distance].every(Number.isFinite)) {
-    store.requestCamera({ id: "shared-view", year: store.year, title: "Shared view", caption: "", target: [lon, lat], altitude: Math.max(0.2, distance - 1), tilt: 0 });
+    store.requestCamera({ id: "shared-view", year: store.year, title: translate("share.viewTitle"), caption: "", target: [lon, lat], altitude: Math.max(0.2, distance - 1), tilt: 0 });
   }
   return true;
 }

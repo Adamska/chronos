@@ -3,6 +3,9 @@
 import { useCallback } from "react";
 import { z } from "zod";
 import { CampaignPayloadSchema } from "@/ai/campaignPayload";
+import { loadChronicle } from "@/data/catalog";
+import { getActiveLocale } from "@/i18n/config";
+import { translate } from "@/i18n/dictionaries";
 import { useChronosStore } from "@/store/useChronosStore";
 import { useGenerationStore } from "@/store/useGenerationStore";
 import type { ChronicleCampaign } from "@/types/chronicle";
@@ -55,24 +58,25 @@ export function useChronicleRequest(): (query: string) => Promise<void> {
       const response = await fetch("/api/chronicle/stream", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query }),
+        body: JSON.stringify({ query, locale: getActiveLocale() }),
       });
       if (response.status === 400) {
         const rejected = ErrorPayloadSchema.safeParse(await response.json());
-        throw new RejectedQueryError(rejected.success ? rejected.data.error : "That request could not be chronicled.");
+        throw new RejectedQueryError(rejected.success ? rejected.data.error : translate("request.rejected"));
       }
       if (!response.ok) throw new Error(`Chronicle request failed with ${response.status}.`);
       const final = await readStream(response);
       if (final.shareId) useGenerationStore.getState().rememberShare(final.campaign.id, final.shareId);
-      settle(final.campaign, final.notice, final.focusEventId);
+      settle((await loadChronicle(final.campaign.id)) ?? final.campaign, final.notice, final.focusEventId);
     } catch (error) {
       if (error instanceof RejectedQueryError) {
         useChronosStore.getState().setChronicleStatus("error", error.message);
         return;
       }
       const { matchEncyclopedia } = await import("@/ai/encyclopedia");
-      const match = matchEncyclopedia(query);
-      settle(match.campaign, `Working offline. ${match.notice}`, match.focusEventId);
+      const match = matchEncyclopedia(query, getActiveLocale());
+      const local = await loadChronicle(match.campaign.id);
+      settle(local ?? match.campaign, translate("request.offline", { notice: match.notice }), match.focusEventId);
     } finally {
       useGenerationStore.getState().setProgress(null);
     }

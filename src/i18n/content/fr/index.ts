@@ -1,0 +1,24 @@
+import type { CampaignTranslation } from "@/i18n/contentTypes";
+
+export const FR_TRANSLATIONS: Readonly<Record<string, () => Promise<CampaignTranslation>>> = {
+  "silk-road": () => import("@/i18n/content/fr/silkRoad").then((module) => module.translation),
+  "islamic-golden-age": () => import("@/i18n/content/fr/islamicGoldenAge").then((module) => module.translation),
+  "age-of-sail": () => import("@/i18n/content/fr/ageOfSail").then((module) => module.translation),
+  "fall-of-rome": () => import("@/i18n/content/fr/fallOfRome").then((module) => module.translation),
+  "industrial-revolution": () => import("@/i18n/content/fr/industrialRevolution").then((module) => module.translation),
+  "space-race": () => import("@/i18n/content/fr/spaceRace").then((module) => module.translation),
+  "mongol-empire": () => import("@/i18n/content/fr/mongolEmpire").then((module) => module.translation),
+  "bantu-expansion": () => import("@/i18n/content/fr/bantuExpansion").then((module) => module.translation),
+  "polynesian-voyaging": () => import("@/i18n/content/fr/polynesianVoyaging").then((module) => module.translation),
+  "columbian-exchange": () => import("@/i18n/content/fr/columbianExchange").then((module) => module.translation),
+  "indian-ocean-world": () => import("@/i18n/content/fr/indianOceanWorld").then((module) => module.translation),
+  "thread-silver": () => import("@/i18n/content/fr/silverThread").then((module) => module.translation),
+  "thread-numerals": () => import("@/i18n/content/fr/numeralsThread").then((module) => module.translation),
+  "thread-plague": () => import("@/i18n/content/fr/plagueThread").then((module) => module.translation),
+  "thread-paper": () => import("@/i18n/content/fr/paperThread").then((module) => module.translation),
+  "thread-printing": () => import("@/i18n/content/fr/printingThread").then((module) => module.translation),
+  "journey-xuanzang": () => import("@/i18n/content/fr/xuanzangJourney").then((module) => module.translation),
+  "journey-ibn-battuta": () => import("@/i18n/content/fr/ibnBattutaJourney").then((module) => module.translation),
+  "journey-zheng-he": () => import("@/i18n/content/fr/zhengHeJourney").then((module) => module.translation),
+  "journey-equiano": () => import("@/i18n/content/fr/equianoJourney").then((module) => module.translation),
+};

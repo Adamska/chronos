@@ -1,18 +1,20 @@
 import type { PaletteItem } from "@/components/hud/usePaletteResults";
 import { eraLabel, formatSpan, formatYear } from "@/data/campaigns/registry";
+import { useT } from "@/i18n/I18nProvider";
 import { TIMELINE_MAX_YEAR, TIMELINE_MIN_YEAR } from "@/types/chronicle";
 
 const fraction = (year: number) => (year - TIMELINE_MIN_YEAR) / (TIMELINE_MAX_YEAR - TIMELINE_MIN_YEAR);
 
 export function PalettePreview({ item }: { readonly item: PaletteItem | undefined }) {
+  const t = useT();
   if (!item) return null;
   if (item.kind === "query") {
     return (
       <div className="p-5">
-        <p className="eyebrow">{item.suggested ? "Suggested question" : "Generate a chronicle"}</p>
+        <p className="eyebrow">{item.suggested ? t("preview.suggested") : t("preview.generate")}</p>
         <p className="mt-2 font-serif text-[18px] leading-snug text-ink">{item.query}</p>
         <p className="mt-3 text-[12px] leading-relaxed text-ink-muted">
-          The AI director builds a full campaign with events, routes and chapters. Without a key, the offline encyclopedia answers from curated entries.
+          {t("preview.body")}
         </p>
       </div>
     );
@@ -29,7 +31,7 @@ export function PalettePreview({ item }: { readonly item: PaletteItem | undefine
           <p className="mt-1.5 font-serif text-[19px] leading-snug text-ink">{item.event.title}</p>
           <p className="mt-1 font-mono text-[10.5px] text-ink-muted">{item.event.place}</p>
           <p className="mt-3 text-[12.5px] leading-relaxed text-ink/85">{item.event.summary}</p>
-          <p className="mt-3 text-[11px] text-ink-faint">In {entry.title}</p>
+          <p className="mt-3 text-[11px] text-ink-faint">{t("preview.in", { title: entry.title })}</p>
         </>
       ) : (
         <>
@@ -43,8 +45,8 @@ export function PalettePreview({ item }: { readonly item: PaletteItem | undefine
             />
           </div>
           <div className="mt-1 flex justify-between font-mono text-[9px] text-ink-faint">
-            <span>3000 BCE</span>
-            <span>2026 CE</span>
+            <span>{formatYear(TIMELINE_MIN_YEAR)}</span>
+            <span>{formatYear(TIMELINE_MAX_YEAR)}</span>
           </div>
           <div className="mt-4 flex flex-wrap gap-1">
             {entry.keywords.slice(0, 8).map((keyword) => (

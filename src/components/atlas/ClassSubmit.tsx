@@ -1,11 +1,13 @@
 "use client";
 
 import { type FormEvent, useState } from "react";
+import { useT } from "@/i18n/I18nProvider";
 import type { ChallengeResult } from "@/store/useChallengeStore";
 
 export function ClassSubmit({ code, results }: { readonly code: string; readonly results: readonly ChallengeResult[] }) {
   const [name, setName] = useState("");
   const [state, setState] = useState<"idle" | "sending" | "sent" | "failed">("idle");
+  const t = useT();
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
@@ -23,19 +25,19 @@ export function ClassSubmit({ code, results }: { readonly code: string; readonly
     setState(response?.ok ? "sent" : "failed");
   };
 
-  if (state === "sent") return <p className="mt-3 text-[12px] text-teal-chart">Sent to class {code}. Your teacher can see your score.</p>;
+  if (state === "sent") return <p className="mt-3 text-[12px] text-teal-chart">{t("classSubmit.sent", { code })}</p>;
   return (
     <form onSubmit={(event) => void submit(event)} className="mt-3 flex gap-2">
       <input
         value={name}
         onChange={(event) => setName(event.target.value)}
-        placeholder="Your name"
-        aria-label="Your name for the class results"
+        placeholder={t("classSubmit.name")}
+        aria-label={t("classSubmit.nameAria")}
         maxLength={40}
         className="min-w-0 flex-1 rounded-lg border border-hairline bg-abyss/60 px-3 py-1.5 text-[12.5px] text-ink outline-none focus:border-ochre/50"
       />
       <button type="submit" disabled={!name.trim() || state === "sending"} className="rounded-full bg-ochre/15 px-3 text-[12px] text-ochre-soft enabled:hover:bg-ochre/25 disabled:opacity-40">
-        {state === "failed" ? "Retry" : `Send to class ${code}`}
+        {state === "failed" ? t("classSubmit.retry") : t("classSubmit.send", { code })}
       </button>
     </form>
   );

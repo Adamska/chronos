@@ -1,18 +1,22 @@
 "use client";
 
 import { useWikipediaSummary, wikipediaArticleUrl } from "@/components/dossier/useWikipediaSummary";
+import { useT } from "@/i18n/I18nProvider";
 import type { LonLat } from "@/types/chronicle";
 
-function formatCoordinate([lon, lat]: LonLat): string {
-  const latLabel = `${Math.abs(lat).toFixed(2)}°${lat >= 0 ? "N" : "S"}`;
-  const lonLabel = `${Math.abs(lon).toFixed(2)}°${lon >= 0 ? "E" : "W"}`;
+function formatCoordinate([lon, lat]: LonLat, t: ReturnType<typeof useT>): string {
+  const latLabel = `${Math.abs(lat).toFixed(2)}°${t(lat >= 0 ? "compass.n" : "compass.s")}`;
+  const lonLabel = `${Math.abs(lon).toFixed(2)}°${t(lon >= 0 ? "compass.e" : "compass.w")}`;
   return `${latLabel} ${lonLabel}`;
 }
 
+const LEADING_WORDS = /^(?:(?:The|Battle of|Siege of|Fall of|La|Le|Les|Bataille d[eu]|Siège d[eu]|Chute d[eu])\s+|(?:Bataille |Siège |Chute )?[dl]’)/i;
+
 function CartographicPlate({ title, coordinates }: { readonly title: string; readonly coordinates: LonLat }) {
-  const initial = title.replace(/^(The|Battle of|Siege of|Fall of)\s+/i, "").charAt(0).toUpperCase();
+  const t = useT();
+  const initial = title.replace(LEADING_WORDS, "").replace(LEADING_WORDS, "").charAt(0).toUpperCase();
   return (
-    <svg viewBox="0 0 320 180" className="h-full w-full" role="img" aria-label={`Cartographic plate for ${title}`}>
+    <svg viewBox="0 0 320 180" className="h-full w-full" role="img" aria-label={t("figure.plate", { title })}>
       <defs>
         <pattern id="plate-grid" width="20" height="20" patternUnits="userSpaceOnUse">
           <path d="M20 0H0V20" fill="none" stroke="rgb(233 228 216 / 0.06)" strokeWidth="1" />
@@ -26,7 +30,7 @@ function CartographicPlate({ title, coordinates }: { readonly title: string; rea
         {initial}
       </text>
       <text x="14" y="168" fontFamily="var(--font-plex-mono)" fontSize="9" letterSpacing="1.5" fill="rgb(233 228 216 / 0.45)">
-        {formatCoordinate(coordinates)}
+        {formatCoordinate(coordinates, t)}
       </text>
     </svg>
   );
@@ -41,6 +45,7 @@ interface WikipediaFigureProps {
 
 export function WikipediaFigure({ slug, title, coordinates, variant = "card" }: WikipediaFigureProps) {
   const state = useWikipediaSummary(slug);
+  const t = useT();
   const thumbnail = state.status === "ready" ? state.summary.thumbnail : undefined;
   const href = state.status === "ready" ? state.summary.pageUrl : wikipediaArticleUrl(slug);
 
@@ -66,10 +71,10 @@ export function WikipediaFigure({ slug, title, coordinates, variant = "card" }: 
       </div>
       <figcaption className={`flex items-center justify-between gap-3 px-3 py-2 ${hero ? "absolute inset-x-0 top-0 bg-gradient-to-b from-black/60 to-transparent pr-14" : ""}`}>
         <span className="truncate font-mono text-[10px] uppercase tracking-[0.14em] text-ink-faint">
-          {state.status === "ready" ? state.summary.description ?? "Archival summary" : state.status === "loading" ? "Retrieving archive" : "Archive offline"}
+          {state.status === "ready" ? state.summary.description ?? t("figure.summary") : state.status === "loading" ? t("figure.loading") : t("figure.offline")}
         </span>
         <a href={href} target="_blank" rel="noreferrer" className="shrink-0 text-[11px] text-ochre-soft hover:underline">
-          Wikipedia
+          {t("figure.wikipedia")}
         </a>
       </figcaption>
     </figure>

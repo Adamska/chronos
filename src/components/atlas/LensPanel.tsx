@@ -4,6 +4,8 @@ import { CLIMATE_PERIODS, FLOW_KIND_LABELS, type FlowKind } from "@/data/environ
 import { KNOWN_PERSPECTIVES, perspectiveFor, snapshotFor } from "@/data/knownWorld";
 import { formatYear } from "@/data/campaigns/registry";
 import { travelModelFor } from "@/geo/travelModels";
+import { useT } from "@/i18n/I18nProvider";
+import { localCityName, localClimatePeriod, localFlowKind, localPerspective, localSnapshotNote, localTravelModel } from "@/i18n/reference";
 import { formatPopulation, largestCities } from "@/scene/cityMetrics";
 import { useAtlasStore } from "@/store/useAtlasStore";
 import { useChronosStore } from "@/store/useChronosStore";
@@ -27,19 +29,20 @@ function Card({ title, children }: { readonly title: string; readonly children: 
 function TravelCard() {
   const origin = useAtlasStore((state) => state.travelOrigin);
   const model = useChronosStore((state) => travelModelFor(state.year));
+  const t = useT();
   return (
-    <Card title="Travel time">
-      <p className="text-[13px] text-ink">From {origin?.label ?? "a chosen point"}</p>
-      <p className="mt-0.5 text-[11.5px] text-ink-muted">{model.label}</p>
+    <Card title={t("rail.travel.label")}>
+      <p className="text-[13px] text-ink">{t("lens.travel.from", { origin: origin?.label ?? t("lens.travel.chosenPoint") })}</p>
+      <p className="mt-0.5 text-[11.5px] text-ink-muted">{localTravelModel(model.id, model.label)}</p>
       <div className="mt-3 h-2 rounded-full bg-[linear-gradient(90deg,#fac761,#db7a42_30%,#5eb3a8_60%,#3d5c8f)]" />
       <div className="mt-1 flex justify-between font-mono text-[9.5px] text-ink-faint">
-        <span>1 week</span>
-        <span>1 month</span>
-        <span>3 months</span>
-        <span>1 year</span>
+        <span>{t("lens.travel.week")}</span>
+        <span>{t("lens.travel.month")}</span>
+        <span>{t("lens.travel.months")}</span>
+        <span>{t("lens.travel.year")}</span>
       </div>
       <p className="mt-2.5 text-[11.5px] leading-snug text-ink-muted">
-        Click anywhere on the globe to move the origin. Surface travel only, using typical speeds of the era.
+        {t("lens.travel.note")}
       </p>
     </Card>
   );
@@ -50,8 +53,9 @@ function KnownCard() {
   const setPerspective = useAtlasStore((state) => state.setKnownPerspective);
   const perspective = perspectiveFor(perspectiveId);
   const snapshot = useChronosStore((state) => snapshotFor(perspective, state.year));
+  const t = useT();
   return (
-    <Card title="Edge of the known world">
+    <Card title={t("rail.known.label")}>
       <div className="flex flex-wrap gap-1">
         {KNOWN_PERSPECTIVES.map((entry) => (
           <button
@@ -63,18 +67,20 @@ function KnownCard() {
               entry.id === perspectiveId ? "border-ochre/50 bg-ochre/10 text-ochre-soft" : "border-hairline text-ink-muted hover:text-ink"
             }`}
           >
-            {entry.label}
+            {localPerspective(entry.id, entry).label}
           </button>
         ))}
       </div>
       {snapshot ? (
         <p className="mt-2.5 text-[12px] leading-snug text-ink/85">
-          <span className="font-mono text-[10.5px] text-ochre-soft">c. {formatYear(snapshot.year)} · {perspective.vantage}</span>
+          <span className="font-mono text-[10.5px] text-ochre-soft">
+            {t("lens.known.circa", { year: formatYear(snapshot.year), vantage: localPerspective(perspective.id, perspective).vantage })}
+          </span>
           <br />
-          {snapshot.note}
+          {localSnapshotNote(perspective.id, snapshot.year, snapshot.note)}
         </p>
       ) : null}
-      <p className="mt-2 text-[10.5px] text-ink-faint">An approximate reconstruction of documented geographical knowledge.</p>
+      <p className="mt-2 text-[10.5px] text-ink-faint">{t("lens.known.note")}</p>
     </Card>
   );
 }
@@ -83,14 +89,16 @@ function EnvironmentCard() {
   const season = useAtlasStore((state) => state.season);
   const setSeason = useAtlasStore((state) => state.setSeason);
   const year = useChronosStore((state) => Math.round(state.year));
-  const period = CLIMATE_PERIODS.find((entry) => year >= entry.startYear && year <= entry.endYear);
+  const found = CLIMATE_PERIODS.find((entry) => year >= entry.startYear && year <= entry.endYear);
+  const period = found ? { ...found, ...localClimatePeriod(found.id, found) } : undefined;
+  const t = useT();
   return (
-    <Card title="Winds, currents and climate">
+    <Card title={t("rail.environment.label")}>
       <ul className="grid grid-cols-2 gap-1.5">
         {(Object.keys(FLOW_SWATCHES) as FlowKind[]).map((kind) => (
           <li key={kind} className="flex items-center gap-2 text-[11.5px] text-ink/85">
             <span className="h-0.5 w-4 rounded-full" style={{ background: FLOW_SWATCHES[kind] }} />
-            {FLOW_KIND_LABELS[kind]}
+            {localFlowKind(kind, FLOW_KIND_LABELS[kind])}
           </li>
         ))}
       </ul>
@@ -103,7 +111,7 @@ function EnvironmentCard() {
             onClick={() => setSeason(value)}
             className={`flex-1 rounded-full px-2 py-1 transition ${season === value ? "bg-white/10 text-ink" : "text-ink-muted"}`}
           >
-            {value === "summer" ? "Summer · southwest monsoon" : "Winter · northeast monsoon"}
+            {value === "summer" ? t("lens.env.summer") : t("lens.env.winter")}
           </button>
         ))}
       </div>
@@ -113,7 +121,7 @@ function EnvironmentCard() {
             <span className={period.tone === "warm" ? "text-[#e8915a]" : "text-[#6fb3e0]"}>{period.name}.</span> {period.note}
           </>
         ) : (
-          "No major climate anomaly is recorded for this year."
+          t("lens.env.none")
         )}
       </p>
     </Card>
@@ -123,19 +131,20 @@ function EnvironmentCard() {
 function CitiesCard() {
   const year = useChronosStore((state) => Math.round(state.year / 5) * 5);
   const ranking = largestCities(year, 5);
+  const t = useT();
   return (
-    <Card title={`Largest cities · ${formatYear(year)}`}>
+    <Card title={t("lens.cities.title", { year: formatYear(year) })}>
       <ol className="space-y-1">
         {ranking.map((entry, index) => (
           <li key={entry.city.id} className="flex items-baseline justify-between gap-3 text-[12px]">
             <span className={index === 0 ? "text-ochre-soft" : "text-ink/85"}>
-              {index + 1}. {entry.city.name}
+              {index + 1}. {localCityName(entry.city.id, entry.city.name)}
             </span>
             <span className="font-mono text-[10.5px] text-ink-muted">~{formatPopulation(entry.population)}</span>
           </li>
         ))}
       </ol>
-      <p className="mt-2 text-[10.5px] text-ink-faint">Estimates after Chandler, Modelski and the UN; ancient figures are uncertain.</p>
+      <p className="mt-2 text-[10.5px] text-ink-faint">{t("lens.cities.note")}</p>
     </Card>
   );
 }
@@ -144,18 +153,20 @@ function CompareCard() {
   const compareYear = useAtlasStore((state) => state.compareYear);
   const setCompareYear = useAtlasStore((state) => state.setCompareYear);
   const year = useChronosStore((state) => Math.round(state.year));
+  const t = useT();
   if (compareYear === null) return null;
   return (
-    <Card title="Compare two years">
+    <Card title={t("rail.compare.label")}>
       <p className="text-[12.5px] text-ink">
-        <span className="text-[#7ed6ec]">Outlines</span> show {formatYear(compareYear)}; colours show {formatYear(year)}.
+        <span className="text-[#7ed6ec]">{t("lens.compare.outlines")}</span>
+        {t("lens.compare.rest", { compare: formatYear(compareYear), year: formatYear(year) })}
       </p>
       <input
         type="range"
         min={-3000}
         max={2024}
         value={compareYear}
-        aria-label="Comparison year"
+        aria-label={t("lens.compare.slider")}
         onChange={(event) => setCompareYear(Number(event.target.value))}
         className="mt-3 w-full accent-[#7ed6ec]"
       />
@@ -166,7 +177,7 @@ function CompareCard() {
           </button>
         ))}
       </div>
-      <p className="mt-2 text-[10.5px] text-ink-faint">Borders: Cliopatria, Seshat Global History Databank (CC BY 4.0).</p>
+      <p className="mt-2 text-[10.5px] text-ink-faint">{t("lens.compare.credit")}</p>
     </Card>
   );
 }

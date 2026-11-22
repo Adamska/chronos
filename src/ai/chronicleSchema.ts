@@ -95,6 +95,7 @@ export type GeneratedCampaign = z.infer<typeof ChronicleCampaignSchema>;
 
 export const ChronicleRequestSchema = z.object({
   query: z.string().trim().min(3, "Describe a historical topic in a few words.").max(200),
+  locale: z.enum(["en", "fr"]).default("en"),
 });
 
 export type ChronicleRequest = z.infer<typeof ChronicleRequestSchema>;
