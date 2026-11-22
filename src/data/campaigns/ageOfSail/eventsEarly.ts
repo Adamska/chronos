@@ -98,7 +98,7 @@ export const earlyEvents: readonly HistoricalEvent[] = [
     keyFigures: ["Vasco da Gama", "Manuel I of Portugal"],
     primarySource: {
       excerpt: "We come to seek Christians and spices.",
-      attribution: "Reply given at Calicut by one of da Gama's men, as recorded in the anonymous Roteiro of the first voyage, 1498",
+      attribution: "Reply given at Calicut by one of da Gama's men, as recorded in the anonymous Roteiro of the first voyage, 1498 (translated from the Portuguese)",
     },
     schematic: {
       kind: "exchange",
@@ -186,7 +186,7 @@ export const earlyEvents: readonly HistoricalEvent[] = [
     coordinates: [56.46, 27.06],
     layer: "borders",
     significance: 3,
-    wikipediaSlug: "Kingdom_of_Ormus",
+    wikipediaSlug: "Portuguese_conquest_of_Hormuz",
     summary: "Returning to a city he had attacked in 1507, Albuquerque secured Hormuz in 1515, keeping its king as a Portuguese vassal and building a fortress over the entrance to the Persian Gulf; he died later that year off Goa.",
     context: "Hormuz's rulers had grown rich as middlemen between Persia, Arabia and India, and Portugal now taxed that traffic. Safavid Persia resented the arrangement, and in 1622 Shah Abbas I, aided by English East India Company ships, expelled the Portuguese.",
     whyHere: "Hormuz is a barren salt island with almost no fresh water of its own, but it sits in the strait that forms the only sea entrance to the Persian Gulf. Every ship carrying Persian horses, Gulf pearls or the trade of Basra had to pass beneath its walls.",

@@ -175,7 +175,7 @@ export const lateEvents: readonly HistoricalEvent[] = [
     coordinates: [102.25, 2.19],
     layer: "conflict",
     significance: 2,
-    wikipediaSlug: "Siege_of_Malacca_(1641)",
+    wikipediaSlug: "Siege_of_Malacca_(1640–1641)",
     summary: "After a siege of more than five months, VOC forces allied with the Sultanate of Johor captured Portuguese Malacca in January 1641.",
     context: "The VOC had blockaded the strait for years, and the fall ended 130 years of Portuguese rule in the city. The Dutch held Malacca mainly to deny it to rivals, steering most of their trade through Batavia instead.",
     whyHere: "Malacca still guarded the narrowest stretch of its strait, but the Brouwer route through the Sunda Strait had already reduced its value to the Dutch. Taking it closed a Portuguese gate between the Indian Ocean and the South China Sea and deprived Goa of its key way station to Macau.",
