@@ -1,17 +1,9 @@
-import earcut from "earcut";
 import { BufferGeometry, Float32BufferAttribute, Vector3 } from "three";
 import { feature, mesh } from "topojson-client";
 import type { GeometryCollection, Topology } from "topojson-specification";
 import type { MultiLineString, MultiPolygon, Polygon, Position } from "geojson";
-import {
-  densifyPath,
-  interiorGrid,
-  planarPolygon,
-  refineTriangles,
-  signedArea,
-  unwrapPath,
-  type PolygonRings,
-} from "@/geo/planarRings";
+import { triangulateCap } from "@/geo/capTriangulation";
+import { densifyPath, planarPolygon, signedArea, unwrapPath, type PolygonRings } from "@/geo/planarRings";
 import { lonLatToVector3 } from "@/geo/sphericalMath";
 import type { LonLat } from "@/types/chronicle";
 
@@ -21,6 +13,7 @@ export interface ExtrusionOptions {
   readonly topRadius: number;
   readonly maxEdgeDegrees?: number;
   readonly walls?: boolean;
+  readonly cap?: boolean;
 }
 
 export interface MeshBuffers {
@@ -30,21 +23,10 @@ export interface MeshBuffers {
 
 const vA = new Vector3();
 const vB = new Vector3();
-const vC = new Vector3();
 const edgeAB = new Vector3();
 const edgeAC = new Vector3();
 const faceNormal = new Vector3();
-const capCentroid = new Vector3();
-const MAX_CHORD_DEGREES = 6;
 
-
-function pushOrderedTriangle(buffers: MeshBuffers, a: Vector3, b: Vector3, c: Vector3): void {
-  for (const vertex of [a, b, c]) {
-    buffers.positions.push(vertex.x, vertex.y, vertex.z);
-    const length = vertex.length() || 1;
-    buffers.normals.push(vertex.x / length, vertex.y / length, vertex.z / length);
-  }
-}
 
 function pushTriangle(
   buffers: MeshBuffers,
@@ -65,39 +47,12 @@ function pushTriangle(
 }
 
 function appendCap(buffers: MeshBuffers, sourceRings: PolygonRings, radius: number, maxEdge: number): void {
-  const rings = planarPolygon(sourceRings);
-  const coords: number[] = [];
-  const holes: number[] = [];
-  rings.forEach((ring, index) => {
-    if (index > 0) holes.push(coords.length / 2);
-    for (const [lon = 0, lat = 0] of densifyPath(ring, maxEdge, false)) coords.push(lon, lat);
-  });
-
-  for (const [lon, lat] of interiorGrid(rings, maxEdge)) {
-    holes.push(coords.length / 2);
-    coords.push(lon, lat);
-  }
-
-  const triangles = earcut(coords, holes.length > 0 ? holes : null, 2);
-  const refined = refineTriangles(coords, triangles, MAX_CHORD_DEGREES);
-
-  for (let i = 0; i < refined.length; i += 3) {
-    const ia = refined[i] ?? 0;
-    const ib = refined[i + 1] ?? 0;
-    const ic = refined[i + 2] ?? 0;
-    const ax = coords[ia * 2] ?? 0, ay = coords[ia * 2 + 1] ?? 0;
-    const planarArea = ((coords[ib * 2] ?? 0) - ax) * ((coords[ic * 2 + 1] ?? 0) - ay) - ((coords[ib * 2 + 1] ?? 0) - ay) * ((coords[ic * 2] ?? 0) - ax);
-    if (planarArea === 0) continue;
-    lonLatToVector3(ax, ay, radius, vA);
-    lonLatToVector3(coords[ib * 2] ?? 0, coords[ib * 2 + 1] ?? 0, radius, vB);
-    lonLatToVector3(coords[ic * 2] ?? 0, coords[ic * 2 + 1] ?? 0, radius, vC);
-    edgeAB.subVectors(vB, vA);
-    edgeAC.subVectors(vC, vA);
-    faceNormal.crossVectors(edgeAB, edgeAC);
-    const conditioned = faceNormal.length() > 1e-6 * edgeAB.length() * edgeAC.length();
-    const facing = faceNormal.dot(capCentroid.copy(vA).add(vB).add(vC));
-    const flip = conditioned ? facing < 0 : planarArea < 0;
-    pushOrderedTriangle(buffers, vA, flip ? vC : vB, flip ? vB : vC);
+  const { lonLat, indices } = triangulateCap(sourceRings, maxEdge);
+  for (const index of indices) {
+    lonLatToVector3(lonLat[index * 2] ?? 0, lonLat[index * 2 + 1] ?? 0, radius, vA);
+    buffers.positions.push(vA.x, vA.y, vA.z);
+    const length = vA.length() || 1;
+    buffers.normals.push(vA.x / length, vA.y / length, vA.z / length);
   }
 }
 
@@ -123,9 +78,9 @@ function appendWalls(buffers: MeshBuffers, rings: PolygonRings, base: number, to
 }
 
 export function appendExtrudedPolygon(buffers: MeshBuffers, rings: PolygonRings, options: ExtrusionOptions): void {
-  const { baseRadius, topRadius, maxEdgeDegrees = 2.5, walls = true } = options;
+  const { baseRadius, topRadius, maxEdgeDegrees = 2.5, walls = true, cap = true } = options;
   if (rings.length === 0) return;
-  appendCap(buffers, rings, topRadius, maxEdgeDegrees);
+  if (cap) appendCap(buffers, rings, topRadius, maxEdgeDegrees);
   if (walls && topRadius > baseRadius) appendWalls(buffers, rings, baseRadius, topRadius, maxEdgeDegrees);
 }
 

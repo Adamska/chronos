@@ -30,9 +30,9 @@ const BARRIER_TOP = LAND_TOP + 0.02;
 const SHELL_RADIUS = 1.16;
 
 interface LandLayers {
-  readonly land: BufferGeometry;
+  readonly land: readonly BufferGeometry[];
   readonly coastline: BufferGeometry;
-  readonly barriers: BufferGeometry | null;
+  readonly barriers: readonly BufferGeometry[];
   readonly shelf: Texture;
 }
 
@@ -74,9 +74,9 @@ function useLandLayers(): LandLayers | null {
     return () => {
       cancelled = true;
       if (built) {
-        built.land.dispose();
+        built.land.forEach((geometry) => geometry.dispose());
         built.coastline.dispose();
-        built.barriers?.dispose();
+        built.barriers.forEach((geometry) => geometry.dispose());
         built.shelf.dispose();
       }
     };
@@ -169,8 +169,12 @@ export function EarthGlobe() {
       <mesh geometry={oceanGeometry} material={oceanMaterial} renderOrder={0} />
       {layers ? (
         <>
-          <mesh geometry={layers.land} material={landMaterial} renderOrder={1} />
-          {layers.barriers ? <mesh geometry={layers.barriers} material={barrierMaterial} renderOrder={1} /> : null}
+          {layers.land.map((geometry) => (
+            <mesh key={geometry.uuid} geometry={geometry} material={landMaterial} renderOrder={1} />
+          ))}
+          {layers.barriers.map((geometry) => (
+            <mesh key={geometry.uuid} geometry={geometry} material={barrierMaterial} renderOrder={1} />
+          ))}
           <lineSegments geometry={layers.coastline} material={coastlineMaterial} renderOrder={2} />
         </>
       ) : null}

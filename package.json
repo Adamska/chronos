@@ -15,7 +15,11 @@
     "test:e2e": "playwright test",
     "validate:data": "vitest run tests/unit/dataIntegrity.test.ts",
     "check:links": "tsx scripts/check-links.mts",
-    "data:elevation": "tsx scripts/build-elevation.mts"
+    "data:elevation": "tsx scripts/build-elevation.mts",
+    "data:land": "tsx scripts/build-land.mts",
+    "data:borders": "tsx scripts/build-borders.mts",
+    "predev": "npm run data:land",
+    "prebuild": "npm run data:land"
   },
   "dependencies": {
     "@ai-sdk/openai": "^4.0.122",

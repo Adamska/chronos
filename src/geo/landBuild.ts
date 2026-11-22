@@ -2,6 +2,7 @@ import type { BufferGeometry } from "three";
 import type { Topology } from "topojson-specification";
 import { TERRAIN_BARRIERS } from "@/data/geography";
 import { type CanvasFactory, computeShelfField, rasterizeLand } from "@/geo/bathymetry";
+import { capGeometry, fetchLandCaps } from "@/geo/landCaps";
 import {
   type MeshBuffers,
   appendExtrudedPolygon,
@@ -20,8 +21,8 @@ export const CELL_DEGREES = 360 / MASK_WIDTH;
 const SLICE_BUDGET_MS = 8;
 
 export interface LandPayload {
-  readonly land: BufferGeometry;
-  readonly barriers: BufferGeometry;
+  readonly land: readonly BufferGeometry[];
+  readonly barriers: readonly BufferGeometry[];
   readonly coastline: BufferGeometry;
   readonly shelf: Uint8Array;
   readonly mask: Uint8Array;
@@ -44,9 +45,11 @@ function createSlicer() {
 
 export async function buildLandPayload(topology: Topology, makeCanvas: CanvasFactory): Promise<LandPayload> {
   const slice = createSlicer();
+  const caps = await fetchLandCaps();
+  const polygons = extractLandPolygons(topology);
   const landBuffers: MeshBuffers = { positions: [], normals: [] };
-  for (const rings of extractLandPolygons(topology)) {
-    appendExtrudedPolygon(landBuffers, rings, { baseRadius: LAND_BASE, topRadius: LAND_TOP, maxEdgeDegrees: 3.5 });
+  for (const rings of polygons) {
+    appendExtrudedPolygon(landBuffers, rings, { baseRadius: LAND_BASE, topRadius: LAND_TOP, maxEdgeDegrees: 3.5, cap: !caps });
     await slice();
   }
 
@@ -56,6 +59,7 @@ export async function buildLandPayload(topology: Topology, makeCanvas: CanvasFac
       baseRadius: LAND_TOP - 0.001,
       topRadius: LAND_TOP + barrier.height,
       maxEdgeDegrees: 1,
+      cap: !caps,
     });
     await slice();
   }
@@ -68,5 +72,7 @@ export async function buildLandPayload(topology: Topology, makeCanvas: CanvasFac
   await yieldToBrowser();
   const shelf = await computeShelfField(topology, makeCanvas, yieldToBrowser);
 
-  return { land: geometryFromBuffers(landBuffers), barriers: geometryFromBuffers(barrierBuffers), coastline, shelf, mask };
+  const land = [geometryFromBuffers(landBuffers), ...(caps ? [capGeometry(caps.land)] : [])];
+  const barriers = [geometryFromBuffers(barrierBuffers), ...(caps ? [capGeometry(caps.barriers)] : [])];
+  return { land, barriers, coastline, shelf, mask };
 }

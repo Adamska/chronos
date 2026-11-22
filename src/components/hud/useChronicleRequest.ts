@@ -3,7 +3,6 @@
 import { useCallback } from "react";
 import { z } from "zod";
 import { ChronicleResponsePayloadSchema } from "@/ai/campaignPayload";
-import { matchEncyclopedia } from "@/ai/encyclopedia";
 import { useChronosStore } from "@/store/useChronosStore";
 import type { ChronicleCampaign } from "@/types/chronicle";
 
@@ -41,6 +40,7 @@ export function useChronicleRequest(): (query: string) => Promise<void> {
         useChronosStore.getState().setChronicleStatus("error", error.message);
         return;
       }
+      const { matchEncyclopedia } = await import("@/ai/encyclopedia");
       const match = matchEncyclopedia(query);
       settle(match.campaign, `Working offline. ${match.notice}`, match.focusEventId);
     }

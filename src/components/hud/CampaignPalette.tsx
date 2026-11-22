@@ -2,10 +2,9 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useChronicleRequest } from "@/components/hud/useChronicleRequest";
-import { LIBRARY } from "@/data/library";
+import { CATALOG, type CatalogEntry, loadChronicle } from "@/data/catalog";
 import { formatSpan } from "@/data/campaigns/registry";
 import { useChronosStore } from "@/store/useChronosStore";
-import type { ChronicleCampaign } from "@/types/chronicle";
 
 const SUGGESTIONS = [
   "Spread of the printing press in 15th-century Europe",
@@ -14,13 +13,13 @@ const SUGGESTIONS = [
 ] as const;
 
 type PaletteItem =
-  | { readonly kind: "campaign"; readonly campaign: ChronicleCampaign }
+  | { readonly kind: "campaign"; readonly campaign: CatalogEntry }
   | { readonly kind: "query"; readonly query: string; readonly suggested: boolean };
 
-function rankCampaigns(query: string): ChronicleCampaign[] {
+function rankCampaigns(query: string): CatalogEntry[] {
   const terms = query.toLowerCase().split(/\s+/).filter((term) => term.length > 1);
-  if (terms.length === 0) return [...LIBRARY];
-  return LIBRARY.map((campaign) => {
+  if (terms.length === 0) return [...CATALOG];
+  return CATALOG.map((campaign) => {
     const haystack = `${campaign.title} ${campaign.subtitle} ${campaign.keywords.join(" ")}`.toLowerCase();
     return { campaign, score: terms.filter((term) => haystack.includes(term)).length };
   })
@@ -72,7 +71,7 @@ export function CampaignPalette() {
 
   const activate = (item: PaletteItem | undefined) => {
     if (!item || status === "loading") return;
-    if (item.kind === "campaign") loadCampaign(item.campaign);
+    if (item.kind === "campaign") void loadChronicle(item.campaign.id).then((campaign) => campaign && loadCampaign(campaign));
     else void request(item.query);
   };
 

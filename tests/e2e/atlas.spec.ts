@@ -1,4 +1,9 @@
-import { expect, test } from "@playwright/test";
+import { type Page, expect, test } from "@playwright/test";
+
+async function openAtlas(page: Page, path = "/") {
+  await page.goto(path);
+  await expect(page.getByRole("heading", { level: 1 })).not.toBeEmpty();
+}
 
 test.describe("atlas", () => {
   test("loads the default chronicle with its timeline", async ({ page }) => {
@@ -9,13 +14,13 @@ test.describe("atlas", () => {
   });
 
   test("opens a dossier from a timeline tick", async ({ page }) => {
-    await page.goto("/");
+    await openAtlas(page);
     await page.locator('button[title*="Zhang Qian"]').click();
     await expect(page.locator("aside h2").first()).toContainText("Zhang Qian");
   });
 
   test("switches chronicles from the palette", async ({ page }) => {
-    await page.goto("/");
+    await openAtlas(page);
     await page.keyboard.press("ControlOrMeta+k");
     await page.getByRole("dialog").locator("input").fill("zheng he");
     await page.getByRole("dialog").getByRole("button", { name: /Treasure Fleets/ }).first().click();
@@ -23,14 +28,15 @@ test.describe("atlas", () => {
   });
 
   test("restores a shared view from the URL", async ({ page }) => {
-    await page.goto("/#c=age-of-sail&y=1500");
+    await page.goto("/?c=age-of-sail&y=1500");
     await expect(page.getByRole("heading", { level: 1 })).toContainText("Age of Sail");
   });
 
   test("plays a round of the why-here challenge", async ({ page }) => {
-    await page.goto("/");
+    await openAtlas(page);
     await page.getByRole("button", { name: "Why here? challenge" }).filter({ visible: true }).first().click();
     await expect(page.getByText("Click the globe where you think this happened.")).toBeVisible();
+    await page.waitForTimeout(2500);
     const canvas = page.locator("canvas");
     const box = await canvas.boundingBox();
     if (!box) throw new Error("canvas not laid out");

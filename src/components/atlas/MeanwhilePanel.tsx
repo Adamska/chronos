@@ -2,13 +2,15 @@
 
 import { contemporaryEvents, meanwhileWindow } from "@/data/contemporaries";
 import { formatYear } from "@/data/campaigns/registry";
+import { useLibrary } from "@/data/useLibrary";
 import { useChronosStore } from "@/store/useChronosStore";
 
 export function MeanwhilePanel() {
   const campaign = useChronosStore((state) => state.campaign);
   const year = useChronosStore((state) => Math.round(state.year / 5) * 5);
   const window = meanwhileWindow(campaign);
-  const entries = contemporaryEvents(year, campaign?.id, window);
+  const library = useLibrary();
+  const entries = library ? contemporaryEvents(library, year, campaign?.id, window) : [];
 
   const open = (campaignId: string, eventId: string) => {
     const target = entries.find((entry) => entry.campaign.id === campaignId)?.campaign;

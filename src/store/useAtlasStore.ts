@@ -32,6 +32,7 @@ interface AtlasState {
   narration: boolean;
   touring: boolean;
   challengeActive: boolean;
+  contextLost: boolean;
   setLens: (lens: Lens) => void;
   togglePanel: (panel: Panel) => void;
   setTravelOrigin: (origin: TravelOrigin | null) => void;
@@ -44,6 +45,7 @@ interface AtlasState {
   setNarration: (value: boolean) => void;
   setTouring: (value: boolean) => void;
   setChallengeActive: (value: boolean) => void;
+  setContextLost: (value: boolean) => void;
 }
 
 export const useAtlasStore = create<AtlasState>()((set, get) => ({
@@ -59,6 +61,7 @@ export const useAtlasStore = create<AtlasState>()((set, get) => ({
   narration: false,
   touring: false,
   challengeActive: false,
+  contextLost: false,
   setLens: (lens) => set({ lens: get().lens === lens ? "none" : lens }),
   togglePanel: (panel) => set({ panel: get().panel === panel ? "none" : panel }),
   setTravelOrigin: (travelOrigin) => set({ travelOrigin }),
@@ -71,4 +74,5 @@ export const useAtlasStore = create<AtlasState>()((set, get) => ({
   setNarration: (narration) => set({ narration }),
   setTouring: (touring) => set({ touring }),
   setChallengeActive: (challengeActive) => set({ challengeActive, lens: "none" }),
+  setContextLost: (contextLost) => set({ contextLost }),
 }));

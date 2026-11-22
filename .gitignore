@@ -35,3 +35,6 @@ AGENTS.md
 playwright-report
 test-results
 tests/e2e/*-snapshots
+
+# generated at build time
+public/generated

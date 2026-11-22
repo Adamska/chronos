@@ -2,12 +2,13 @@
 
 import dynamic from "next/dynamic";
 import { useEffect } from "react";
-import { restoreFromHash, syncHash } from "@/components/atlas/shareState";
+import { GraphicsNotice } from "@/components/atlas/GraphicsNotice";
+import { restoreSharedView, syncUrl } from "@/components/atlas/shareState";
 import { CampaignPalette, SearchPill } from "@/components/hud/CampaignPalette";
 import { ChronicleNotice } from "@/components/hud/ChronicleNotice";
 import { HudOverlay } from "@/components/hud/HudOverlay";
 import { LabelOverlay } from "@/components/hud/LabelOverlay";
-import { DEFAULT_CAMPAIGN } from "@/data/campaigns";
+import { DEFAULT_CHRONICLE_ID, loadChronicle } from "@/data/catalog";
 import { useAtlasStore } from "@/store/useAtlasStore";
 import { useChronosStore } from "@/store/useChronosStore";
 
@@ -22,11 +23,17 @@ const AtlasCanvas = dynamic(() => import("@/scene/AtlasCanvas"), {
 
 export function AtlasShell() {
   useEffect(() => {
-    if (!useChronosStore.getState().campaign && !restoreFromHash()) useChronosStore.getState().loadCampaign(DEFAULT_CAMPAIGN);
+    if (!useChronosStore.getState().campaign) {
+      void restoreSharedView().then(async (restored) => {
+        if (restored) return;
+        const fallback = await loadChronicle(DEFAULT_CHRONICLE_ID);
+        if (fallback && !useChronosStore.getState().campaign) useChronosStore.getState().loadCampaign(fallback);
+      });
+    }
     let timer = 0;
     const schedule = () => {
       window.clearTimeout(timer);
-      timer = window.setTimeout(syncHash, 600);
+      timer = window.setTimeout(syncUrl, 600);
     };
     const unsubscribeChronos = useChronosStore.subscribe(schedule);
     const unsubscribeAtlas = useAtlasStore.subscribe(schedule);
@@ -45,6 +52,7 @@ export function AtlasShell() {
       <HudOverlay search={<SearchPill />} />
       <ChronicleNotice />
       <CampaignPalette />
+      <GraphicsNotice />
     </main>
   );
 }

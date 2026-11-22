@@ -2,7 +2,7 @@
 
 import { PerformanceMonitor, Stars } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
-import { Bloom, EffectComposer, Noise } from "@react-three/postprocessing";
+import { Suspense, lazy } from "react";
 import { ACESFilmicToneMapping, SRGBColorSpace } from "three";
 import { CameraDirector } from "@/scene/CameraDirector";
 import { ChallengeMarkers } from "@/scene/ChallengeMarkers";
@@ -13,19 +13,20 @@ import { EnvironmentLayer } from "@/scene/EnvironmentLayer";
 import { EventBeacons } from "@/scene/EventBeacons";
 import { LensOverlay } from "@/scene/LensOverlay";
 import { MeanwhileMarkers } from "@/scene/MeanwhileMarkers";
+import { IdleThrottle } from "@/scene/IdleThrottle";
 import { useQuality, useQualityStore } from "@/scene/quality";
+import { useAtlasStore } from "@/store/useAtlasStore";
 import { SmartLabels } from "@/scene/SmartLabels";
 import { TerritoryLayer } from "@/scene/TerritoryLayer";
 
-function Effects() {
-  const { bloom, grain } = useQuality();
-  if (!bloom) return null;
-  return (
-    <EffectComposer multisampling={0}>
-      <Bloom mipmapBlur intensity={0.55} luminanceThreshold={0.55} luminanceSmoothing={0.2} />
-      <Noise opacity={grain ? 0.025 : 0} />
-    </EffectComposer>
-  );
+const Effects = lazy(() => import("@/scene/Effects"));
+
+function watchContext(canvas: HTMLCanvasElement): void {
+  canvas.addEventListener("webglcontextlost", (event) => {
+    event.preventDefault();
+    useAtlasStore.getState().setContextLost(true);
+  });
+  canvas.addEventListener("webglcontextrestored", () => useAtlasStore.getState().setContextLost(false));
 }
 
 export default function AtlasCanvas() {
@@ -40,6 +41,7 @@ export default function AtlasCanvas() {
       gl={{ antialias: true, toneMapping: ACESFilmicToneMapping, outputColorSpace: SRGBColorSpace, powerPreference: "high-performance" }}
       onCreated={({ gl }) => {
         gl.debug.checkShaderErrors = process.env.NODE_ENV !== "production";
+        watchContext(gl.domElement);
       }}
     >
       <PerformanceMonitor bounds={() => [42, 58]} flipflops={4} onDecline={() => step(-1)} onIncline={() => step(1)} />
@@ -56,7 +58,10 @@ export default function AtlasCanvas() {
       <ChallengeMarkers />
       <SmartLabels />
       <CameraDirector />
-      <Effects />
+      <IdleThrottle />
+      <Suspense fallback={null}>
+        <Effects />
+      </Suspense>
     </Canvas>
   );
 }

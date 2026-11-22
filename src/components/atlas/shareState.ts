@@ -1,4 +1,4 @@
-import { findLibraryCampaign } from "@/data/library";
+import { findCatalogEntry, loadChronicle } from "@/data/catalog";
 import { vector3ToLonLat } from "@/geo/sphericalMath";
 import { currentCamera } from "@/scene/cameraRef";
 import { type Lens, useAtlasStore } from "@/store/useAtlasStore";
@@ -11,7 +11,7 @@ function encodeState(withCamera: boolean): string {
   const { campaign, year, selection } = useChronosStore.getState();
   const { lens, travelOrigin, knownPerspective } = useAtlasStore.getState();
   const params = new URLSearchParams();
-  if (campaign && findLibraryCampaign(campaign.id)) params.set("c", campaign.id);
+  if (campaign && findCatalogEntry(campaign.id)) params.set("c", campaign.id);
   params.set("y", String(Math.round(year)));
   if (selection) params.set(selection.kind === "event" ? "e" : "r", selection.id);
   if (lens !== "none") params.set("lens", lens);
@@ -26,12 +26,17 @@ function encodeState(withCamera: boolean): string {
 }
 
 export function buildShareUrl(): string {
-  return `${window.location.origin}${window.location.pathname}#${encodeState(true)}`;
+  return `${window.location.origin}${window.location.pathname}?${encodeState(true)}`;
 }
 
-export function syncHash(): void {
-  const next = `#${encodeState(false)}`;
-  if (window.location.hash !== next) window.history.replaceState(null, "", next);
+export function syncUrl(): void {
+  const next = `?${encodeState(false)}`;
+  if (window.location.search !== next || window.location.hash) window.history.replaceState(null, "", `${window.location.pathname}${next}`);
+}
+
+function sharedParams(): URLSearchParams {
+  const query = new URLSearchParams(window.location.search);
+  return query.has("c") ? query : new URLSearchParams(window.location.hash.slice(1));
 }
 
 const parsePoint = (value: string | null): LonLat | null => {
@@ -39,9 +44,9 @@ const parsePoint = (value: string | null): LonLat | null => {
   return lon !== undefined && lat !== undefined && Number.isFinite(lon) && Number.isFinite(lat) ? [lon, lat] : null;
 };
 
-export function restoreFromHash(): boolean {
-  const params = new URLSearchParams(window.location.hash.slice(1));
-  const campaign = findLibraryCampaign(params.get("c") ?? "");
+export async function restoreSharedView(): Promise<boolean> {
+  const params = sharedParams();
+  const campaign = await loadChronicle(params.get("c") ?? "");
   if (!campaign) return false;
   const store = useChronosStore.getState();
   store.loadCampaign(campaign);

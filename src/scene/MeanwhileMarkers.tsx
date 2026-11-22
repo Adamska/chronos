@@ -3,6 +3,7 @@
 import { useLayoutEffect, useMemo, useRef } from "react";
 import { IcosahedronGeometry, type InstancedMesh, Matrix4, MeshBasicMaterial, Quaternion, Vector3 } from "three";
 import { contemporaryEvents, meanwhileWindow } from "@/data/contemporaries";
+import { useLibrary } from "@/data/useLibrary";
 import { lonLatToVector3 } from "@/geo/sphericalMath";
 import { useAtlasStore } from "@/store/useAtlasStore";
 import { useChronosStore } from "@/store/useChronosStore";
@@ -18,7 +19,11 @@ export function MeanwhileMarkers() {
   const open = useAtlasStore((state) => state.panel === "meanwhile");
   const campaign = useChronosStore((state) => state.campaign);
   const year = useChronosStore((state) => Math.round(state.year / 5) * 5);
-  const entries = useMemo(() => (open ? contemporaryEvents(year, campaign?.id, meanwhileWindow(campaign)) : []), [open, year, campaign]);
+  const library = useLibrary(open);
+  const entries = useMemo(
+    () => (open && library ? contemporaryEvents(library, year, campaign?.id, meanwhileWindow(campaign)) : []),
+    [open, library, year, campaign],
+  );
   const mesh = useRef<InstancedMesh>(null);
 
   useLayoutEffect(() => {
