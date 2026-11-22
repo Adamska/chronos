@@ -1,0 +1,337 @@
+{
+  "source": "https://github.com/Seshat-Global-History-Databank/cliopatria",
+  "license": "CC BY 4.0",
+  "attribution": "Historical borders: Cliopatria, Seshat Global History Databank (Bennett et al. 2025, Scientific Data 12, 247, doi:10.1038/s41597-025-04516-9), CC BY 4.0. Simplified, quantized and split into century bins by Chronos.",
+  "bins": [
+    {
+      "bin": -3400,
+      "file": "-3400.json",
+      "bytes": 728,
+      "polities": 1
+    },
+    {
+      "bin": -3300,
+      "file": "-3300.json",
+      "bytes": 728,
+      "polities": 1
+    },
+    {
+      "bin": -3200,
+      "file": "-3200.json",
+      "bytes": 1014,
+      "polities": 2
+    },
+    {
+      "bin": -3100,
+      "file": "-3100.json",
+      "bytes": 1014,
+      "polities": 2
+    },
+    {
+      "bin": -3000,
+      "file": "-3000.json",
+      "bytes": 1839,
+      "polities": 4
+    },
+    {
+      "bin": -2900,
+      "file": "-2900.json",
+      "bytes": 1839,
+      "polities": 4
+    },
+    {
+      "bin": -2800,
+      "file": "-2800.json",
+      "bytes": 1839,
+      "polities": 4
+    },
+    {
+      "bin": -2700,
+      "file": "-2700.json",
+      "bytes": 1942,
+      "polities": 3
+    },
+    {
+      "bin": -2600,
+      "file": "-2600.json",
+      "bytes": 1942,
+      "polities": 3
+    },
+    {
+      "bin": -2500,
+      "file": "-2500.json",
+      "bytes": 2768,
+      "polities": 3
+    },
+    {
+      "bin": -2400,
+      "file": "-2400.json",
+      "bytes": 2768,
+      "polities": 3
+    },
+    {
+      "bin": -2300,
+      "file": "-2300.json",
+      "bytes": 5248,
+      "polities": 5
+    },
+    {
+      "bin": -2200,
+      "file": "-2200.json",
+      "bytes": 3928,
+      "polities": 5
+    },
+    {
+      "bin": -2100,
+      "file": "-2100.json",
+      "bytes": 3761,
+      "polities": 6
+    },
+    {
+      "bin": -2000,
+      "file": "-2000.json",
+      "bytes": 3526,
+      "polities": 4
+    },
+    {
+      "bin": -1900,
+      "file": "-1900.json",
+      "bytes": 3526,
+      "polities": 4
+    },
+    {
+      "bin": -1800,
+      "file": "-1800.json",
+      "bytes": 6906,
+      "polities": 12
+    },
+    {
+      "bin": -1700,
+      "file": "-1700.json",
+      "bytes": 3277,
+      "polities": 6
+    },
+    {
+      "bin": -1600,
+      "file": "-1600.json",
+      "bytes": 4975,
+      "polities": 11
+    },
+    {
+      "bin": -1500,
+      "file": "-1500.json",
+      "bytes": 6241,
+      "polities": 11
+    },
+    {
+      "bin": -1400,
+      "file": "-1400.json",
+      "bytes": 6192,
+      "polities": 8
+    },
+    {
+      "bin": -1300,
+      "file": "-1300.json",
+      "bytes": 10954,
+      "polities": 15
+    },
+    {
+      "bin": -1200,
+      "file": "-1200.json",
+      "bytes": 9436,
+      "polities": 14
+    },
+    {
+      "bin": -1100,
+      "file": "-1100.json",
+      "bytes": 5787,
+      "polities": 9
+    },
+    {
+      "bin": -1000,
+      "file": "-1000.json",
+      "bytes": 5966,
+      "polities": 11
+    },
+    {
+      "bin": -900,
+      "file": "-900.json",
+      "bytes": 7551,
+      "polities": 14
+    },
+    {
+      "bin": -800,
+      "file": "-800.json",
+      "bytes": 17237,
+      "polities": 38
+    },
+    {
+      "bin": -700,
+      "file": "-700.json",
+      "bytes": 36476,
+      "polities": 62
+    },
+    {
+      "bin": -600,
+      "file": "-600.json",
+      "bytes": 37032,
+      "polities": 70
+    },
+    {
+      "bin": -500,
+      "file": "-500.json",
+      "bytes": 49752,
+      "polities": 96
+    },
+    {
+      "bin": -400,
+      "file": "-400.json",
+      "bytes": 101376,
+      "polities": 159
+    },
+    {
+      "bin": -300,
+      "file": "-300.json",
+      "bytes": 168685,
+      "polities": 306
+    },
+    {
+      "bin": -200,
+      "file": "-200.json",
+      "bytes": 101596,
+      "polities": 148
+    },
+    {
+      "bin": -100,
+      "file": "-100.json",
+      "bytes": 131919,
+      "polities": 186
+    },
+    {
+      "bin": 0,
+      "file": "0.json",
+      "bytes": 90971,
+      "polities": 133
+    },
+    {
+      "bin": 100,
+      "file": "100.json",
+      "bytes": 77319,
+      "polities": 120
+    },
+    {
+      "bin": 200,
+      "file": "200.json",
+      "bytes": 113485,
+      "polities": 133
+    },
+    {
+      "bin": 300,
+      "file": "300.json",
+      "bytes": 150207,
+      "polities": 216
+    },
+    {
+      "bin": 400,
+      "file": "400.json",
+      "bytes": 164719,
+      "polities": 280
+    },
+    {
+      "bin": 500,
+      "file": "500.json",
+      "bytes": 150841,
+      "polities": 239
+    },
+    {
+      "bin": 600,
+      "file": "600.json",
+      "bytes": 247994,
+      "polities": 390
+    },
+    {
+      "bin": 700,
+      "file": "700.json",
+      "bytes": 191259,
+      "polities": 335
+    },
+    {
+      "bin": 800,
+      "file": "800.json",
+      "bytes": 244778,
+      "polities": 497
+    },
+    {
+      "bin": 900,
+      "file": "900.json",
+      "bytes": 242252,
+      "polities": 489
+    },
+    {
+      "bin": 1000,
+      "file": "1000.json",
+      "bytes": 239443,
+      "polities": 643
+    },
+    {
+      "bin": 1100,
+      "file": "1100.json",
+      "bytes": 223140,
+      "polities": 488
+    },
+    {
+      "bin": 1200,
+      "file": "1200.json",
+      "bytes": 252219,
+      "polities": 772
+    },
+    {
+      "bin": 1300,
+      "file": "1300.json",
+      "bytes": 238829,
+      "polities": 699
+    },
+    {
+      "bin": 1400,
+      "file": "1400.json",
+      "bytes": 271348,
+      "polities": 787
+    },
+    {
+      "bin": 1500,
+      "file": "1500.json",
+      "bytes": 302680,
+      "polities": 739
+    },
+    {
+      "bin": 1600,
+      "file": "1600.json",
+      "bytes": 308686,
+      "polities": 725
+    },
+    {
+      "bin": 1700,
+      "file": "1700.json",
+      "bytes": 417497,
+      "polities": 958
+    },
+    {
+      "bin": 1800,
+      "file": "1800.json",
+      "bytes": 663375,
+      "polities": 1378
+    },
+    {
+      "bin": 1900,
+      "file": "1900.json",
+      "bytes": 582311,
+      "polities": 1217
+    },
+    {
+      "bin": 2000,
+      "file": "2000.json",
+      "bytes": 223396,
+      "polities": 224
+    }
+  ]
+}
