@@ -3,7 +3,10 @@
 import { useFrame } from "@react-three/fiber";
 import { useMemo } from "react";
 import { Vector3 } from "three";
+import { populationAt } from "@/scene/cityMetrics";
 import { labelNodes, labelsFor } from "@/scene/labelModel";
+import { useAtlasStore } from "@/store/useAtlasStore";
+import { isConcealed } from "@/store/useChallengeStore";
 import { campaignFade, eventPresence, eventSpotlight, territoryPresence } from "@/scene/temporal";
 import { useChronosStore } from "@/store/useChronosStore";
 
@@ -15,7 +18,8 @@ const toCamera = new Vector3();
 
 export function SmartLabels() {
   const campaign = useChronosStore((state) => state.campaign);
-  const labels = labelsFor(campaign);
+  const withCities = useAtlasStore((state) => state.showCities);
+  const labels = labelsFor(campaign, withCities);
   const widths = useMemo(() => new Float32Array(labels.length), [labels]);
   const lastX = useMemo(() => new Float32Array(labels.length).fill(-1), [labels]);
   const lastY = useMemo(() => new Float32Array(labels.length).fill(-1), [labels]);
@@ -31,6 +35,7 @@ export function SmartLabels() {
     const threshold = distance > 4.2 ? 62 : distance > 3.1 ? 48 : distance > 2.3 ? 36 : distance > 1.7 ? 24 : 0;
     const selectedId = selection?.kind === "event" ? selection.id : null;
     toCamera.copy(camera.position).normalize();
+    const concealed = isConcealed();
     if (zones.frame++ % ZONE_REFRESH_FRAMES === 0) {
       zones.count = 0;
       document.querySelectorAll<HTMLElement>("[data-hud-zone]").forEach((element) => {
@@ -56,10 +61,14 @@ export function SmartLabels() {
       let presence = 1;
       let priority = label.priority;
       if (label.event) {
-        presence = eventPresence(label.event, year, fade, layers);
+        presence = concealed ? 0 : eventPresence(label.event, year, fade, layers);
         priority += eventSpotlight(label.event, year, fade) * 25 + (label.id === selectedId ? 100 : 0);
       } else if (label.zone) {
-        presence = territoryPresence(label.zone, year, fade, layers);
+        presence = concealed ? 0 : territoryPresence(label.zone, year, fade, layers);
+      } else if (label.city) {
+        const population = populationAt(label.city, year);
+        presence = population > 0 ? 1 : 0;
+        priority = population > 0 ? 8 + Math.log10(population) * 9 : 0;
       }
 
       const facing = label.anchor.dot(toCamera) / label.anchor.length();

@@ -15,6 +15,7 @@ import {
 import { createShelfTexture } from "@/geo/bathymetry";
 import { LAND_BASE, LAND_TOP } from "@/geo/landBuild";
 import { loadLandPayload } from "@/geo/landClient";
+import { handleGlobeClick, handleGlobeHover, handleGlobeLeave } from "@/scene/globeInteraction";
 import { advanceSun, sunDirectionUniform } from "@/scene/solar";
 import atmosphereFragment from "@/shaders/atmosphere.frag";
 import atmosphereVertex from "@/shaders/atmosphere.vert";
@@ -176,8 +177,9 @@ export function EarthGlobe() {
       <mesh geometry={shellGeometry} material={atmosphereMaterial} renderOrder={10} />
       <mesh
         geometry={occluderGeometry}
-        onClick={(event) => event.stopPropagation()}
-        onPointerMove={(event) => event.stopPropagation()}
+        onClick={handleGlobeClick}
+        onPointerMove={handleGlobeHover}
+        onPointerOut={handleGlobeLeave}
       >
         <meshBasicMaterial colorWrite={false} depthWrite={false} />
       </mesh>

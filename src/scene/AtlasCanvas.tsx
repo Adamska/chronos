@@ -5,9 +5,14 @@ import { Canvas } from "@react-three/fiber";
 import { Bloom, EffectComposer, Noise } from "@react-three/postprocessing";
 import { ACESFilmicToneMapping, SRGBColorSpace } from "three";
 import { CameraDirector } from "@/scene/CameraDirector";
+import { ChallengeMarkers } from "@/scene/ChallengeMarkers";
 import { ChronicleArcs } from "@/scene/ChronicleArcs";
+import { CityLayer } from "@/scene/CityLayer";
 import { EarthGlobe } from "@/scene/EarthGlobe";
+import { EnvironmentLayer } from "@/scene/EnvironmentLayer";
 import { EventBeacons } from "@/scene/EventBeacons";
+import { LensOverlay } from "@/scene/LensOverlay";
+import { MeanwhileMarkers } from "@/scene/MeanwhileMarkers";
 import { useQuality, useQualityStore } from "@/scene/quality";
 import { SmartLabels } from "@/scene/SmartLabels";
 import { TerritoryLayer } from "@/scene/TerritoryLayer";
@@ -42,8 +47,13 @@ export default function AtlasCanvas() {
       <Stars key={quality.stars} radius={60} depth={40} count={quality.stars} factor={2.4} saturation={0} fade speed={0.25} />
       <EarthGlobe />
       <TerritoryLayer />
+      <LensOverlay />
+      <EnvironmentLayer />
+      <CityLayer />
       <ChronicleArcs />
       <EventBeacons />
+      <MeanwhileMarkers />
+      <ChallengeMarkers />
       <SmartLabels />
       <CameraDirector />
       <Effects />

@@ -13,8 +13,9 @@ import {
 
 export const LAND_BASE = 1.0;
 export const LAND_TOP = 1.0045;
-export const MASK_WIDTH = 360;
-export const MASK_HEIGHT = 180;
+export const MASK_WIDTH = 720;
+export const MASK_HEIGHT = 360;
+export const CELL_DEGREES = 360 / MASK_WIDTH;
 
 const SLICE_BUDGET_MS = 8;
 

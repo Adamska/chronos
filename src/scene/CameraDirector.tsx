@@ -2,6 +2,8 @@
 
 import { CameraControls, type CameraControlsImpl } from "@react-three/drei";
 import { useThree } from "@react-three/fiber";
+import { registerCamera } from "@/scene/cameraRef";
+import { useAtlasStore } from "@/store/useAtlasStore";
 import { useEffect, useRef } from "react";
 import { Vector3 } from "three";
 import { DEG2RAD, GLOBE_RADIUS, cameraPositionFor, lonLatToVector3 } from "@/geo/sphericalMath";
@@ -17,6 +19,12 @@ export function CameraDirector() {
   const request = useChronosStore((state) => state.cameraRequest);
   const yieldCamera = useChronosStore((state) => state.yieldCamera);
   const aspect = useThree((state) => state.size.width / Math.max(1, state.size.height));
+  const camera = useThree((state) => state.camera);
+
+  useEffect(() => {
+    registerCamera(camera);
+    return () => registerCamera(null);
+  }, [camera]);
 
   useEffect(() => {
     const rig = controls.current;
@@ -28,7 +36,8 @@ export function CameraDirector() {
 
     let cancelled = false;
     rig.smoothTime = FLIGHT_SMOOTH_TIME;
-    void rig.setLookAt(position.x, position.y, position.z, focus.x, focus.y, focus.z, true).then(() => {
+    const animate = !useAtlasStore.getState().reducedMotion;
+    void rig.setLookAt(position.x, position.y, position.z, focus.x, focus.y, focus.z, animate).then(() => {
       if (!cancelled) rig.smoothTime = USER_SMOOTH_TIME;
     });
     return () => {

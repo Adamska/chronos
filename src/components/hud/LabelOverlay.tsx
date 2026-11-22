@@ -1,18 +1,21 @@
 "use client";
 
 import { type LabelKind, labelNodes, labelsFor } from "@/scene/labelModel";
+import { useAtlasStore } from "@/store/useAtlasStore";
 import { useChronosStore } from "@/store/useChronosStore";
 
 const KIND_CLASS: Record<LabelKind, string> = {
   event: "text-[11px] font-medium tracking-[0.01em] text-ink hover:text-ochre-soft cursor-pointer",
   territory: "font-mono text-[9.5px] uppercase tracking-[0.24em] text-ink/60",
   chokepoint: "font-serif text-[11.5px] italic text-teal-chart/85",
+  city: "font-mono text-[10px] tracking-[0.06em] text-ink/75",
 };
 
 export function LabelOverlay() {
   const campaign = useChronosStore((state) => state.campaign);
   const select = useChronosStore((state) => state.select);
-  const labels = labelsFor(campaign);
+  const withCities = useAtlasStore((state) => state.showCities);
+  const labels = labelsFor(campaign, withCities);
 
   return (
     <div className="pointer-events-none absolute inset-0 z-[5] overflow-hidden" aria-hidden>

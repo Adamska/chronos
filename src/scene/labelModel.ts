@@ -1,10 +1,12 @@
 import { geoCentroid } from "d3-geo";
 import type { Vector3 } from "three";
+import { CITIES } from "@/data/cities";
 import { CHOKEPOINTS } from "@/data/geography";
 import { lonLatToVector3 } from "@/geo/sphericalMath";
+import type { CityRecord } from "@/types/atlas";
 import type { ChronicleCampaign, HistoricalEvent, TerritoryZone } from "@/types/chronicle";
 
-export type LabelKind = "event" | "territory" | "chokepoint";
+export type LabelKind = "event" | "territory" | "chokepoint" | "city";
 
 export interface LabelSpec {
   readonly id: string;
@@ -14,9 +16,11 @@ export interface LabelSpec {
   readonly anchor: Vector3;
   readonly event?: HistoricalEvent;
   readonly zone?: TerritoryZone;
+  readonly city?: CityRecord;
 }
 
 const cache = new WeakMap<ChronicleCampaign, readonly LabelSpec[]>();
+const cityCache = new WeakMap<ChronicleCampaign, readonly LabelSpec[]>();
 const EMPTY: readonly LabelSpec[] = [];
 
 export const labelNodes = new Map<string, HTMLDivElement>();
@@ -45,11 +49,21 @@ function build(campaign: ChronicleCampaign): LabelSpec[] {
   return [...events, ...zones, ...straits].sort((a, b) => b.priority - a.priority);
 }
 
-export function labelsFor(campaign: ChronicleCampaign | null): readonly LabelSpec[] {
+const cityLabels: readonly LabelSpec[] = CITIES.map((city) => ({
+  id: `city-${city.id}`,
+  kind: "city",
+  text: city.name,
+  priority: 0,
+  anchor: lonLatToVector3(city.coordinates[0], city.coordinates[1], 1.006),
+  city,
+}));
+
+export function labelsFor(campaign: ChronicleCampaign | null, withCities = false): readonly LabelSpec[] {
   if (!campaign) return EMPTY;
-  const cached = cache.get(campaign);
+  const store = withCities ? cityCache : cache;
+  const cached = store.get(campaign);
   if (cached) return cached;
-  const labels = build(campaign);
-  cache.set(campaign, labels);
+  const labels = withCities ? [...build(campaign), ...cityLabels] : build(campaign);
+  store.set(campaign, labels);
   return labels;
 }

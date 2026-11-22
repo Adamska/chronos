@@ -16,6 +16,7 @@ import { useQuality } from "@/scene/quality";
 import { arcPresence, campaignFade } from "@/scene/temporal";
 import arcFragment from "@/shaders/arc.frag";
 import arcVertex from "@/shaders/arc.vert";
+import { isConcealed } from "@/store/useChallengeStore";
 import { useChronosStore } from "@/store/useChronosStore";
 import type { GeoArc } from "@/types/chronicle";
 
@@ -109,8 +110,9 @@ export function ChronicleArcs() {
     if (!campaign || !bundle || !mesh) return;
     const { year, layers, selection } = useChronosStore.getState();
     const fade = campaignFade(campaign);
+    const concealed = isConcealed();
     arcs.forEach((arc, index) => {
-      presence[index] = arcPresence(arc, year, fade, layers);
+      presence[index] = concealed ? 0 : arcPresence(arc, year, fade, layers);
     });
 
     const uniforms = tubeMaterial.uniforms;
