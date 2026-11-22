@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef } from "react";
+import { FocusTrack } from "@/components/hud/FocusTrack";
 import { LayerToggles } from "@/components/hud/LayerToggles";
 import { ClimateBands, ScrubTrack, TickAxis, toFraction, type YearRange } from "@/components/hud/TimelineTrack";
 import { CLIMATE_PERIODS } from "@/data/environment";
 import { eraLabel, formatYear } from "@/data/campaigns/registry";
-import { LAYER_COLORS } from "@/scene/temporal";
 import { useChronosStore } from "@/store/useChronosStore";
 import { TIMELINE_MAX_YEAR, TIMELINE_MIN_YEAR } from "@/types/chronicle";
 
@@ -77,17 +77,6 @@ function ChapterStepper() {
 
 export function TimelineScrubber() {
   const campaign = useChronosStore((state) => state.campaign);
-  const layers = useChronosStore((state) => state.layers);
-  const activeChapterId = useChronosStore((state) => state.activeChapterId);
-  const goToChapter = useChronosStore((state) => state.goToChapter);
-  const select = useChronosStore((state) => state.select);
-  const setYear = useChronosStore((state) => state.setYear);
-
-  const focus = useMemo<YearRange>(() => {
-    if (!campaign) return OVERVIEW;
-    const pad = Math.max(2, (campaign.endYear - campaign.startYear) * 0.02);
-    return { start: campaign.startYear - pad, end: campaign.endYear + pad };
-  }, [campaign]);
 
   return (
     <section data-hud-zone className="glass-panel pointer-events-auto w-full rounded-2xl px-4 pb-3 pt-3.5 sm:px-5">
@@ -98,49 +87,7 @@ export function TimelineScrubber() {
         <LayerToggles />
       </div>
 
-      <div className="mt-3">
-        <ScrubTrack range={focus} label="Campaign timeline" height="h-11" needleClass="w-px bg-ochre shadow-[0_0_12px_2px_rgb(217_164_65/0.55)]">
-          <div className="absolute inset-x-0 top-[26px] h-px bg-white/10" />
-          <ClimateBands range={focus} periods={CLIMATE_PERIODS} />
-          {campaign?.events.map((event) => (
-            <button
-              key={event.id}
-              type="button"
-              data-track-control
-              title={`${formatYear(event.year)} · ${event.title}`}
-              onClick={() => {
-                setYear(event.year);
-                select({ kind: "event", id: event.id });
-              }}
-              className="absolute bottom-[17px] w-[3px] -translate-x-1/2 rounded-full transition-[opacity,height] hover:!opacity-100"
-              style={{
-                left: `${toFraction(event.year, focus) * 100}%`,
-                height: `${4 + event.significance * 2.4}px`,
-                background: LAYER_COLORS[event.layer],
-                opacity: layers[event.layer] ? 0.85 : 0.15,
-              }}
-            />
-          ))}
-          {campaign?.chapters.map((chapter, index) => (
-            <button
-              key={chapter.id}
-              type="button"
-              data-track-control
-              title={chapter.title}
-              onClick={() => goToChapter(chapter.id)}
-              className={`absolute top-0 flex size-[17px] -translate-x-1/2 items-center justify-center rounded-[5px] border font-mono text-[9px] transition ${
-                chapter.id === activeChapterId
-                  ? "border-ochre bg-ochre text-abyss"
-                  : "border-white/15 bg-slate-deep text-ink-muted hover:border-ochre/60 hover:text-ink"
-              }`}
-              style={{ left: `${toFraction(chapter.year, focus) * 100}%` }}
-            >
-              {index + 1}
-            </button>
-          ))}
-        </ScrubTrack>
-        <TickAxis range={focus} />
-      </div>
+      {campaign ? <FocusTrack key={campaign.id} campaign={campaign} /> : null}
 
       <div className="mt-2 border-t border-hairline pt-2">
         <ScrubTrack range={OVERVIEW} label="Five thousand year overview" height="h-3" needleClass="w-[2px] bg-ink/80">

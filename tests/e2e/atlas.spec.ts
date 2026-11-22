@@ -1,13 +1,19 @@
 import { type Page, expect, test } from "@playwright/test";
 
 async function openAtlas(page: Page, path = "/") {
+  await page.addInitScript(() => window.localStorage.setItem("chronos.landing.seen", "1"));
   await page.goto(path);
   await expect(page.getByRole("heading", { level: 1 })).not.toBeEmpty();
 }
 
+async function openTool(page: Page, group: string, item: string) {
+  await page.getByRole("button", { name: group }).filter({ visible: true }).first().click();
+  await page.getByRole("menuitemcheckbox", { name: item }).click();
+}
+
 test.describe("atlas", () => {
   test("loads the default chronicle with its timeline", async ({ page }) => {
-    await page.goto("/");
+    await openAtlas(page);
     await expect(page.locator("canvas")).toBeVisible();
     await expect(page.getByRole("heading", { level: 1 })).toContainText("Silk Road");
     await expect(page.getByRole("slider", { name: "Campaign timeline" })).toBeVisible();
@@ -15,7 +21,7 @@ test.describe("atlas", () => {
 
   test("opens a dossier from a timeline tick", async ({ page }) => {
     await openAtlas(page);
-    await page.locator('button[title*="Zhang Qian"]').click();
+    await page.getByRole("button", { name: /Zhang Qian/ }).first().click();
     await expect(page.locator("aside h2").first()).toContainText("Zhang Qian");
   });
 
@@ -28,13 +34,13 @@ test.describe("atlas", () => {
   });
 
   test("restores a shared view from the URL", async ({ page }) => {
-    await page.goto("/?c=age-of-sail&y=1500");
+    await openAtlas(page, "/?c=age-of-sail&y=1500");
     await expect(page.getByRole("heading", { level: 1 })).toContainText("Age of Sail");
   });
 
   test("plays a round of the why-here challenge", async ({ page }) => {
     await openAtlas(page);
-    await page.getByRole("button", { name: "Why here? challenge" }).filter({ visible: true }).first().click();
+    await openTool(page, "Modes", "Why here? challenge");
     await expect(page.getByText("Click the globe where you think this happened.")).toBeVisible();
     await page.waitForTimeout(2500);
     const canvas = page.locator("canvas");
@@ -49,6 +55,13 @@ test.describe("atlas", () => {
     await expect(page.getByRole("heading", { level: 1 })).toContainText("Plague");
     await expect(page.getByRole("button", { name: "Print this sheet" })).toBeVisible();
   });
+});
+
+test("shows the landing screen on a first visit", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByRole("dialog", { name: "Welcome to Chronos" })).toBeVisible();
+  await page.getByRole("button", { name: /Explore the atlas/ }).click();
+  await expect(page.getByRole("dialog", { name: "Welcome to Chronos" })).toBeHidden();
 });
 
 test.describe("api", () => {

@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import type { Season } from "@/data/environment";
+import { useChronosStore } from "@/store/useChronosStore";
 import type { LonLat } from "@/types/chronicle";
 
 export type Lens = "none" | "travel" | "known";
@@ -34,6 +35,10 @@ interface AtlasState {
   touring: boolean;
   challengeActive: boolean;
   contextLost: boolean;
+  landingOpen: boolean;
+  compareYear: number | null;
+  posterNonce: number;
+  ambientSound: boolean;
   setLens: (lens: Lens) => void;
   togglePanel: (panel: Panel) => void;
   setTravelOrigin: (origin: TravelOrigin | null) => void;
@@ -48,6 +53,11 @@ interface AtlasState {
   setTouring: (value: boolean) => void;
   setChallengeActive: (value: boolean) => void;
   setContextLost: (value: boolean) => void;
+  setLandingOpen: (value: boolean) => void;
+  toggleCompare: () => void;
+  setCompareYear: (year: number | null) => void;
+  requestPoster: () => void;
+  setAmbientSound: (value: boolean) => void;
 }
 
 export const useAtlasStore = create<AtlasState>()((set, get) => ({
@@ -65,6 +75,10 @@ export const useAtlasStore = create<AtlasState>()((set, get) => ({
   touring: false,
   challengeActive: false,
   contextLost: false,
+  landingOpen: false,
+  compareYear: null,
+  posterNonce: 0,
+  ambientSound: false,
   setLens: (lens) => set({ lens: get().lens === lens ? "none" : lens }),
   togglePanel: (panel) => set({ panel: get().panel === panel ? "none" : panel }),
   setTravelOrigin: (travelOrigin) => set({ travelOrigin }),
@@ -79,4 +93,17 @@ export const useAtlasStore = create<AtlasState>()((set, get) => ({
   setTouring: (touring) => set({ touring }),
   setChallengeActive: (challengeActive) => set({ challengeActive, lens: "none" }),
   setContextLost: (contextLost) => set({ contextLost }),
+  setLandingOpen: (landingOpen) => set({ landingOpen }),
+  toggleCompare: () => {
+    if (get().compareYear !== null) {
+      set({ compareYear: null });
+      return;
+    }
+    const { year, campaign } = useChronosStore.getState();
+    const span = campaign ? campaign.endYear - campaign.startYear : 400;
+    set({ compareYear: Math.round(year - Math.max(50, span * 0.25)) });
+  },
+  setCompareYear: (compareYear) => set({ compareYear }),
+  requestPoster: () => set({ posterNonce: get().posterNonce + 1 }),
+  setAmbientSound: (ambientSound) => set({ ambientSound }),
 }));

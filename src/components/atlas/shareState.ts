@@ -2,6 +2,7 @@ import { findCatalogEntry, loadChronicle } from "@/data/catalog";
 import { vector3ToLonLat } from "@/geo/sphericalMath";
 import { currentCamera } from "@/scene/cameraRef";
 import { type Lens, useAtlasStore } from "@/store/useAtlasStore";
+import { useChallengeStore } from "@/store/useChallengeStore";
 import { useChronosStore } from "@/store/useChronosStore";
 import type { LonLat } from "@/types/chronicle";
 
@@ -63,6 +64,12 @@ export async function restoreSharedView(): Promise<boolean> {
   if (origin) atlas.setTravelOrigin({ coordinates: origin, label: `${Math.abs(origin[1]).toFixed(1)}°, ${Math.abs(origin[0]).toFixed(1)}°` });
   if (params.get("p")) atlas.setKnownPerspective(params.get("p") ?? "latin-europe");
   if (lens === "travel" || lens === "known") atlas.setLens(lens);
+
+  const challenge = params.get("challenge");
+  if (challenge === "easy" || challenge === "normal" || challenge === "hard") {
+    useChallengeStore.setState({ difficulty: challenge });
+    atlas.setChallengeActive(true);
+  }
 
   const cameraPoint = params.get("cam");
   const [lon, lat, distance] = (cameraPoint ?? "").split(",").map(Number);

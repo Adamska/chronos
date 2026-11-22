@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { type CSSProperties, useEffect, useRef, useState } from "react";
 import { ActionButton, Badge, Section } from "@/components/dossier/DossierParts";
 import { FlowSchematic } from "@/components/dossier/FlowSchematic";
 import { formatKm, nearestBarrier, nearestChokepoint } from "@/components/dossier/geoInsights";
@@ -13,6 +13,10 @@ import { ARC_KIND_COLORS, LAYER_COLORS } from "@/scene/temporal";
 import { useChronosStore } from "@/store/useChronosStore";
 import type { ChronicleCampaign, GeoArc, HistoricalEvent } from "@/types/chronicle";
 import { LAYER_LABELS } from "@/types/chronicle";
+
+type Sheet = "peek" | "half" | "full";
+const SHEET_HEIGHTS: Record<Sheet, string> = { peek: "30dvh", half: "56dvh", full: "92dvh" };
+const NEXT_SHEET: Record<Sheet, Sheet> = { peek: "half", half: "full", full: "peek" };
 
 function EventBody({ event, campaign }: { readonly event: HistoricalEvent; readonly campaign: ChronicleCampaign }) {
   const select = useChronosStore((state) => state.select);
@@ -147,24 +151,49 @@ export function EventDossier() {
   const event = open ? selectedEvent : retained.event;
   const arc = open ? selectedArc : retained.arc;
   const contentKey = event?.id ?? arc?.id ?? "empty";
+  const panel = useRef<HTMLElement>(null);
+  const dragStart = useRef(0);
+  const [sheet, setSheet] = useState<Sheet>("half");
+
+  useEffect(() => {
+    if (open) panel.current?.querySelector<HTMLElement>("h2")?.focus({ preventScroll: true });
+  }, [open, contentKey]);
 
   return (
     <aside
+      ref={panel}
       aria-hidden={!open}
+      aria-label="Dossier"
       data-hud-zone
-      className={`pointer-events-auto absolute right-3 top-3 bottom-3 z-20 w-[min(420px,calc(100vw-24px))] transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] sm:right-4 sm:top-4 md:bottom-[13.5rem] ${
-        open ? "translate-x-0 opacity-100" : "pointer-events-none translate-x-[calc(100%+2rem)] opacity-0"
+      style={{ "--sheet-height": SHEET_HEIGHTS[sheet] } as CSSProperties}
+      className={`pointer-events-auto absolute inset-x-0 bottom-0 z-20 h-[var(--sheet-height)] transition-[transform,opacity,height] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] md:inset-x-auto md:right-4 md:top-4 md:bottom-[13.5rem] md:h-auto md:w-[min(420px,calc(100vw-24px))] ${
+        open ? "translate-y-0 opacity-100 md:translate-x-0" : "pointer-events-none translate-y-full opacity-0 md:translate-x-[calc(100%+2rem)] md:translate-y-0"
       }`}
     >
-      <div key={contentKey} className="glass-panel scrollbar-quiet relative h-full overflow-y-auto rounded-2xl">
-        <button
-          type="button"
-          onClick={() => select(null)}
-          aria-label="Close dossier"
-          className="sticky top-3 z-10 float-right mr-3 mt-3 flex size-8 items-center justify-center rounded-full border border-hairline bg-abyss/70 text-ink-muted backdrop-blur transition hover:text-ink"
-        >
-          <svg viewBox="0 0 16 16" className="size-3" stroke="currentColor" strokeWidth="1.8"><path d="m3 3 10 10M13 3 3 13" /></svg>
-        </button>
+      <button
+        type="button"
+        aria-label="Resize dossier"
+        onClick={() => setSheet(NEXT_SHEET[sheet])}
+        onPointerDown={(event) => (dragStart.current = event.clientY)}
+        onPointerUp={(event) => {
+          const delta = event.clientY - dragStart.current;
+          if (Math.abs(delta) > 24) setSheet(delta < 0 ? (sheet === "peek" ? "half" : "full") : sheet === "full" ? "half" : "peek");
+        }}
+        className="absolute -top-0 left-1/2 z-20 flex h-6 w-16 -translate-x-1/2 items-center justify-center md:hidden"
+      >
+        <span className="h-1 w-10 rounded-full bg-white/30" />
+      </button>
+      <div key={contentKey} className="glass-panel scrollbar-quiet relative h-full overflow-y-auto rounded-t-2xl md:rounded-2xl">
+        <div className="sticky top-0 z-10 h-0">
+          <button
+            type="button"
+            onClick={() => select(null)}
+            aria-label="Close dossier"
+            className="absolute right-3 top-3 flex size-8 items-center justify-center rounded-full border border-hairline bg-abyss/70 text-ink-muted backdrop-blur transition hover:text-ink"
+          >
+            <svg viewBox="0 0 16 16" className="size-3" stroke="currentColor" strokeWidth="1.8"><path d="m3 3 10 10M13 3 3 13" /></svg>
+          </button>
+        </div>
         {campaign && event ? <EventBody event={event} campaign={campaign} /> : null}
         {campaign && arc ? <RouteDossier arc={arc} campaign={campaign} /> : null}
       </div>

@@ -20,7 +20,7 @@ export function useHotkeys(): void {
         else if (store.selection) store.select(null);
         return;
       }
-      if (isTypingTarget(event.target) || store.paletteOpen) return;
+      if (isTypingTarget(event.target) || store.paletteOpen || event.shiftKey) return;
       if (event.key === " ") {
         event.preventDefault();
         store.togglePlaying();

@@ -1,6 +1,7 @@
 "use client";
 
 import { formatSpan } from "@/data/campaigns/registry";
+import { useAtlasStore } from "@/store/useAtlasStore";
 import { useChronosStore } from "@/store/useChronosStore";
 import type { CampaignSource } from "@/types/chronicle";
 
@@ -19,10 +20,10 @@ export function CampaignHeader() {
 
   return (
     <div data-hud-zone className="pointer-events-auto max-w-[min(26rem,calc(100vw-2rem))]">
-      <div className="flex items-center gap-2">
+      <button type="button" onClick={() => useAtlasStore.getState().setLandingOpen(true)} className="flex items-center gap-2" aria-label="Open the Chronos welcome screen">
         <span className="size-1.5 rounded-full bg-ochre shadow-[0_0_10px_2px_rgb(217_164_65/0.6)]" />
         <span className="font-mono text-[11px] font-medium uppercase tracking-[0.42em] text-ink">Chronos</span>
-      </div>
+      </button>
       {campaign ? (
         <div className="mt-4">
           <p className="eyebrow">

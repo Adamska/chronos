@@ -1,7 +1,7 @@
 "use client";
 
 import { CameraControls, type CameraControlsImpl } from "@react-three/drei";
-import { useThree } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import { registerCamera } from "@/scene/cameraRef";
 import { useAtlasStore } from "@/store/useAtlasStore";
 import { useEffect, useRef } from "react";
@@ -45,12 +45,46 @@ export function CameraDirector() {
     };
   }, [request, aspect]);
 
-  const handleControlStart = () => {
+  useFrame((_, delta) => {
     const rig = controls.current;
-    if (rig) {
-      rig.stop();
-      rig.smoothTime = USER_SMOOTH_TIME;
-    }
+    if (rig && useAtlasStore.getState().landingOpen && !useAtlasStore.getState().reducedMotion) rig.rotate(delta * 0.05, 0, false);
+  });
+
+  useEffect(() => {
+    const handle = (event: KeyboardEvent) => {
+      const target = event.target;
+      if (target instanceof HTMLElement && (target.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName))) return;
+      const rig = controls.current;
+      if (!rig) return;
+      const step = 0.18;
+      const moves: Record<string, () => void> = {
+        ArrowLeft: () => void rig.rotate(-step, 0, true),
+        ArrowRight: () => void rig.rotate(step, 0, true),
+        ArrowUp: () => void rig.rotate(0, -step, true),
+        ArrowDown: () => void rig.rotate(0, step, true),
+      };
+      const move = event.shiftKey ? moves[event.key] : undefined;
+      if (move) {
+        event.preventDefault();
+        yieldCamera();
+        move();
+      } else if (event.key === "+" || event.key === "=") {
+        yieldCamera();
+        void rig.dolly(0.35, true);
+      } else if (event.key === "-" || event.key === "_") {
+        yieldCamera();
+        void rig.dolly(-0.35, true);
+      }
+    };
+    window.addEventListener("keydown", handle);
+    return () => window.removeEventListener("keydown", handle);
+  }, [yieldCamera]);
+
+  const handleControl = () => {
+    const rig = controls.current;
+    if (!rig || useChronosStore.getState().cameraMode === "free") return;
+    rig.stop();
+    rig.smoothTime = USER_SMOOTH_TIME;
     yieldCamera();
   };
 
@@ -65,7 +99,7 @@ export function CameraDirector() {
       dollySpeed={0.6}
       azimuthRotateSpeed={0.55}
       polarRotateSpeed={0.55}
-      onControlStart={handleControlStart}
+      onControl={handleControl}
     />
   );
 }

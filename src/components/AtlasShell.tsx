@@ -8,7 +8,9 @@ import { CampaignPalette, SearchPill } from "@/components/hud/CampaignPalette";
 import { ChronicleNotice } from "@/components/hud/ChronicleNotice";
 import { HudOverlay } from "@/components/hud/HudOverlay";
 import { LabelOverlay } from "@/components/hud/LabelOverlay";
-import { DEFAULT_CHRONICLE_ID, loadChronicle } from "@/data/catalog";
+import { Landing, hasSeenLanding } from "@/components/landing/Landing";
+import { pushRecent } from "@/components/hud/recent";
+import { DEFAULT_CHRONICLE_ID, findCatalogEntry, loadChronicle } from "@/data/catalog";
 import { useAtlasStore } from "@/store/useAtlasStore";
 import { useChronosStore } from "@/store/useChronosStore";
 
@@ -26,6 +28,7 @@ export function AtlasShell() {
     if (!useChronosStore.getState().campaign) {
       void restoreSharedView().then(async (restored) => {
         if (restored) return;
+        if (!hasSeenLanding()) useAtlasStore.getState().setLandingOpen(true);
         const fallback = await loadChronicle(DEFAULT_CHRONICLE_ID);
         if (fallback && !useChronosStore.getState().campaign) useChronosStore.getState().loadCampaign(fallback);
       });
@@ -35,7 +38,10 @@ export function AtlasShell() {
       window.clearTimeout(timer);
       timer = window.setTimeout(syncUrl, 600);
     };
-    const unsubscribeChronos = useChronosStore.subscribe(schedule);
+    const unsubscribeChronos = useChronosStore.subscribe((state, previous) => {
+      if (state.campaign && state.campaign !== previous.campaign && findCatalogEntry(state.campaign.id)) pushRecent(state.campaign.id);
+      schedule();
+    });
     const unsubscribeAtlas = useAtlasStore.subscribe(schedule);
     return () => {
       window.clearTimeout(timer);
@@ -52,6 +58,7 @@ export function AtlasShell() {
       <HudOverlay search={<SearchPill />} />
       <ChronicleNotice />
       <CampaignPalette />
+      <Landing />
       <GraphicsNotice />
     </main>
   );

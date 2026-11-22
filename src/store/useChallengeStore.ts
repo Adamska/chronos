@@ -3,6 +3,9 @@ import { angularDistance } from "@/geo/sphericalMath";
 import type { ChronicleCampaign, HistoricalEvent, LonLat } from "@/types/chronicle";
 
 export type ChallengePhase = "idle" | "question" | "reveal" | "done";
+export type Difficulty = "easy" | "normal" | "hard";
+
+export const DIFFICULTY_SCALE_KM: Record<Difficulty, number> = { easy: 2000, normal: 1200, hard: 700 };
 
 export interface ChallengeResult {
   readonly event: HistoricalEvent;
@@ -20,7 +23,10 @@ interface ChallengeState {
   round: number;
   results: readonly ChallengeResult[];
   campaignId: string | null;
-  start: (campaign: ChronicleCampaign) => void;
+  difficulty: Difficulty;
+  hints: number;
+  start: (campaign: ChronicleCampaign, difficulty?: Difficulty) => void;
+  useHint: () => void;
   guess: (point: LonLat) => ChallengeResult | null;
   next: () => void;
   reset: () => void;
@@ -42,21 +48,25 @@ export const useChallengeStore = create<ChallengeState>()((set, get) => ({
   round: 0,
   results: [],
   campaignId: null,
-  start: (campaign) => set({ phase: "question", queue: pickRounds(campaign), round: 0, results: [], campaignId: campaign.id }),
+  difficulty: "normal",
+  hints: 0,
+  start: (campaign, difficulty) =>
+    set((state) => ({ phase: "question", queue: pickRounds(campaign), round: 0, results: [], hints: 0, campaignId: campaign.id, difficulty: difficulty ?? state.difficulty })),
+  useHint: () => set((state) => ({ hints: Math.min(2, state.hints + 1) })),
   guess: (point) => {
     const { phase, queue, round, results } = get();
     const event = queue[round];
     if (phase !== "question" || !event) return null;
     const distanceKm = angularDistance(point, event.coordinates) * EARTH_RADIUS_KM;
-    const result = { event, guess: point, distanceKm, points: Math.round(1000 * Math.exp(-distanceKm / 1200)) };
+    const result = { event, guess: point, distanceKm, points: Math.round(1000 * Math.exp(-distanceKm / DIFFICULTY_SCALE_KM[get().difficulty])) };
     set({ phase: "reveal", results: [...results, result] });
     return result;
   },
   next: () => {
     const { round, queue } = get();
-    set(round + 1 >= queue.length ? { phase: "done" } : { phase: "question", round: round + 1 });
+    set(round + 1 >= queue.length ? { phase: "done" } : { phase: "question", round: round + 1, hints: 0 });
   },
-  reset: () => set({ phase: "idle", queue: [], round: 0, results: [], campaignId: null }),
+  reset: () => set({ phase: "idle", queue: [], round: 0, results: [], hints: 0, campaignId: null }),
 }));
 
 export const isConcealed = (): boolean => useChallengeStore.getState().phase === "question";

@@ -34,6 +34,8 @@ function ActivePanel() {
 export function HudOverlay({ search }: { readonly search?: ReactNode }) {
   usePlayback();
   useHotkeys();
+  const landingOpen = useAtlasStore((state) => state.landingOpen);
+  if (landingOpen) return null;
 
   return (
     <div className="pointer-events-none absolute inset-0 z-10">
