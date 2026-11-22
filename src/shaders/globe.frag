@@ -13,34 +13,6 @@ varying vec3 vWorldPosition;
 
 #define PI 3.141592653589793
 
-float hash(vec3 p) {
-  p = fract(p * 0.3183099 + 0.1);
-  p *= 17.0;
-  return fract(p.x * p.y * p.z * (p.x + p.y + p.z));
-}
-
-float valueNoise(vec3 x) {
-  vec3 i = floor(x);
-  vec3 f = fract(x);
-  f = f * f * (3.0 - 2.0 * f);
-  return mix(
-    mix(mix(hash(i), hash(i + vec3(1, 0, 0)), f.x), mix(hash(i + vec3(0, 1, 0)), hash(i + vec3(1, 1, 0)), f.x), f.y),
-    mix(mix(hash(i + vec3(0, 0, 1)), hash(i + vec3(1, 0, 1)), f.x), mix(hash(i + vec3(0, 1, 1)), hash(i + vec3(1, 1, 1)), f.x), f.y),
-    f.z
-  );
-}
-
-float fbm(vec3 p) {
-  float sum = 0.0;
-  float amplitude = 0.5;
-  for (int octave = 0; octave < 4; octave++) {
-    sum += amplitude * valueNoise(p);
-    p *= 2.07;
-    amplitude *= 0.5;
-  }
-  return sum;
-}
-
 float gridLine(float coordinate, float spacing, float derivative) {
   float distanceToLine = abs(fract(coordinate / spacing - 0.5) - 0.5) * spacing;
   return 1.0 - smoothstep(0.0, derivative * 1.25, distanceToLine);

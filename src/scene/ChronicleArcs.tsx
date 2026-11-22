@@ -1,0 +1,192 @@
+"use client";
+
+import { type ThreeEvent, useFrame } from "@react-three/fiber";
+import { useEffect, useMemo, useRef } from "react";
+import {
+  AdditiveBlending,
+  Color,
+  DynamicDrawUsage,
+  IcosahedronGeometry,
+  type InstancedMesh,
+  MeshBasicMaterial,
+  ShaderMaterial,
+} from "three";
+import { ARC_SAMPLES, MAX_ARCS, buildArcBundle } from "@/scene/arcGeometry";
+import { arcPresence, campaignFade } from "@/scene/temporal";
+import arcFragment from "@/shaders/arc.frag";
+import arcVertex from "@/shaders/arc.vert";
+import { useChronosStore } from "@/store/useChronosStore";
+import type { GeoArc } from "@/types/chronicle";
+
+const MAX_PARTICLES = 4000;
+const PARTICLE_SIZE = 0.0042;
+
+interface ParticleField {
+  readonly count: number;
+  readonly arcIndex: Uint16Array;
+  readonly offset: Float32Array;
+  readonly speed: Float32Array;
+}
+
+function seedParticles(arcs: readonly GeoArc[]): ParticleField {
+  const perArc = arcs.map((arc) => Math.round(28 + arc.intensity * 84));
+  const budget = perArc.reduce((sum, value) => sum + value, 0);
+  const scale = budget > MAX_PARTICLES ? MAX_PARTICLES / budget : 1;
+  const counts = perArc.map((value) => Math.max(8, Math.floor(value * scale)));
+  const count = counts.reduce((sum, value) => sum + value, 0);
+  const arcIndex = new Uint16Array(count);
+  const offset = new Float32Array(count);
+  const speed = new Float32Array(count);
+  let cursor = 0;
+  counts.forEach((amount, index) => {
+    for (let i = 0; i < amount; i += 1, cursor += 1) {
+      arcIndex[cursor] = index;
+      offset[cursor] = (i + Math.random() * 0.6) / amount;
+      speed[cursor] = 0.05 + Math.random() * 0.035;
+    }
+  });
+  return { count, arcIndex, offset, speed };
+}
+
+function setCursor(cursor: "pointer" | "auto"): void {
+  document.body.style.cursor = cursor;
+}
+
+export function ChronicleArcs() {
+  const campaign = useChronosStore((state) => state.campaign);
+  const select = useChronosStore((state) => state.select);
+  const arcs = useMemo(() => (campaign?.arcs ?? []).slice(0, MAX_ARCS), [campaign]);
+  const bundle = useMemo(() => buildArcBundle(arcs), [arcs]);
+  const particles = useMemo(() => seedParticles(arcs), [arcs]);
+  const presence = useMemo(() => new Float32Array(MAX_ARCS), []);
+  const particleMesh = useRef<InstancedMesh>(null);
+
+  const tubeMaterial = useMemo(
+    () =>
+      new ShaderMaterial({
+        vertexShader: arcVertex,
+        fragmentShader: arcFragment,
+        transparent: true,
+        depthWrite: false,
+        blending: AdditiveBlending,
+        uniforms: { uPresence: { value: presence }, uSelected: { value: -1 }, uTime: { value: 0 } },
+      }),
+    [presence],
+  );
+  const particleGeometry = useMemo(() => new IcosahedronGeometry(1, 1), []);
+  const particleMaterial = useMemo(
+    () => new MeshBasicMaterial({ transparent: true, depthWrite: false, blending: AdditiveBlending, toneMapped: false }),
+    [],
+  );
+
+  useEffect(() => () => bundle?.tubes.dispose(), [bundle]);
+  useEffect(() => () => bundle?.pick.dispose(), [bundle]);
+  useEffect(
+    () => () => {
+      tubeMaterial.dispose();
+      particleGeometry.dispose();
+      particleMaterial.dispose();
+    },
+    [tubeMaterial, particleGeometry, particleMaterial],
+  );
+
+  useEffect(() => {
+    const mesh = particleMesh.current;
+    if (!mesh || !bundle) return;
+    mesh.instanceMatrix.setUsage(DynamicDrawUsage);
+    const tint = new Color();
+    for (let i = 0; i < particles.count; i += 1) {
+      const color = bundle.colors[particles.arcIndex[i] ?? 0];
+      if (color) mesh.setColorAt(i, tint.copy(color).multiplyScalar(1.8));
+    }
+    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+  }, [bundle, particles]);
+
+  useFrame((_, delta) => {
+    const mesh = particleMesh.current;
+    if (!campaign || !bundle || !mesh) return;
+    const { year, layers, selection } = useChronosStore.getState();
+    const fade = campaignFade(campaign);
+    arcs.forEach((arc, index) => {
+      presence[index] = arcPresence(arc, year, fade, layers);
+    });
+
+    const uniforms = tubeMaterial.uniforms;
+    if (uniforms.uTime) uniforms.uTime.value += delta;
+    if (uniforms.uSelected) {
+      uniforms.uSelected.value = selection?.kind === "arc" ? arcs.findIndex((arc) => arc.id === selection.id) : -1;
+    }
+
+    const time = uniforms.uTime?.value as number;
+    const matrices = mesh.instanceMatrix.array;
+    for (let i = 0; i < particles.count; i += 1) {
+      const arc = particles.arcIndex[i] ?? 0;
+      const visibility = presence[arc] ?? 0;
+      const base = i * 16;
+      if (visibility < 0.01) {
+        matrices[base] = matrices[base + 5] = matrices[base + 10] = 0;
+        continue;
+      }
+      const table = bundle.samples[arc];
+      const length = bundle.lengths[arc] ?? 1;
+      if (!table) continue;
+      const travel = ((particles.offset[i] ?? 0) + (time * (particles.speed[i] ?? 0.06)) / length) % 1;
+      const position = travel * (ARC_SAMPLES - 1);
+      const lower = Math.floor(position);
+      const blend = position - lower;
+      const a = lower * 3;
+      const b = Math.min(ARC_SAMPLES - 1, lower + 1) * 3;
+      const taper = Math.min(1, travel * 12, (1 - travel) * 12);
+      const scale = PARTICLE_SIZE * visibility * (0.45 + 0.55 * taper);
+      matrices[base] = scale;
+      matrices[base + 5] = scale;
+      matrices[base + 10] = scale;
+      matrices[base + 12] = (table[a] ?? 0) + ((table[b] ?? 0) - (table[a] ?? 0)) * blend;
+      matrices[base + 13] = (table[a + 1] ?? 0) + ((table[b + 1] ?? 0) - (table[a + 1] ?? 0)) * blend;
+      matrices[base + 14] = (table[a + 2] ?? 0) + ((table[b + 2] ?? 0) - (table[a + 2] ?? 0)) * blend;
+      matrices[base + 15] = 1;
+    }
+    mesh.instanceMatrix.needsUpdate = true;
+  });
+
+  const resolveArc = (event: ThreeEvent<PointerEvent | MouseEvent>): GeoArc | null => {
+    const vertex = event.face?.a;
+    const attribute = bundle?.pick.getAttribute("aArc");
+    if (vertex === undefined || !attribute) return null;
+    const index = Math.round(attribute.getX(vertex));
+    return (presence[index] ?? 0) > 0.2 ? (arcs[index] ?? null) : null;
+  };
+
+  if (!bundle) return null;
+
+  return (
+    <group>
+      <mesh geometry={bundle.tubes} material={tubeMaterial} renderOrder={4} frustumCulled={false} />
+      <instancedMesh
+        key={campaign?.id}
+        ref={particleMesh}
+        args={[particleGeometry, particleMaterial, particles.count]}
+        renderOrder={5}
+        frustumCulled={false}
+      />
+      <mesh
+        geometry={bundle.pick}
+        onPointerMove={(event) => {
+          if (resolveArc(event)) {
+            event.stopPropagation();
+            setCursor("pointer");
+          } else setCursor("auto");
+        }}
+        onPointerOut={() => setCursor("auto")}
+        onClick={(event) => {
+          const arc = resolveArc(event);
+          if (!arc) return;
+          event.stopPropagation();
+          select({ kind: "arc", id: arc.id });
+        }}
+      >
+        <meshBasicMaterial transparent opacity={0} depthWrite={false} colorWrite={false} />
+      </mesh>
+    </group>
+  );
+}

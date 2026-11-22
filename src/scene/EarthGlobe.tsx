@@ -29,6 +29,7 @@ import globeFragment from "@/shaders/globe.frag";
 import globeVertex from "@/shaders/globe.vert";
 import landFragment from "@/shaders/land.frag";
 import landVertex from "@/shaders/land.vert";
+import noiseChunk from "@/shaders/noise.glsl";
 import { useChronosStore } from "@/store/useChronosStore";
 
 const LAND_BASE = 1.0;
@@ -46,7 +47,7 @@ interface LandLayers {
 function createLandMaterial(base: string, highlight: string, top: number, opacity = 1): ShaderMaterial {
   return new ShaderMaterial({
     vertexShader: landVertex,
-    fragmentShader: landFragment,
+    fragmentShader: `${noiseChunk}\n${landFragment}`,
     transparent: opacity < 1,
     uniforms: {
       uSunDirection: sunDirectionUniform,
@@ -111,12 +112,13 @@ export function EarthGlobe() {
 
   const oceanGeometry = useMemo(() => new SphereGeometry(1, 160, 120), []);
   const shellGeometry = useMemo(() => new SphereGeometry(SHELL_RADIUS, 128, 96), []);
+  const occluderGeometry = useMemo(() => new SphereGeometry(1.002, 48, 32), []);
 
   const oceanMaterial = useMemo(
     () =>
       new ShaderMaterial({
         vertexShader: globeVertex,
-        fragmentShader: globeFragment,
+        fragmentShader: `${noiseChunk}\n${globeFragment}`,
         uniforms: {
           uSunDirection: sunDirectionUniform,
           uShelf: { value: null },
@@ -153,7 +155,7 @@ export function EarthGlobe() {
   );
 
   const landMaterial = useMemo(() => createLandMaterial("#14171a", "#383832", LAND_TOP), []);
-  const barrierMaterial = useMemo(() => createLandMaterial("#24221e", "#6e6552", BARRIER_TOP), []);
+  const barrierMaterial = useMemo(() => createLandMaterial("#1e1d1a", "#5e5646", BARRIER_TOP), []);
   const coastlineMaterial = useMemo(
     () => new LineBasicMaterial({ color: "#d8d0bb", transparent: true, opacity: 0.32, depthWrite: false }),
     [],
@@ -168,13 +170,14 @@ export function EarthGlobe() {
     () => () => {
       oceanGeometry.dispose();
       shellGeometry.dispose();
+      occluderGeometry.dispose();
       oceanMaterial.dispose();
       atmosphereMaterial.dispose();
       landMaterial.dispose();
       barrierMaterial.dispose();
       coastlineMaterial.dispose();
     },
-    [oceanGeometry, shellGeometry, oceanMaterial, atmosphereMaterial, landMaterial, barrierMaterial, coastlineMaterial],
+    [oceanGeometry, shellGeometry, occluderGeometry, oceanMaterial, atmosphereMaterial, landMaterial, barrierMaterial, coastlineMaterial],
   );
 
   useFrame(({ camera }, delta) => {
@@ -194,6 +197,13 @@ export function EarthGlobe() {
         </>
       ) : null}
       <mesh geometry={shellGeometry} material={atmosphereMaterial} renderOrder={10} />
+      <mesh
+        geometry={occluderGeometry}
+        onClick={(event) => event.stopPropagation()}
+        onPointerMove={(event) => event.stopPropagation()}
+      >
+        <meshBasicMaterial colorWrite={false} depthWrite={false} />
+      </mesh>
     </group>
   );
 }

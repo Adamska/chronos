@@ -1,10 +1,15 @@
 "use client";
 
-import { CameraControls, Stars } from "@react-three/drei";
+import { Stars } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { Bloom, EffectComposer, Noise, Vignette } from "@react-three/postprocessing";
 import { ACESFilmicToneMapping, SRGBColorSpace } from "three";
+import { CameraDirector } from "@/scene/CameraDirector";
+import { ChronicleArcs } from "@/scene/ChronicleArcs";
 import { EarthGlobe } from "@/scene/EarthGlobe";
+import { EventBeacons } from "@/scene/EventBeacons";
+import { SmartLabels } from "@/scene/SmartLabels";
+import { TerritoryLayer } from "@/scene/TerritoryLayer";
 
 export default function AtlasCanvas() {
   return (
@@ -17,7 +22,11 @@ export default function AtlasCanvas() {
       <color attach="background" args={["#05070a"]} />
       <Stars radius={60} depth={40} count={2600} factor={2.4} saturation={0} fade speed={0.25} />
       <EarthGlobe />
-      <CameraControls makeDefault minDistance={1.25} maxDistance={7} smoothTime={0.35} />
+      <TerritoryLayer />
+      <ChronicleArcs />
+      <EventBeacons />
+      <SmartLabels />
+      <CameraDirector />
       <EffectComposer multisampling={0}>
         <Bloom mipmapBlur intensity={0.55} luminanceThreshold={0.55} luminanceSmoothing={0.2} />
         <Noise opacity={0.025} />

@@ -1,6 +1,10 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useEffect } from "react";
+import { LabelOverlay } from "@/components/hud/LabelOverlay";
+import { DEFAULT_CAMPAIGN } from "@/data/campaigns";
+import { useChronosStore } from "@/store/useChronosStore";
 
 const AtlasCanvas = dynamic(() => import("@/scene/AtlasCanvas"), {
   ssr: false,
@@ -12,9 +16,14 @@ const AtlasCanvas = dynamic(() => import("@/scene/AtlasCanvas"), {
 });
 
 export function AtlasShell() {
+  useEffect(() => {
+    if (!useChronosStore.getState().campaign) useChronosStore.getState().loadCampaign(DEFAULT_CAMPAIGN);
+  }, []);
+
   return (
     <main className="relative h-dvh w-full overflow-hidden bg-abyss">
       <AtlasCanvas />
+      <LabelOverlay />
     </main>
   );
 }

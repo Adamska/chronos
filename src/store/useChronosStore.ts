@@ -37,12 +37,19 @@ interface ChronosActions {
   togglePlaying: () => void;
   toggleLayer: (layer: LayerKind) => void;
   select: (selection: Selection | null) => void;
-  goToChapter: (chapterId: string, options?: { readonly moveYear?: boolean }) => void;
+  goToChapter: (chapterId: string, options?: ChapterOptions) => void;
+  markChapter: (chapterId: string) => void;
+  focusEvent: (eventId: string) => void;
   stepChapter: (direction: 1 | -1) => void;
   requestCamera: (keyframe: CameraKeyframe) => void;
   yieldCamera: () => void;
   setPaletteOpen: (open: boolean) => void;
   setChronicleStatus: (status: ChronicleStatus, message?: string | null) => void;
+}
+
+export interface ChapterOptions {
+  readonly moveYear?: boolean;
+  readonly openDossier?: boolean;
 }
 
 export type ChronosStore = ChronosState & ChronosActions;
@@ -112,8 +119,29 @@ export const useChronosStore = create<ChronosStore>()((set, get) => ({
       year: options?.moveYear === false ? state.year : chapter.year,
       cameraMode: "directed",
       cameraRequest: { keyframe: chapter, nonce: cameraNonce },
-      selection: chapter.eventId ? { kind: "event", id: chapter.eventId } : state.selection,
+      selection: chapter.eventId && options?.openDossier !== false ? { kind: "event", id: chapter.eventId } : state.selection,
     }));
+  },
+
+  focusEvent: (eventId) => {
+    const event = get().campaign?.events.find((entry) => entry.id === eventId);
+    if (!event) return;
+    cameraNonce += 1;
+    const keyframe: CameraKeyframe = {
+      id: `focus-${event.id}`,
+      year: event.year,
+      title: event.title,
+      caption: event.summary,
+      target: event.coordinates,
+      altitude: 1.05,
+      tilt: 24,
+      eventId: event.id,
+    };
+    set({ year: event.year, selection: { kind: "event", id: event.id }, cameraMode: "directed", cameraRequest: { keyframe, nonce: cameraNonce } });
+  },
+
+  markChapter: (chapterId) => {
+    if (get().activeChapterId !== chapterId) set({ activeChapterId: chapterId });
   },
 
   stepChapter: (direction) => {
