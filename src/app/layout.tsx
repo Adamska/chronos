@@ -18,6 +18,7 @@ const plexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
   title: "Chronos — A Temporal & Geopolitical Atlas",
   description:
     "An interactive 3D atlas that renders trade networks, scientific diffusion, migrations and shifting borders across five thousand years of history.",

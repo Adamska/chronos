@@ -4,7 +4,7 @@ import { useChronosStore } from "@/store/useChronosStore";
 import type { LonLat } from "@/types/chronicle";
 
 export type Lens = "none" | "travel" | "known";
-export type Panel = "none" | "meanwhile" | "index" | "settings" | "ask";
+export type Panel = "none" | "meanwhile" | "index" | "settings" | "ask" | "teacher";
 
 export interface TravelOrigin {
   readonly coordinates: LonLat;

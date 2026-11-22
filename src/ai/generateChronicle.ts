@@ -1,6 +1,6 @@
 import { createOpenAI } from "@ai-sdk/openai";
-import { Output, generateText } from "ai";
-import { ChronicleCampaignSchema } from "@/ai/chronicleSchema";
+import { Output, generateText, streamText } from "ai";
+import { ChronicleCampaignSchema, type GeneratedCampaign } from "@/ai/chronicleSchema";
 import { normalizeGeneratedCampaign } from "@/ai/normalizeCampaign";
 import type { ChronicleCampaign } from "@/types/chronicle";
 
@@ -36,6 +36,41 @@ export async function generateChronicle(query: string): Promise<ChronicleCampaig
   });
 
   const campaign = normalizeGeneratedCampaign(output, query);
+  if (campaign.events.length < 3) throw new Error("The generated chronicle contained too few events.");
+  return campaign;
+}
+
+export interface ChronicleProgress {
+  readonly title?: string;
+  readonly events: readonly string[];
+  readonly arcs: number;
+}
+
+export function progressFrom(partial: Partial<GeneratedCampaign> | undefined): ChronicleProgress {
+  const events = (partial?.events ?? []).map((event) => event?.title).filter((title): title is string => typeof title === "string" && title.length > 0);
+  return { title: partial?.title, events, arcs: partial?.arcs?.length ?? 0 };
+}
+
+export async function streamChronicle(query: string, onProgress: (progress: ChronicleProgress) => void): Promise<ChronicleCampaign> {
+  const provider = createOpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  const result = streamText({
+    model: provider(process.env.CHRONICLE_MODEL ?? DEFAULT_MODEL),
+    system: SYSTEM_PROMPT,
+    prompt: `Topic: ${query}`,
+    output: Output.object({ schema: ChronicleCampaignSchema, name: "chronicle_campaign" }),
+    abortSignal: AbortSignal.timeout(GENERATION_TIMEOUT_MS),
+  });
+  let lastEvents = -1;
+  let lastArcs = -1;
+  for await (const partial of result.partialOutputStream) {
+    const progress = progressFrom(partial as Partial<GeneratedCampaign>);
+    if (progress.events.length !== lastEvents || progress.arcs !== lastArcs) {
+      lastEvents = progress.events.length;
+      lastArcs = progress.arcs;
+      onProgress(progress);
+    }
+  }
+  const campaign = normalizeGeneratedCampaign(await result.output, query);
   if (campaign.events.length < 3) throw new Error("The generated chronicle contained too few events.");
   return campaign;
 }

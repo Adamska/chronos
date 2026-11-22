@@ -9,6 +9,7 @@ import { useFocusTrap } from "@/components/useFocusTrap";
 import { loadChronicle } from "@/data/catalog";
 import { formatSpan, formatYear } from "@/data/campaigns/registry";
 import { useChronosStore } from "@/store/useChronosStore";
+import { useGenerationStore } from "@/store/useGenerationStore";
 
 export function SearchPill() {
   const setPaletteOpen = useChronosStore((state) => state.setPaletteOpen);
@@ -58,6 +59,7 @@ export function CampaignPalette() {
   const status = useChronosStore((state) => state.chronicleStatus);
   const message = useChronosStore((state) => state.chronicleMessage);
   const request = useChronicleRequest();
+  const progress = useGenerationStore((state) => state.progress);
   const [query, setQuery] = useState("");
   const [cursor, setCursor] = useState(0);
   const dialog = useRef<HTMLDivElement>(null);
@@ -115,6 +117,20 @@ export function CampaignPalette() {
             {status === "loading" ? <span className="size-4 animate-spin rounded-full border-2 border-ochre/30 border-t-ochre" /> : null}
           </div>
           {status === "error" && message ? <p className="border-b border-hairline px-5 py-2.5 text-[12px] text-vermilion">{message}</p> : null}
+          {status === "loading" && progress ? (
+            <div aria-live="polite" className="border-b border-hairline px-5 py-3">
+              <p className="eyebrow">Directing your chronicle</p>
+              <p className="mt-1 font-serif text-[16px] text-ink">{progress.title ?? "Researching the story…"}</p>
+              <p className="mt-1 font-mono text-[10.5px] text-ink-muted">
+                {progress.events.length} events · {progress.arcs} routes
+              </p>
+              <ul className="mt-2 space-y-0.5">
+                {progress.events.slice(-4).map((title) => (
+                  <li key={title} className="truncate text-[12px] text-ink/75">{title}</li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
           <div className="scrollbar-quiet max-h-[56vh] overflow-y-auto p-2">
             {sections.map((section, sectionIndex) => (
               <section key={section.title} aria-label={section.title}>

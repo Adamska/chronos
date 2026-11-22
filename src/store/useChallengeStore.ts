@@ -25,7 +25,10 @@ interface ChallengeState {
   campaignId: string | null;
   difficulty: Difficulty;
   hints: number;
+  classCode: string | null;
+  classEventIds: readonly string[] | null;
   start: (campaign: ChronicleCampaign, difficulty?: Difficulty) => void;
+  joinClass: (code: string, eventIds: readonly string[], difficulty: Difficulty) => void;
   useHint: () => void;
   guess: (point: LonLat) => ChallengeResult | null;
   next: () => void;
@@ -50,8 +53,15 @@ export const useChallengeStore = create<ChallengeState>()((set, get) => ({
   campaignId: null,
   difficulty: "normal",
   hints: 0,
+  classCode: null,
+  classEventIds: null,
   start: (campaign, difficulty) =>
-    set((state) => ({ phase: "question", queue: pickRounds(campaign), round: 0, results: [], hints: 0, campaignId: campaign.id, difficulty: difficulty ?? state.difficulty })),
+    set((state) => {
+      const fixed = state.classEventIds?.map((id) => campaign.events.find((event) => event.id === id)).filter((event): event is HistoricalEvent => event !== undefined);
+      const queue = fixed && fixed.length > 0 ? fixed : pickRounds(campaign);
+      return { phase: "question", queue, round: 0, results: [], hints: 0, campaignId: campaign.id, difficulty: difficulty ?? state.difficulty };
+    }),
+  joinClass: (code, eventIds, difficulty) => set({ classCode: code, classEventIds: eventIds, difficulty }),
   useHint: () => set((state) => ({ hints: Math.min(2, state.hints + 1) })),
   guess: (point) => {
     const { phase, queue, round, results } = get();

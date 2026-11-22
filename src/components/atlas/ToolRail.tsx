@@ -83,6 +83,7 @@ function useMenuGroups(): MenuGroup[] {
       icon: "settings",
       label: "Tools",
       items: [
+        { id: "teacher", icon: "classroom", label: "Create a class challenge", hint: "Pick places, share a code, see results", active: atlas.panel === "teacher", onSelect: () => atlas.togglePanel("teacher") },
         { id: "index", icon: "index", label: "Event index", hint: "Every event, keyboard friendly", active: atlas.panel === "index", onSelect: () => atlas.togglePanel("index") },
         { id: "share", icon: "share", label: share.copied ? "Link copied" : "Copy a link to this view", hint: "Chronicle, year, lens and camera", active: share.copied, onSelect: share.copy },
         { id: "poster", icon: "poster", label: "Save a poster", hint: "A PNG of this view with its title", active: false, onSelect: () => atlas.requestPoster() },

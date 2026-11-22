@@ -8,6 +8,7 @@ import { LensPanel } from "@/components/atlas/LensPanel";
 import { MeanwhilePanel } from "@/components/atlas/MeanwhilePanel";
 import { SettingsPanel } from "@/components/atlas/SettingsPanel";
 import { ToolRail } from "@/components/atlas/ToolRail";
+import { TeacherPanel } from "@/components/atlas/TeacherPanel";
 import { TourController } from "@/components/atlas/TourController";
 import { TravelReadout } from "@/components/atlas/TravelReadout";
 import { EventDossier } from "@/components/dossier/EventDossier";
@@ -27,6 +28,7 @@ function ActivePanel() {
       {panel === "index" ? <IndexPanel /> : null}
       {panel === "settings" ? <SettingsPanel /> : null}
       {panel === "ask" ? <AskPanel /> : null}
+      {panel === "teacher" ? <TeacherPanel /> : null}
     </div>
   );
 }

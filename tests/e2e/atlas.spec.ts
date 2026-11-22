@@ -72,6 +72,34 @@ test.describe("api", () => {
     expect(body.campaign.id).toBe("journey-zheng-he");
   });
 
+  test("streams an offline chronicle as newline-delimited JSON", async ({ request }) => {
+    const response = await request.post("/api/chronicle/stream", { data: { query: "Voyages of Zheng He" } });
+    expect(response.ok()).toBe(true);
+    const lines = (await response.text()).trim().split("\n").map((line) => JSON.parse(line) as { type: string; campaign?: { id: string } });
+    expect(lines.at(-1)?.type).toBe("final");
+    expect(lines.at(-1)?.campaign?.id).toBe("journey-zheng-he");
+  });
+
+  test("runs a class challenge from creation to results", async ({ request, page }) => {
+    const created = await request.post("/api/classroom/challenges", {
+      data: { campaignId: "silk-road", title: "Silk Road quiz", difficulty: "easy", eventIds: ["silk-zhang-qian", "silk-hexi-corridor", "silk-talas"] },
+    });
+    expect(created.ok()).toBe(true);
+    const { code } = (await created.json()) as { code: string };
+    const submitted = await request.post(`/api/classroom/challenges/${code}/results`, {
+      data: { name: "Ada", score: 2400, rounds: [{ eventId: "silk-zhang-qian", distanceKm: 320, points: 850 }] },
+    });
+    expect(submitted.ok()).toBe(true);
+    await page.goto(`/classroom/results/${code}`);
+    await expect(page.getByRole("cell", { name: "Ada" })).toBeVisible();
+  });
+
+  test("renders an open graph image for a chronicle", async ({ request }) => {
+    const response = await request.get("/api/og?c=silk-road&y=-128");
+    expect(response.ok()).toBe(true);
+    expect(response.headers()["content-type"]).toContain("image/png");
+  });
+
   test("rejects malformed chronicle requests", async ({ request }) => {
     const response = await request.post("/api/chronicle", { data: { query: "x" } });
     expect(response.status()).toBe(400);

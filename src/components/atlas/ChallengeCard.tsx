@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { frameAnswer, frameRegionHint, frameWholeCampaign, readBest, resultText, writeBest } from "@/components/atlas/challengeActions";
+import { ClassSubmit } from "@/components/atlas/ClassSubmit";
 import { formatKm } from "@/components/dossier/geoInsights";
 import { formatYear } from "@/data/campaigns/registry";
 import { continentOf } from "@/geo/continents";
@@ -147,6 +148,7 @@ export function ChallengeCard() {
               </li>
             ))}
           </ol>
+          {challenge.classCode ? <ClassSubmit code={challenge.classCode} results={challenge.results} /> : null}
           <div className="mt-4 flex flex-wrap gap-2">
             <button type="button" onClick={() => restart(challenge.difficulty)} className={button}>
               Play again
