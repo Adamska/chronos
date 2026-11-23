@@ -19,6 +19,7 @@ import { romanEmpireCampaign } from "@/data/campaigns/romanEmpire";
 import { silkRoadCampaign } from "@/data/campaigns/silkRoad";
 import { spaceRaceCampaign } from "@/data/campaigns/spaceRace";
 import { vikingsCampaign } from "@/data/campaigns/vikings";
+import { westAfricanEmpiresCampaign } from "@/data/campaigns/westAfricanEmpires";
 import { sortCampaignEvents } from "@/data/campaigns/registry";
 import type { ChronicleCampaign } from "@/types/chronicle";
 
@@ -33,6 +34,7 @@ export const CAMPAIGNS: readonly ChronicleCampaign[] = [
   imperialChinaCampaign,
   vikingsCampaign,
   crusadesCampaign,
+  westAfricanEmpiresCampaign,
   silkRoadCampaign,
   islamicGoldenAgeCampaign,
   ageOfSailCampaign,

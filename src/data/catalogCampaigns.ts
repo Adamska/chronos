@@ -113,6 +113,17 @@ export const CAMPAIGN_ENTRIES: readonly CatalogEntry[] = [
     load: () => import("@/data/campaigns/crusades").then((module) => sortCampaignEvents(module.crusadesCampaign)),
   },
   {
+    id: "west-african-empires",
+    title: "The Empires of West Africa",
+    subtitle: "Ghana, Mali and Songhai, where the desert meets the Niger",
+    startYear: 300,
+    endYear: 1591,
+    accent: "#c99a3b",
+    source: "curated",
+    keywords: ["west africa","sahel","ghana empire","wagadu","mali empire","songhai empire","trans-saharan trade","gold and salt","timbuktu","djenne","gao","koumbi saleh","sundiata keita","mansa musa","sonni ali","askia muhammad","ibn battuta","almoravids","tondibi","griots"],
+    load: () => import("@/data/campaigns/westAfricanEmpires").then((module) => sortCampaignEvents(module.westAfricanEmpiresCampaign)),
+  },
+  {
     id: "silk-road",
     title: "The Silk Road & Eurasian Exchange",
     subtitle: "Oases, passes and monsoon winds that tied Eurasia together",
