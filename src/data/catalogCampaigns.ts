@@ -91,6 +91,17 @@ export const CAMPAIGN_ENTRIES: readonly CatalogEntry[] = [
     load: () => import("@/data/campaigns/imperialChina").then((module) => sortCampaignEvents(module.imperialChinaCampaign)),
   },
   {
+    id: "vikings",
+    title: "The Vikings",
+    subtitle: "Raiders, traders and settlers from the fjords of the North",
+    startYear: 793,
+    endYear: 1066,
+    accent: "#6f8fa0",
+    source: "curated",
+    keywords: ["vikings","norse","northmen","varangians","rus","longships","lindisfarne","danelaw","alfred the great","rollo","normandy","iceland","althing","erik the red","greenland","leif erikson","vinland","harald bluetooth","cnut","harald hardrada","stamford bridge"],
+    load: () => import("@/data/campaigns/vikings").then((module) => sortCampaignEvents(module.vikingsCampaign)),
+  },
+  {
     id: "silk-road",
     title: "The Silk Road & Eurasian Exchange",
     subtitle: "Oases, passes and monsoon winds that tied Eurasia together",

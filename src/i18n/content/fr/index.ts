@@ -9,6 +9,7 @@ export const FR_TRANSLATIONS: Readonly<Record<string, () => Promise<CampaignTran
   "greece-alexander": () => import("@/i18n/content/fr/greeceAlexander").then((module) => module.translation),
   "persian-empire": () => import("@/i18n/content/fr/persianEmpire").then((module) => module.translation),
   "imperial-china": () => import("@/i18n/content/fr/imperialChina").then((module) => module.translation),
+  "vikings": () => import("@/i18n/content/fr/vikings").then((module) => module.translation),
   "silk-road": () => import("@/i18n/content/fr/silkRoad").then((module) => module.translation),
   "islamic-golden-age": () => import("@/i18n/content/fr/islamicGoldenAge").then((module) => module.translation),
   "age-of-sail": () => import("@/i18n/content/fr/ageOfSail").then((module) => module.translation),
