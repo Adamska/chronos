@@ -157,6 +157,17 @@ export const CAMPAIGN_ENTRIES: readonly CatalogEntry[] = [
     load: () => import("@/data/campaigns/worldWarOne").then((module) => sortCampaignEvents(module.worldWarOneCampaign)),
   },
   {
+    id: "world-war-two",
+    title: "The Second World War",
+    subtitle: "A global war, from the Marco Polo Bridge to Tokyo Bay",
+    startYear: 1937,
+    endYear: 1945,
+    accent: "#9c5b4a",
+    source: "curated",
+    keywords: ["second world war","world war ii","ww2","holocaust","shoah","d-day","stalingrad","pearl harbor","hiroshima","churchill","de gaulle","roosevelt","stalin","anne frank","zhukov","resistance","blitz","pacific war","nanjing","united nations"],
+    load: () => import("@/data/campaigns/worldWarTwo").then((module) => sortCampaignEvents(module.worldWarTwoCampaign)),
+  },
+  {
     id: "silk-road",
     title: "The Silk Road & Eurasian Exchange",
     subtitle: "Oases, passes and monsoon winds that tied Eurasia together",
