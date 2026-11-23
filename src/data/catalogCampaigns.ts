@@ -47,6 +47,17 @@ export const CAMPAIGN_ENTRIES: readonly CatalogEntry[] = [
     load: () => import("@/data/campaigns/revolutionNapoleon").then((module) => sortCampaignEvents(module.revolutionNapoleonCampaign)),
   },
   {
+    id: "mesopotamia",
+    title: "Mesopotamia",
+    subtitle: "The land between the rivers, where cities, writing and empires began",
+    startYear: -3500,
+    endYear: -539,
+    accent: "#b98a4a",
+    source: "curated",
+    keywords: ["mesopotamia","sumer","sumerians","uruk","cuneiform","gilgamesh","akkad","sargon","ziggurat","ur","babylon","hammurabi","assyria","nineveh","ashurbanipal","nebuchadnezzar","ishtar gate","tigris","euphrates","fertile crescent"],
+    load: () => import("@/data/campaigns/mesopotamia").then((module) => sortCampaignEvents(module.mesopotamiaCampaign)),
+  },
+  {
     id: "silk-road",
     title: "The Silk Road & Eurasian Exchange",
     subtitle: "Oases, passes and monsoon winds that tied Eurasia together",
