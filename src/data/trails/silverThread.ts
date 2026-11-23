@@ -1,4 +1,5 @@
 import type { Trail } from "@/types/atlas";
+import { story } from "./stories/silverThread";
 
 export const silverThreadTrail: Trail = {
   id: "thread-silver",
@@ -168,4 +169,5 @@ export const silverThreadTrail: Trail = {
       },
     },
   ],
+  story,
 };

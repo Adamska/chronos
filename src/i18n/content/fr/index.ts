@@ -1,6 +1,10 @@
 import type { CampaignTranslation } from "@/i18n/contentTypes";
 
 export const FR_TRANSLATIONS: Readonly<Record<string, () => Promise<CampaignTranslation>>> = {
+  "roman-empire": () => import("@/i18n/content/fr/romanEmpire").then((module) => module.translation),
+  "ancient-egypt": () => import("@/i18n/content/fr/ancientEgypt").then((module) => module.translation),
+  "france-england": () => import("@/i18n/content/fr/franceEngland").then((module) => module.translation),
+  "revolution-napoleon": () => import("@/i18n/content/fr/revolutionNapoleon").then((module) => module.translation),
   "silk-road": () => import("@/i18n/content/fr/silkRoad").then((module) => module.translation),
   "islamic-golden-age": () => import("@/i18n/content/fr/islamicGoldenAge").then((module) => module.translation),
   "age-of-sail": () => import("@/i18n/content/fr/ageOfSail").then((module) => module.translation),

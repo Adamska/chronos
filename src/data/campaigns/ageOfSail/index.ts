@@ -2,6 +2,7 @@ import type { ChronicleCampaign } from "@/types/chronicle";
 import { earlyEvents } from "./eventsEarly";
 import { lateEvents } from "./eventsLate";
 import { arcs, territories } from "./routes";
+import { story } from "./story";
 
 export const ageOfSailCampaign: ChronicleCampaign = {
   id: "age-of-sail",
@@ -130,4 +131,5 @@ export const ageOfSailCampaign: ChronicleCampaign = {
   events: [...earlyEvents, ...lateEvents],
   arcs,
   territories,
+  story,
 };

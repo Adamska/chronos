@@ -1,4 +1,5 @@
 import type { Trail } from "@/types/atlas";
+import { story } from "./stories/plagueThread";
 
 export const plagueThreadTrail: Trail = {
   id: "thread-plague",
@@ -213,4 +214,5 @@ export const plagueThreadTrail: Trail = {
       keyFigures: ["Simeon the Proud", "Theognostus"],
     },
   ],
+  story,
 };

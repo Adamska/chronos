@@ -1,4 +1,5 @@
 import type { Trail } from "@/types/atlas";
+import { story } from "./stories/paperThread";
 
 export const paperThreadTrail: Trail = {
   id: "thread-paper",
@@ -183,4 +184,5 @@ export const paperThreadTrail: Trail = {
       keyFigures: ["Ulman Stromer"],
     },
   ],
+  story,
 };

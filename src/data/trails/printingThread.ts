@@ -1,4 +1,5 @@
 import type { Trail } from "@/types/atlas";
+import { story } from "./stories/printingThread";
 
 export const printingThreadTrail: Trail = {
   id: "thread-printing",
@@ -194,4 +195,5 @@ export const printingThreadTrail: Trail = {
       },
     },
   ],
+  story,
 };

@@ -1,0 +1,77 @@
+import type { KeyFigure } from "@/types/story";
+
+export const figures: readonly KeyFigure[] = [
+  {
+    id: "paper-fig-cai-lun",
+    name: "Cai Lun",
+    role: "Han court eunuch credited with inventing paper",
+    born: 50,
+    died: 121,
+    wikipediaSlug: "Cai_Lun",
+    places: [
+      { year: 50, place: "Guiyang, southern China", coordinates: [112.86, 26.42], note: "Born in a commandery of what is now Hunan, far from the court he would serve." },
+      { year: 75, place: "Luoyang", coordinates: [112.45, 34.62], note: "Entered palace service as a eunuch and rose through the inner court." },
+      { year: 105, place: "Luoyang", coordinates: [112.46, 34.62], note: "As head of the imperial workshops, presented his papermaking method to Emperor He." },
+      { year: 114, place: "Longting, Shaanxi", coordinates: [107.55, 33.23], note: "Was made Marquis of Longting; his tomb and a memorial temple stand there today." },
+      { year: 121, place: "Luoyang", coordinates: [112.45, 34.63], note: "Caught in a court purge, he took poison rather than face prison." },
+    ],
+  },
+  {
+    id: "paper-fig-stein",
+    name: "Aurel Stein",
+    role: "Explorer-archaeologist of the Silk Road deserts",
+    born: 1862,
+    died: 1943,
+    wikipediaSlug: "Aurel_Stein",
+    places: [
+      { year: 1862, place: "Budapest, Hungary", coordinates: [19.04, 47.5], note: "Born into a Jewish family in Pest; he later became a British subject." },
+      { year: 1888, place: "Lahore, British India", coordinates: [74.34, 31.55], note: "Became principal of the Oriental College, his base for the expeditions to come." },
+      { year: 1907, place: "Watchtower near Dunhuang", coordinates: [94.66, 40.14], note: "Found the Sogdian Ancient Letters, a lost bundle of paper mail from the early fourth century." },
+      { year: 1907, place: "Mogao Caves, Dunhuang", coordinates: [94.81, 40.04], note: "Acquired thousands of manuscripts from the sealed cave library, including the printed Diamond Sutra." },
+      { year: 1943, place: "Kabul, Afghanistan", coordinates: [69.17, 34.53], note: "Died at eighty, having at last reached the country he had long wished to explore." },
+    ],
+  },
+  {
+    id: "paper-fig-harun",
+    name: "Harun al-Rashid",
+    role: "Abbasid caliph under whom Baghdad made paper",
+    born: 763,
+    died: 809,
+    wikipediaSlug: "Harun_al-Rashid",
+    places: [
+      { year: 763, place: "Rayy, Persia", coordinates: [51.43, 35.6], note: "Born near modern Tehran, son of the future caliph al-Mahdi." },
+      { year: 786, place: "Baghdad", coordinates: [44.37, 33.32], note: "Became caliph, with the Barmakid Yahya ibn Khalid as his powerful vizier." },
+      { year: 796, place: "Raqqa, on the Euphrates", coordinates: [39.01, 35.95], note: "Moved his court to Raqqa, closer to the Byzantine frontier." },
+      { year: 803, place: "Al-Anbar, on the Euphrates", coordinates: [43.6, 33.37], note: "Abruptly destroyed the Barmakids, having his vizier Ja'far executed." },
+      { year: 809, place: "Tus, Khorasan", coordinates: [59.6, 36.48], note: "Died on campaign in the east, on his way to put down a revolt." },
+    ],
+  },
+  {
+    id: "paper-fig-idrisi",
+    name: "Muhammad al-Idrisi",
+    role: "Andalusi geographer who praised the paper of Xàtiva",
+    born: 1100,
+    died: 1165,
+    wikipediaSlug: "Muhammad_al-Idrisi",
+    places: [
+      { year: 1100, place: "Ceuta", coordinates: [-5.32, 35.89], note: "Born on the African shore of the Strait of Gibraltar into a family of noble descent." },
+      { year: 1116, place: "Córdoba, al-Andalus", coordinates: [-4.78, 37.88], note: "Studied in the old Umayyad capital, then travelled widely in al-Andalus, North Africa and beyond." },
+      { year: 1138, place: "Palermo, Sicily", coordinates: [13.36, 38.12], note: "Invited by the Norman king Roger II to make a map of the known world." },
+      { year: 1154, place: "Palermo, Sicily", coordinates: [13.36, 38.11], note: "Completed his great geography, which singles out the fine paper made at Xàtiva." },
+    ],
+  },
+  {
+    id: "paper-fig-stromer",
+    name: "Ulman Stromer",
+    role: "Nuremberg merchant who built Germany's first paper mill",
+    born: 1329,
+    died: 1407,
+    wikipediaSlug: "Ulman_Stromer",
+    places: [
+      { year: 1329, place: "Nuremberg", coordinates: [11.08, 49.45], note: "Born into a patrician family of merchants who sat on the city council." },
+      { year: 1385, place: "Lombardy", coordinates: [9.19, 45.46], note: "His trading company dealt across the Alps in Italy, where paper was made on a large scale." },
+      { year: 1390, place: "Gleismühl, Nuremberg", coordinates: [11.06, 49.45], note: "Converted a mill on the Pegnitz into a paper mill, with craftsmen brought from Italy." },
+      { year: 1407, place: "Nuremberg", coordinates: [11.08, 49.45], note: "Died leaving a family book, one of the earliest German merchant memoirs." },
+    ],
+  },
+];

@@ -2,6 +2,7 @@ import type { ChronicleCampaign } from "@/types/chronicle";
 import { earlyEvents } from "./eventsEarly";
 import { lateEvents } from "./eventsLate";
 import { arcs, territories } from "./routes";
+import { story } from "./story";
 
 export const spaceRaceCampaign: ChronicleCampaign = {
   id: "space-race",
@@ -138,4 +139,5 @@ export const spaceRaceCampaign: ChronicleCampaign = {
   events: [...earlyEvents, ...lateEvents],
   arcs,
   territories,
+  story,
 };

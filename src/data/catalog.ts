@@ -18,7 +18,7 @@ export interface CatalogEntry {
 }
 
 export const CATALOG: readonly CatalogEntry[] = [...CAMPAIGN_ENTRIES, ...TRAIL_ENTRIES];
-export const DEFAULT_CHRONICLE_ID = "silk-road";
+export const DEFAULT_CHRONICLE_ID = "roman-empire";
 
 const loaded = new Map<string, Promise<ChronicleCampaign>>();
 const libraries = new Map<Locale, Promise<readonly ChronicleCampaign[]>>();

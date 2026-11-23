@@ -1,0 +1,75 @@
+import type { KeyFigure } from "@/types/story";
+
+export const figures: readonly KeyFigure[] = [
+  {
+    id: "plague-fig-jani-beg",
+    name: "Jani Beg",
+    role: "Khan of the Golden Horde during the Black Death",
+    born: 1310,
+    died: 1357,
+    wikipediaSlug: "Jani_Beg",
+    places: [
+      { year: 1342, place: "Sarai, lower Volga", coordinates: [47.1, 47.0], note: "Seized the throne after the death of his father Özbeg, removing his own brothers." },
+      { year: 1343, place: "Tana, mouth of the Don", coordinates: [39.4, 47.1], note: "After a brawl in which an Italian killed a Tatar, he expelled the Venetian and Genoese merchants." },
+      { year: 1346, place: "Caffa, Crimea", coordinates: [35.38, 45.03], note: "Besieged the Genoese port until plague broke out among his own troops." },
+      { year: 1357, place: "Tabriz, Azerbaijan", coordinates: [46.29, 38.08], note: "Conquered the city in a last campaign, then died on the way home, perhaps murdered by his son." },
+    ],
+  },
+  {
+    id: "plague-fig-kantakouzenos",
+    name: "John VI Kantakouzenos",
+    role: "Byzantine emperor and historian who lost a son to plague",
+    born: 1292,
+    died: 1383,
+    wikipediaSlug: "John_VI_Kantakouzenos",
+    places: [
+      { year: 1292, place: "Constantinople", coordinates: [28.98, 41.01], note: "Born into a wealthy aristocratic family, he became the closest friend of the future Andronikos III." },
+      { year: 1341, place: "Didymoteicho, Thrace", coordinates: [26.5, 41.35], note: "Proclaimed himself emperor, starting a six-year civil war against the regency of the young John V." },
+      { year: 1347, place: "Constantinople", coordinates: [28.97, 41.02], note: "Entered the capital as co-emperor, weeks before the plague killed his youngest son Andronikos." },
+      { year: 1354, place: "Constantinople", coordinates: [28.99, 41.0], note: "Forced to abdicate, he became the monk Joasaph and wrote a history of his times." },
+      { year: 1383, place: "Mystras, Peloponnese", coordinates: [22.37, 37.07], note: "Died in the Peloponnese, where his son Manuel had ruled as despot." },
+    ],
+  },
+  {
+    id: "plague-fig-chauliac",
+    name: "Guy de Chauliac",
+    role: "Papal surgeon who described the plague at Avignon",
+    born: 1300,
+    died: 1368,
+    wikipediaSlug: "Guy_de_Chauliac",
+    places: [
+      { year: 1300, place: "Chaulhac, Gévaudan", coordinates: [3.26, 44.82], note: "Born into a peasant family in the uplands of southern France." },
+      { year: 1320, place: "Montpellier", coordinates: [3.88, 43.61], note: "Studied at the great medical school of Montpellier, and later in Bologna and Paris." },
+      { year: 1348, place: "Avignon", coordinates: [4.81, 43.95], note: "Stayed with Pope Clement VI through the epidemic, caught the disease and recovered." },
+      { year: 1363, place: "Avignon", coordinates: [4.8, 43.95], note: "Completed his Great Surgery, whose account of the plague distinguishes its lung and bubo forms." },
+    ],
+  },
+  {
+    id: "plague-fig-boccaccio",
+    name: "Giovanni Boccaccio",
+    role: "Florentine writer who described the plague in the Decameron",
+    born: 1313,
+    died: 1375,
+    wikipediaSlug: "Giovanni_Boccaccio",
+    places: [
+      { year: 1327, place: "Naples", coordinates: [14.25, 40.85], note: "Sent by his father to learn banking with the Bardi company, he turned to literature instead." },
+      { year: 1348, place: "Florence", coordinates: [11.26, 43.77], note: "Lived through the epidemic that killed perhaps half the city; his father died the following year." },
+      { year: 1350, place: "Florence", coordinates: [11.25, 43.77], note: "Welcomed Petrarch, beginning a lifelong friendship between the two great writers." },
+      { year: 1353, place: "Florence", coordinates: [11.26, 43.78], note: "Completed the Decameron, a hundred tales told by young Florentines who flee the plague." },
+      { year: 1375, place: "Certaldo, Tuscany", coordinates: [11.04, 43.55], note: "Died in his family's small hill town, a year after Petrarch." },
+    ],
+  },
+  {
+    id: "plague-fig-simeon",
+    name: "Simeon the Proud",
+    role: "Grand Prince of Moscow killed by the plague",
+    born: 1316,
+    died: 1353,
+    wikipediaSlug: "Simeon_of_Moscow",
+    places: [
+      { year: 1316, place: "Moscow", coordinates: [37.62, 55.75], note: "Born the eldest son of Ivan Kalita, who made Moscow the leading Russian principality." },
+      { year: 1340, place: "Sarai, Golden Horde", coordinates: [47.1, 47.0], note: "Travelled to the khan's court to receive the patent for the throne of Vladimir." },
+      { year: 1353, place: "Moscow", coordinates: [37.62, 55.76], note: "Died of plague in the spring, weeks after his sons, leaving the throne to his brother Ivan." },
+    ],
+  },
+];

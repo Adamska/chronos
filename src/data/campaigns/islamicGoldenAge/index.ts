@@ -2,6 +2,7 @@ import type { ChronicleCampaign } from "@/types/chronicle";
 import { earlyEvents } from "./eventsEarly";
 import { lateEvents } from "./eventsLate";
 import { arcs, territories } from "./routes";
+import { story } from "./story";
 
 export const islamicGoldenAgeCampaign: ChronicleCampaign = {
   id: "islamic-golden-age",
@@ -136,4 +137,5 @@ export const islamicGoldenAgeCampaign: ChronicleCampaign = {
   events: [...earlyEvents, ...lateEvents],
   arcs,
   territories,
+  story,
 };

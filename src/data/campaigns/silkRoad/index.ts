@@ -2,6 +2,7 @@ import type { ChronicleCampaign } from "@/types/chronicle";
 import { earlyEvents } from "./eventsEarly";
 import { lateEvents } from "./eventsLate";
 import { arcs, territories } from "./routes";
+import { story } from "./story";
 
 export const silkRoadCampaign: ChronicleCampaign = {
   id: "silk-road",
@@ -130,4 +131,5 @@ export const silkRoadCampaign: ChronicleCampaign = {
   events: [...earlyEvents, ...lateEvents],
   arcs,
   territories,
+  story,
 };

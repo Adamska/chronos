@@ -2,6 +2,7 @@ import type { ChronicleCampaign } from "@/types/chronicle";
 import { earlyEvents } from "./eventsEarly";
 import { lateEvents } from "./eventsLate";
 import { arcs, territories } from "./routes";
+import { story } from "./story";
 
 export const industrialRevolutionCampaign: ChronicleCampaign = {
   id: "industrial-revolution",
@@ -129,4 +130,5 @@ export const industrialRevolutionCampaign: ChronicleCampaign = {
   events: [...earlyEvents, ...lateEvents],
   arcs,
   territories,
+  story,
 };

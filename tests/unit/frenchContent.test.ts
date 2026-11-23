@@ -20,6 +20,18 @@ describe("french content", () => {
     }
   });
 
+  it("translates every story step and key figure", async () => {
+    for (const [id, load] of Object.entries(FR_TRANSLATIONS)) {
+      const story = LIBRARY.find((candidate) => candidate.id === id)?.story;
+      expect(story, id).toBeDefined();
+      const translation = await load();
+      const steps = (story?.steps ?? []).filter((step) => !translation.steps?.[step.id]?.title || !translation.steps[step.id]?.narration).map((step) => step.id);
+      expect(steps, id).toEqual([]);
+      const figures = (story?.figures ?? []).filter((figure) => !translation.figures?.[figure.id]?.role || translation.figures[figure.id]?.places?.length !== figure.places.length).map((figure) => figure.id);
+      expect(figures, id).toEqual([]);
+    }
+  });
+
   it("keeps the french dictionary complete and free of placeholder drift", () => {
     for (const [key, english] of Object.entries(dictionaries.en)) {
       const french = dictionaries.fr[key as keyof typeof dictionaries.en];

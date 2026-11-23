@@ -1,0 +1,67 @@
+import type { KeyFigure } from "@/types/story";
+
+export const figures: readonly KeyFigure[] = [
+  {
+    id: "zhenghe-fig-zheng-he",
+    name: "Zheng He",
+    role: "Ming eunuch admiral who led seven voyages across the Indian Ocean",
+    born: 1371,
+    died: 1433,
+    wikipediaSlug: "Zheng_He",
+    places: [
+      { year: 1371, place: "Kunyang, Yunnan", coordinates: [102.6, 24.67], note: "Born Ma He into a Muslim family whose father and grandfather had made the pilgrimage to Mecca." },
+      { year: 1381, place: "Yunnan", coordinates: [102.71, 25.04], note: "Captured as a boy when Ming armies conquered Yunnan, he was castrated and taken into service." },
+      { year: 1390, place: "Beiping (Beijing)", coordinates: [116.4, 39.9], note: "Served in the household of Zhu Di, Prince of Yan, and won his trust as a soldier." },
+      { year: 1404, place: "Nanjing", coordinates: [118.78, 32.06], note: "Given the surname Zheng by Zhu Di, now the Yongle Emperor, for his deeds in the civil war." },
+      { year: 1405, place: "Longjiang shipyard, Nanjing", coordinates: [118.73, 32.07], note: "Took command of the first treasure fleet bound for the Western Ocean." },
+      { year: 1414, place: "Hormuz", coordinates: [56.46, 27.1], note: "His fourth voyage pushed beyond India to the mouth of the Persian Gulf." },
+      { year: 1431, place: "Changle, Fujian", coordinates: [119.52, 25.96], note: "Raised a stele recording his seven voyages before sailing for the last time." },
+      { year: 1433, place: "Calicut, Malabar Coast", coordinates: [75.78, 11.25], note: "Died, by most accounts, during the return of the seventh voyage." },
+    ],
+  },
+  {
+    id: "zhenghe-fig-yongle",
+    name: "Yongle Emperor",
+    role: "Ming emperor who ordered the treasure voyages",
+    born: 1360,
+    died: 1424,
+    wikipediaSlug: "Yongle_Emperor",
+    places: [
+      { year: 1360, place: "Nanjing", coordinates: [118.78, 32.06], note: "Born Zhu Di, fourth son of Zhu Yuanzhang, founder of the Ming dynasty." },
+      { year: 1380, place: "Beiping (Beijing)", coordinates: [116.4, 39.9], note: "Took up his fief as Prince of Yan, guarding the northern frontier against the Mongols." },
+      { year: 1402, place: "Nanjing", coordinates: [118.78, 32.06], note: "Captured the capital after a three-year civil war and took the throne from his nephew." },
+      { year: 1405, place: "Nanjing", coordinates: [118.78, 32.05], note: "Sent out the first treasure fleet to win acknowledgement from foreign rulers." },
+      { year: 1421, place: "Beijing", coordinates: [116.39, 39.92], note: "Moved the capital north to Beijing, around his new Forbidden City." },
+      { year: 1424, place: "Yumuchuan, Inner Mongolia", coordinates: [116.47, 42.2], note: "Died returning from his fifth campaign against the Mongols." },
+    ],
+  },
+  {
+    id: "zhenghe-fig-ma-huan",
+    name: "Ma Huan",
+    role: "Muslim interpreter who described the lands of the voyages",
+    born: 1380,
+    died: 1460,
+    wikipediaSlug: "Ma_Huan",
+    places: [
+      { year: 1380, place: "Kuaiji (Shaoxing), Zhejiang", coordinates: [120.58, 30.0], note: "Born into a Chinese Muslim family; he learned Arabic and Persian." },
+      { year: 1413, place: "Nanjing", coordinates: [118.78, 32.06], note: "Joined the fourth voyage as an interpreter for the fleet's dealings with Muslim rulers." },
+      { year: 1414, place: "Hormuz", coordinates: [56.46, 27.1], note: "Recorded the markets, coins and customs of the great Gulf emporium." },
+      { year: 1432, place: "Mecca, Hejaz", coordinates: [39.83, 21.42], note: "On the seventh voyage, went with a small party from Calicut to the holy city." },
+    ],
+  },
+  {
+    id: "zhenghe-fig-parameswara",
+    name: "Parameswara",
+    role: "Founder of the sultanate of Malacca and ally of the Ming",
+    born: 1344,
+    died: 1414,
+    wikipediaSlug: "Parameswara_(king)",
+    places: [
+      { year: 1344, place: "Palembang, Sumatra", coordinates: [104.76, -2.99], note: "Born a prince of Palembang, heir to the memory of the old empire of Srivijaya." },
+      { year: 1390, place: "Temasek (Singapore)", coordinates: [103.85, 1.29], note: "Fled a Majapahit attack and seized the island port, from which he was later driven out." },
+      { year: 1400, place: "Malacca", coordinates: [102.25, 2.19], note: "Founded a new port at the mouth of the Malacca River, on the narrows of the strait." },
+      { year: 1411, place: "Nanjing", coordinates: [118.78, 32.06], note: "Sailed to China with Zheng He's fleet and a retinue of hundreds to pay homage to Yongle." },
+      { year: 1414, place: "Malacca", coordinates: [102.25, 2.19], note: "Died after making Malacca the leading port of the straits." },
+    ],
+  },
+];

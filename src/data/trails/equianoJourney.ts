@@ -1,4 +1,5 @@
 import type { Trail } from "@/types/atlas";
+import { story } from "./stories/equianoJourney";
 
 export const equianoJourneyTrail: Trail = {
   id: "journey-equiano",
@@ -187,4 +188,5 @@ export const equianoJourneyTrail: Trail = {
       keyFigures: ["Olaudah Equiano"],
     },
   ],
+  story,
 };

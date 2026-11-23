@@ -1,18 +1,26 @@
 import { ageOfSailCampaign } from "@/data/campaigns/ageOfSail";
+import { ancientEgyptCampaign } from "@/data/campaigns/ancientEgypt";
 import { bantuExpansionCampaign } from "@/data/campaigns/bantuExpansion";
 import { columbianExchangeCampaign } from "@/data/campaigns/columbianExchange";
 import { fallOfRomeCampaign } from "@/data/campaigns/fallOfRome";
+import { franceEnglandCampaign } from "@/data/campaigns/franceEngland";
 import { indianOceanWorldCampaign } from "@/data/campaigns/indianOceanWorld";
 import { industrialRevolutionCampaign } from "@/data/campaigns/industrialRevolution";
 import { islamicGoldenAgeCampaign } from "@/data/campaigns/islamicGoldenAge";
 import { mongolEmpireCampaign } from "@/data/campaigns/mongolEmpire";
 import { polynesianVoyagingCampaign } from "@/data/campaigns/polynesianVoyaging";
+import { revolutionNapoleonCampaign } from "@/data/campaigns/revolutionNapoleon";
+import { romanEmpireCampaign } from "@/data/campaigns/romanEmpire";
 import { silkRoadCampaign } from "@/data/campaigns/silkRoad";
 import { spaceRaceCampaign } from "@/data/campaigns/spaceRace";
 import { sortCampaignEvents } from "@/data/campaigns/registry";
 import type { ChronicleCampaign } from "@/types/chronicle";
 
 export const CAMPAIGNS: readonly ChronicleCampaign[] = [
+  romanEmpireCampaign,
+  ancientEgyptCampaign,
+  franceEnglandCampaign,
+  revolutionNapoleonCampaign,
   silkRoadCampaign,
   islamicGoldenAgeCampaign,
   ageOfSailCampaign,
@@ -26,7 +34,7 @@ export const CAMPAIGNS: readonly ChronicleCampaign[] = [
   indianOceanWorldCampaign,
 ].map(sortCampaignEvents);
 
-export const DEFAULT_CAMPAIGN: ChronicleCampaign = CAMPAIGNS[0] ?? sortCampaignEvents(silkRoadCampaign);
+export const DEFAULT_CAMPAIGN: ChronicleCampaign = CAMPAIGNS[0] ?? sortCampaignEvents(romanEmpireCampaign);
 
 export function findCampaign(id: string): ChronicleCampaign | undefined {
   return CAMPAIGNS.find((campaign) => campaign.id === id);

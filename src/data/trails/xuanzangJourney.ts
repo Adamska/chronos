@@ -1,4 +1,5 @@
 import type { Trail } from "@/types/atlas";
+import { story } from "./stories/xuanzangJourney";
 
 export const xuanzangJourneyTrail: Trail = {
   id: "journey-xuanzang",
@@ -205,4 +206,5 @@ export const xuanzangJourneyTrail: Trail = {
       keyFigures: ["Xuanzang", "Emperor Taizong of Tang", "Bianji"],
     },
   ],
+  story,
 };

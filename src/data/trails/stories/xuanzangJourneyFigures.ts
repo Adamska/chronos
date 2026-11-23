@@ -1,0 +1,68 @@
+import type { KeyFigure } from "@/types/story";
+
+export const figures: readonly KeyFigure[] = [
+  {
+    id: "xuanzang-fig-xuanzang",
+    name: "Xuanzang",
+    role: "Chinese Buddhist monk, pilgrim to India and translator",
+    born: 602,
+    died: 664,
+    wikipediaSlug: "Xuanzang",
+    places: [
+      { year: 602, place: "Chenliu, near Luoyang", coordinates: [112.79, 34.67], note: "Born Chen Yi into a family of scholars; he followed an elder brother into a monastery as a boy." },
+      { year: 622, place: "Chengdu, Sichuan", coordinates: [104.07, 30.67], note: "Fully ordained in this city, where many monks had taken refuge from the wars that ended the Sui." },
+      { year: 629, place: "Chang'an", coordinates: [108.94, 34.26], note: "Left the capital for India without the travel permit the court had refused him." },
+      { year: 630, place: "Gaochang, Turpan Basin", coordinates: [89.53, 42.85], note: "Escaped the generous captivity of King Qu Wentai with a hunger strike, and left with rich supplies." },
+      { year: 637, place: "Nalanda, Magadha", coordinates: [85.44, 25.14], note: "Studied Yogacara philosophy and Sanskrit under the abbot Silabhadra." },
+      { year: 643, place: "Kanauj, on the Ganges", coordinates: [79.92, 27.06], note: "Defended Mahayana doctrine before Emperor Harsha's great assembly." },
+      { year: 645, place: "Chang'an", coordinates: [108.96, 34.22], note: "Returned in triumph with 657 texts and began his life's work of translation." },
+      { year: 664, place: "Yuhua Palace, north of Chang'an", coordinates: [109.07, 35.1], note: "Died in a former palace turned monastery, after translating some 75 texts." },
+    ],
+  },
+  {
+    id: "xuanzang-fig-silabhadra",
+    name: "Silabhadra",
+    role: "Abbot of Nalanda and Xuanzang's teacher",
+    born: 529,
+    died: 654,
+    wikipediaSlug: "Śīlabhadra",
+    places: [
+      { year: 529, place: "Samatata, Bengal", coordinates: [91.0, 23.5], note: "Born, by tradition, into a ruling Brahmin family of the eastern delta." },
+      { year: 560, place: "Nalanda, Magadha", coordinates: [85.44, 25.14], note: "Became a pupil of the great master Dharmapala, whom he later succeeded." },
+      { year: 637, place: "Nalanda, Magadha", coordinates: [85.44, 25.14], note: "Already very old, he taught Xuanzang the Yogacara texts that had drawn him to India." },
+    ],
+  },
+  {
+    id: "xuanzang-fig-harsha",
+    name: "Harsha",
+    role: "Emperor of northern India and patron of Xuanzang",
+    born: 590,
+    died: 647,
+    wikipediaSlug: "Harsha",
+    places: [
+      { year: 590, place: "Thanesar, Haryana", coordinates: [76.82, 29.97], note: "Born into the Pushyabhuti dynasty, rulers of a small kingdom north of Delhi." },
+      { year: 606, place: "Thanesar, Haryana", coordinates: [76.82, 29.97], note: "Took the throne at sixteen after his elder brother was murdered." },
+      { year: 612, place: "Kanauj, on the Ganges", coordinates: [79.92, 27.06], note: "Made Kanauj his capital, ruling much of the Ganges plain from it." },
+      { year: 619, place: "Narmada River", coordinates: [75.0, 22.2], note: "His drive south was stopped by the Chalukya king Pulakeshin II." },
+      { year: 643, place: "Kanauj, on the Ganges", coordinates: [79.93, 27.05], note: "Hosted the great religious assembly where Xuanzang was the star." },
+      { year: 643, place: "Prayaga, Ganges and Yamuna", coordinates: [81.88, 25.43], note: "With Xuanzang present, gave away his treasury at a great religious festival." },
+      { year: 647, place: "Kanauj, on the Ganges", coordinates: [79.92, 27.06], note: "Died without an heir, and his empire broke apart soon after." },
+    ],
+  },
+  {
+    id: "xuanzang-fig-taizong",
+    name: "Emperor Taizong of Tang",
+    role: "Tang emperor who pardoned and patronised Xuanzang",
+    born: 598,
+    died: 649,
+    wikipediaSlug: "Emperor_Taizong_of_Tang",
+    places: [
+      { year: 598, place: "Wugong, Wei River valley", coordinates: [108.2, 34.26], note: "Born Li Shimin, son of the Sui general Li Yuan." },
+      { year: 617, place: "Taiyuan, Shanxi", coordinates: [112.55, 37.87], note: "Pushed his father to rebel against the Sui, leading to the founding of the Tang." },
+      { year: 626, place: "Xuanwu Gate, Chang'an", coordinates: [108.94, 34.27], note: "Killed two of his brothers in an ambush and forced his father to abdicate." },
+      { year: 630, place: "Chang'an", coordinates: [108.94, 34.26], note: "After crushing the Eastern Turks, took the title Heavenly Khagan." },
+      { year: 645, place: "Luoyang", coordinates: [112.45, 34.62], note: "Received the returning pilgrim and urged him, in vain, to become a minister." },
+      { year: 649, place: "Cuiwei Palace, near Chang'an", coordinates: [108.85, 34.0], note: "Died in his summer palace in the Zhongnan mountains." },
+    ],
+  },
+];

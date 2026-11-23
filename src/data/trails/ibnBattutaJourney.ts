@@ -1,4 +1,5 @@
 import type { Trail } from "@/types/atlas";
+import { story } from "./stories/ibnBattutaJourney";
 
 export const ibnBattutaJourneyTrail: Trail = {
   id: "journey-ibn-battuta",
@@ -207,4 +208,5 @@ export const ibnBattutaJourneyTrail: Trail = {
       keyFigures: ["Mansa Sulayman", "Ibn Juzayy"],
     },
   ],
+  story,
 };

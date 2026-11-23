@@ -1,0 +1,66 @@
+import type { KeyFigure } from "@/types/story";
+
+export const figures: readonly KeyFigure[] = [
+  {
+    id: "silver-fig-urdaneta",
+    name: "Andrés de Urdaneta",
+    role: "Basque friar and navigator who found the Pacific return route",
+    born: 1498,
+    died: 1568,
+    wikipediaSlug: "Andrés_de_Urdaneta",
+    places: [
+      { year: 1498, place: "Ordizia, Gipuzkoa", coordinates: [-2.18, 43.05], note: "Born in a small Basque town, in a region that supplied many of Spain's pilots and shipwrights." },
+      { year: 1526, place: "Moluccas, Spice Islands", coordinates: [127.4, 0.8], note: "Reached the Spice Islands with the Loaísa expedition and spent years there, learning the winds of the western Pacific." },
+      { year: 1553, place: "Mexico City, New Spain", coordinates: [-99.13, 19.43], note: "Gave up the sea to become an Augustinian friar, until the king called on his experience once more." },
+      { year: 1565, place: "Cebu, Philippines", coordinates: [123.89, 10.31], note: "Arrived with Legazpi's expedition, then sailed north in June to look for a way back to America." },
+      { year: 1565, place: "Acapulco, New Spain", coordinates: [-99.89, 16.85], note: "Anchored in October after the first eastward crossing of the Pacific, opening the route of the Manila galleons." },
+      { year: 1568, place: "Mexico City, New Spain", coordinates: [-99.13, 19.43], note: "Died in his convent three years after the voyage that tied Asia to the Americas." },
+    ],
+  },
+  {
+    id: "silver-fig-legazpi",
+    name: "Miguel López de Legazpi",
+    role: "Conquistador who founded Spanish Manila",
+    born: 1502,
+    died: 1572,
+    wikipediaSlug: "Miguel_López_de_Legazpi",
+    places: [
+      { year: 1502, place: "Zumárraga, Gipuzkoa", coordinates: [-2.32, 43.09], note: "Born into a Basque noble family a few kilometres from Urdaneta's birthplace." },
+      { year: 1528, place: "Mexico City, New Spain", coordinates: [-99.13, 19.43], note: "Moved to New Spain and spent decades there as a royal official and town councillor." },
+      { year: 1564, place: "Barra de Navidad, New Spain", coordinates: [-104.68, 19.2], note: "Sailed west across the Pacific in command of a small fleet, with Urdaneta as his navigator." },
+      { year: 1565, place: "Cebu, Philippines", coordinates: [123.89, 10.31], note: "Founded the first permanent Spanish settlement in the islands." },
+      { year: 1571, place: "Manila, Philippines", coordinates: [120.97, 14.59], note: "Took the Muslim port on Manila Bay and made it the capital of the Spanish Philippines." },
+      { year: 1572, place: "Manila, Philippines", coordinates: [120.98, 14.6], note: "Died in his new city the following year, as the galleon trade was taking shape." },
+    ],
+  },
+  {
+    id: "silver-fig-toledo",
+    name: "Francisco de Toledo",
+    role: "Viceroy of Peru who reorganised Andean silver mining",
+    born: 1515,
+    died: 1582,
+    wikipediaSlug: "Francisco_de_Toledo",
+    places: [
+      { year: 1515, place: "Oropesa, Castile", coordinates: [-5.17, 39.92], note: "Born into the powerful Álvarez de Toledo family, close to the royal court." },
+      { year: 1569, place: "Lima, Peru", coordinates: [-77.03, -12.05], note: "Arrived as viceroy with orders to make Peru orderly, Christian and profitable." },
+      { year: 1572, place: "Cusco, Peru", coordinates: [-71.97, -13.53], note: "Had Túpac Amaru, the last Inca ruler of Vilcabamba, executed in the old Inca capital." },
+      { year: 1573, place: "Potosí, Upper Peru", coordinates: [-65.75, -19.58], note: "Organised the mita labour draft and mercury amalgamation, multiplying the mountain's output." },
+      { year: 1582, place: "Escalona, Castile", coordinates: [-4.41, 40.17], note: "Died back in Spain, out of royal favour, soon after his return." },
+    ],
+  },
+  {
+    id: "silver-fig-zhang",
+    name: "Zhang Juzheng",
+    role: "Ming grand secretary who put taxes on a silver basis",
+    born: 1525,
+    died: 1582,
+    wikipediaSlug: "Zhang_Juzheng",
+    places: [
+      { year: 1525, place: "Jiangling, Huguang", coordinates: [112.19, 30.35], note: "Born on the middle Yangtze into a modest family, he was a celebrated prodigy as a boy." },
+      { year: 1547, place: "Beijing", coordinates: [116.4, 39.91], note: "Passed the highest imperial examination and entered the Hanlin Academy." },
+      { year: 1572, place: "Beijing", coordinates: [116.39, 39.92], note: "Became senior grand secretary and the real ruler of China for the boy Wanli Emperor." },
+      { year: 1581, place: "Beijing", coordinates: [116.4, 39.9], note: "Extended the Single Whip reform to the whole empire, after a national survey of farmland." },
+      { year: 1582, place: "Beijing", coordinates: [116.41, 39.91], note: "Died in office; the emperor soon disgraced his family and stripped his honours." },
+    ],
+  },
+];

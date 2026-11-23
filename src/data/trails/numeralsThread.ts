@@ -1,4 +1,5 @@
 import type { Trail } from "@/types/atlas";
+import { story } from "./stories/numeralsThread";
 
 export const numeralsThreadTrail: Trail = {
   id: "thread-numerals",
@@ -185,4 +186,5 @@ export const numeralsThreadTrail: Trail = {
       keyFigures: ["Leonardo of Pisa (Fibonacci)"],
     },
   ],
+  story,
 };
