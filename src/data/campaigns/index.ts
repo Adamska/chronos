@@ -1,5 +1,6 @@
 import { ageOfSailCampaign } from "@/data/campaigns/ageOfSail";
 import { ancientEgyptCampaign } from "@/data/campaigns/ancientEgypt";
+import { aztecsIncasCampaign } from "@/data/campaigns/aztecsIncas";
 import { bantuExpansionCampaign } from "@/data/campaigns/bantuExpansion";
 import { columbianExchangeCampaign } from "@/data/campaigns/columbianExchange";
 import { crusadesCampaign } from "@/data/campaigns/crusades";
@@ -37,6 +38,7 @@ export const CAMPAIGNS: readonly ChronicleCampaign[] = [
   crusadesCampaign,
   westAfricanEmpiresCampaign,
   ottomanEmpireCampaign,
+  aztecsIncasCampaign,
   silkRoadCampaign,
   islamicGoldenAgeCampaign,
   ageOfSailCampaign,

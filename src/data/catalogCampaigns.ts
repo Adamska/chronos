@@ -135,6 +135,17 @@ export const CAMPAIGN_ENTRIES: readonly CatalogEntry[] = [
     load: () => import("@/data/campaigns/ottomanEmpire").then((module) => sortCampaignEvents(module.ottomanEmpireCampaign)),
   },
   {
+    id: "aztecs-incas",
+    title: "The Aztecs and the Incas",
+    subtitle: "Lake cities, mountain roads and the fall of two empires",
+    startYear: 1325,
+    endYear: 1572,
+    accent: "#d07a3a",
+    source: "curated",
+    keywords: ["aztecs","incas","mexica","tenochtitlan","triple alliance","moctezuma","la malinche","hernán cortés","tlaxcala","conquest of mexico","cusco","pachacuti","machu picchu","inca roads","quipu","atahualpa","francisco pizarro","conquest of peru","potosí","smallpox"],
+    load: () => import("@/data/campaigns/aztecsIncas").then((module) => sortCampaignEvents(module.aztecsIncasCampaign)),
+  },
+  {
     id: "silk-road",
     title: "The Silk Road & Eurasian Exchange",
     subtitle: "Oases, passes and monsoon winds that tied Eurasia together",
