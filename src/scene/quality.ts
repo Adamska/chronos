@@ -17,8 +17,6 @@ export const QUALITY_SETTINGS: Record<QualityTier, QualitySettings> = {
   low: { dpr: [0.85, 1], bloom: false, grain: false, stars: 700, particleScale: 0.45, smaa: false },
 };
 
-const ORDER: readonly QualityTier[] = ["low", "balanced", "high"];
-
 function detectInitialTier(): QualityTier {
   if (typeof navigator === "undefined") return "balanced";
   const cores = navigator.hardwareConcurrency || 4;
@@ -31,20 +29,13 @@ function detectInitialTier(): QualityTier {
 interface QualityState {
   tier: QualityTier;
   pinned: boolean;
-  step: (direction: 1 | -1) => void;
   pin: (tier: QualityTier | null) => void;
 }
 
-export const useQualityStore = create<QualityState>()((set, get) => ({
+export const useQualityStore = create<QualityState>()((set) => ({
   tier: detectInitialTier(),
   pinned: false,
-  step: (direction) => {
-    if (get().pinned) return;
-    const index = ORDER.indexOf(get().tier);
-    const next = ORDER[Math.min(ORDER.length - 1, Math.max(0, index + direction))];
-    if (next && next !== get().tier) set({ tier: next });
-  },
-  pin: (tier) => set(tier ? { tier, pinned: true } : { pinned: false }),
+  pin: (tier) => set(tier ? { tier, pinned: true } : { tier: detectInitialTier(), pinned: false }),
 }));
 
 export const useQuality = (): QualitySettings => QUALITY_SETTINGS[useQualityStore((state) => state.tier)];

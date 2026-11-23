@@ -49,7 +49,7 @@ export const atlas: Record<keyof typeof en, string> = {
   "settings.current.high": "Rendu actuel en haute qualité",
   "settings.current.balanced": "Rendu actuel en qualité équilibrée",
   "settings.current.low": "Rendu actuel en qualité réduite",
-  "settings.adaptive": ", ajusté à la fréquence d’images de votre appareil",
+  "settings.adaptive": ", choisi pour cet appareil",
   "settings.motion.label": "Réduire les animations",
   "settings.motion.hint": "Supprime les vols de caméra et garde le globe immobile entre les chapitres.",
   "settings.sound.label": "Ambiance sonore",

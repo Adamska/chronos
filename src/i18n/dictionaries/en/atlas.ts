@@ -47,7 +47,7 @@ export const atlas = {
   "settings.current.high": "Currently rendering at high quality",
   "settings.current.balanced": "Currently rendering at balanced quality",
   "settings.current.low": "Currently rendering at low quality",
-  "settings.adaptive": ", adjusted to your device’s frame rate",
+  "settings.adaptive": ", chosen for this device",
   "settings.motion.label": "Reduce motion",
   "settings.motion.hint": "Cut camera flights and keep the globe still between chapters.",
   "settings.sound.label": "Ambient sound",

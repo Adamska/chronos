@@ -1,6 +1,6 @@
 "use client";
 
-import { PerformanceMonitor, Stars } from "@react-three/drei";
+import { Stars } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { Suspense, lazy, useState } from "react";
 import { ACESFilmicToneMapping, SRGBColorSpace } from "three";
@@ -20,8 +20,8 @@ import { PosterCapture } from "@/scene/PosterCapture";
 import { NightLights } from "@/scene/NightLights";
 import { DepthRange } from "@/scene/DepthRange";
 import { ViewOffset } from "@/scene/ViewOffset";
-import { IdleThrottle, isMeasuringFrames } from "@/scene/IdleThrottle";
-import { useQuality, useQualityStore } from "@/scene/quality";
+import { IdleThrottle } from "@/scene/IdleThrottle";
+import { useQuality } from "@/scene/quality";
 import { useAtlasStore } from "@/store/useAtlasStore";
 import { SmartLabels } from "@/scene/SmartLabels";
 import { TerritoryLayer } from "@/scene/TerritoryLayer";
@@ -39,7 +39,6 @@ function watchContext(canvas: HTMLCanvasElement): void {
 
 export default function AtlasCanvas() {
   const quality = useQuality();
-  const step = useQualityStore((state) => state.step);
   const [starCount] = useState(quality.stars);
 
   return (
@@ -53,12 +52,6 @@ export default function AtlasCanvas() {
         watchContext(gl.domElement);
       }}
     >
-      <PerformanceMonitor
-        bounds={(refreshRate) => (refreshRate > 90 ? [50, refreshRate - 12] : [40, refreshRate - 4])}
-        flipflops={2}
-        onDecline={() => isMeasuringFrames() && step(-1)}
-        onIncline={() => isMeasuringFrames() && step(1)}
-      />
       <color attach="background" args={["#05070a"]} />
       <Stars radius={60} depth={40} count={starCount} factor={2.4} saturation={0} fade speed={0.25} />
       <EarthGlobe />

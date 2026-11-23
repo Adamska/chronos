@@ -109,7 +109,7 @@ export function SmartLabels() {
           rects[slot + 3] = top + LABEL_HEIGHT;
           accepted += 1;
           if (Math.abs(x - (lastX[index] ?? 0)) > 0.4 || Math.abs(y - (lastY[index] ?? 0)) > 0.4) {
-            node.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
+            node.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)`;
             lastX[index] = x;
             lastY[index] = y;
           }
@@ -120,6 +120,7 @@ export function SmartLabels() {
       if (shown[index] !== state) {
         shown[index] = state;
         node.style.opacity = visible ? "1" : "0";
+        node.style.visibility = visible ? "visible" : "hidden";
         node.style.pointerEvents = visible && (label.kind === "event" || label.kind === "world") ? "auto" : "none";
       }
     }

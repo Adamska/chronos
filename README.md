@@ -84,8 +84,8 @@ A story is a chronicle (events, routes, territories) plus a story layer: an era,
 ## Quality and performance
 
 - **Tests:** Vitest covers spherical math, crack-free triangulation, the travel solver, the land-cap format, the catalog, the integrity of every story and translation, the atlas time scale, region timelines and population decoding. Playwright covers stories, figures, search, shared links, atlas layers, place lookups and the French locale. GitHub Actions runs lint, typecheck, unit tests, build and end-to-end tests on every push, plus a weekly Wikipedia link check.
-- **Stable rendering:** a depth range that follows the camera, polygon offsets between land and coastlines, SMAA under the bloom pass and label hysteresis prevent flicker while moving.
-- **Adaptive quality:** a starting tier from hardware hints, then `PerformanceMonitor` adjusts pixel ratio, bloom, grain and particle budgets, ignoring idle periods; the tier can be pinned in settings.
+- **Stable rendering:** a depth range that follows the camera, polygon offsets between land and coastlines, SMAA under the bloom pass, label hysteresis and labels that stop being GPU layers when hidden prevent flicker while moving.
+- **Quality tiers:** the tier (pixel ratio, bloom, grain, particle budgets) is chosen once from hardware hints and can be changed in settings; it never switches mid-session, because reallocating the drawing buffer can flash black frames.
 - **Off the main thread and lazy:** travel times and border rasterisation run in Web Workers, land caps are precomputed at build time, the frame rate drops to 30 fps when idle, and stories, world data and post-processing load on demand.
 
 ## Data sources and credits
