@@ -124,6 +124,17 @@ export const CAMPAIGN_ENTRIES: readonly CatalogEntry[] = [
     load: () => import("@/data/campaigns/westAfricanEmpires").then((module) => sortCampaignEvents(module.westAfricanEmpiresCampaign)),
   },
   {
+    id: "ottoman-empire",
+    title: "The Ottoman Empire",
+    subtitle: "From a frontier beylik to the gates of Vienna",
+    startYear: 1299,
+    endYear: 1699,
+    accent: "#3f8f6b",
+    source: "curated",
+    keywords: ["ottoman empire","ottomans","turks","osman","mehmed the conqueror","fall of constantinople","istanbul","topkapi","selim","mamluks","suleiman the magnificent","hurrem sultan","roxelana","sinan","mohacs","siege of vienna","barbarossa","lepanto","janissaries","karlowitz"],
+    load: () => import("@/data/campaigns/ottomanEmpire").then((module) => sortCampaignEvents(module.ottomanEmpireCampaign)),
+  },
+  {
     id: "silk-road",
     title: "The Silk Road & Eurasian Exchange",
     subtitle: "Oases, passes and monsoon winds that tied Eurasia together",

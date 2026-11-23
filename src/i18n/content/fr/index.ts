@@ -12,6 +12,7 @@ export const FR_TRANSLATIONS: Readonly<Record<string, () => Promise<CampaignTran
   "vikings": () => import("@/i18n/content/fr/vikings").then((module) => module.translation),
   "crusades": () => import("@/i18n/content/fr/crusades").then((module) => module.translation),
   "west-african-empires": () => import("@/i18n/content/fr/westAfricanEmpires").then((module) => module.translation),
+  "ottoman-empire": () => import("@/i18n/content/fr/ottomanEmpire").then((module) => module.translation),
   "silk-road": () => import("@/i18n/content/fr/silkRoad").then((module) => module.translation),
   "islamic-golden-age": () => import("@/i18n/content/fr/islamicGoldenAge").then((module) => module.translation),
   "age-of-sail": () => import("@/i18n/content/fr/ageOfSail").then((module) => module.translation),

@@ -12,6 +12,7 @@ import { industrialRevolutionCampaign } from "@/data/campaigns/industrialRevolut
 import { islamicGoldenAgeCampaign } from "@/data/campaigns/islamicGoldenAge";
 import { mesopotamiaCampaign } from "@/data/campaigns/mesopotamia";
 import { mongolEmpireCampaign } from "@/data/campaigns/mongolEmpire";
+import { ottomanEmpireCampaign } from "@/data/campaigns/ottomanEmpire";
 import { persianEmpireCampaign } from "@/data/campaigns/persianEmpire";
 import { polynesianVoyagingCampaign } from "@/data/campaigns/polynesianVoyaging";
 import { revolutionNapoleonCampaign } from "@/data/campaigns/revolutionNapoleon";
@@ -35,6 +36,7 @@ export const CAMPAIGNS: readonly ChronicleCampaign[] = [
   vikingsCampaign,
   crusadesCampaign,
   westAfricanEmpiresCampaign,
+  ottomanEmpireCampaign,
   silkRoadCampaign,
   islamicGoldenAgeCampaign,
   ageOfSailCampaign,
