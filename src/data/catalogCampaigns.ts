@@ -80,6 +80,17 @@ export const CAMPAIGN_ENTRIES: readonly CatalogEntry[] = [
     load: () => import("@/data/campaigns/persianEmpire").then((module) => sortCampaignEvents(module.persianEmpireCampaign)),
   },
   {
+    id: "imperial-china",
+    title: "Imperial China",
+    subtitle: "From the First Emperor to the fall of the Tang",
+    startYear: -221,
+    endYear: 907,
+    accent: "#c0463a",
+    source: "curated",
+    keywords: ["imperial china","qin dynasty","han dynasty","sui dynasty","tang dynasty","qin shi huang","first emperor","terracotta army","great wall","emperor wu","xiongnu","sima qian","paper","three kingdoms","buddhism","grand canal","chang'an","taizong","wu zetian","an lushan"],
+    load: () => import("@/data/campaigns/imperialChina").then((module) => sortCampaignEvents(module.imperialChinaCampaign)),
+  },
+  {
     id: "silk-road",
     title: "The Silk Road & Eurasian Exchange",
     subtitle: "Oases, passes and monsoon winds that tied Eurasia together",

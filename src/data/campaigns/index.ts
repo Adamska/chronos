@@ -5,6 +5,7 @@ import { columbianExchangeCampaign } from "@/data/campaigns/columbianExchange";
 import { fallOfRomeCampaign } from "@/data/campaigns/fallOfRome";
 import { franceEnglandCampaign } from "@/data/campaigns/franceEngland";
 import { greeceAlexanderCampaign } from "@/data/campaigns/greeceAlexander";
+import { imperialChinaCampaign } from "@/data/campaigns/imperialChina";
 import { indianOceanWorldCampaign } from "@/data/campaigns/indianOceanWorld";
 import { industrialRevolutionCampaign } from "@/data/campaigns/industrialRevolution";
 import { islamicGoldenAgeCampaign } from "@/data/campaigns/islamicGoldenAge";
@@ -27,6 +28,7 @@ export const CAMPAIGNS: readonly ChronicleCampaign[] = [
   mesopotamiaCampaign,
   greeceAlexanderCampaign,
   persianEmpireCampaign,
+  imperialChinaCampaign,
   silkRoadCampaign,
   islamicGoldenAgeCampaign,
   ageOfSailCampaign,
