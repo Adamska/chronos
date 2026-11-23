@@ -69,6 +69,17 @@ export const CAMPAIGN_ENTRIES: readonly CatalogEntry[] = [
     load: () => import("@/data/campaigns/greeceAlexander").then((module) => sortCampaignEvents(module.greeceAlexanderCampaign)),
   },
   {
+    id: "persian-empire",
+    title: "The Persian Empire",
+    subtitle: "Roads, satraps and the King of Kings, from Cyrus to Darius III",
+    startYear: -559,
+    endYear: -330,
+    accent: "#8a7bb5",
+    source: "curated",
+    keywords: ["persian empire","achaemenid empire","ancient persia","cyrus the great","darius the great","xerxes","darius iii","persepolis","pasargadae","susa","babylon","cyrus cylinder","behistun","royal road","satrapy","zoroastrianism","persian wars","salamis","gaugamela","alexander the great"],
+    load: () => import("@/data/campaigns/persianEmpire").then((module) => sortCampaignEvents(module.persianEmpireCampaign)),
+  },
+  {
     id: "silk-road",
     title: "The Silk Road & Eurasian Exchange",
     subtitle: "Oases, passes and monsoon winds that tied Eurasia together",
