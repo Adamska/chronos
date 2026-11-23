@@ -58,6 +58,17 @@ export const CAMPAIGN_ENTRIES: readonly CatalogEntry[] = [
     load: () => import("@/data/campaigns/mesopotamia").then((module) => sortCampaignEvents(module.mesopotamiaCampaign)),
   },
   {
+    id: "greece-alexander",
+    title: "Ancient Greece and Alexander the Great",
+    subtitle: "From rival cities around a sea to an empire reaching the Indus",
+    startYear: -776,
+    endYear: -146,
+    accent: "#5b8fb9",
+    source: "curated",
+    keywords: ["ancient greece","alexander the great","olympic games","greek colonies","sparta","athens","athenian democracy","persian wars","marathon","thermopylae","salamis","pericles","parthenon","peloponnesian war","macedon","gaugamela","hellenistic","alexandria","archimedes","aristotle"],
+    load: () => import("@/data/campaigns/greeceAlexander").then((module) => sortCampaignEvents(module.greeceAlexanderCampaign)),
+  },
+  {
     id: "silk-road",
     title: "The Silk Road & Eurasian Exchange",
     subtitle: "Oases, passes and monsoon winds that tied Eurasia together",
