@@ -2,6 +2,8 @@
 
 **[Live demo](https://chronos-orpin-seven.vercel.app)**
 
+![Historical story of Alexander the Great on 3D globe](https://github.com/user-attachments/assets/949bbdb8-cd4c-4784-a732-894a654dc222)
+
 **An interactive 3D history atlas, in English and French.** Chronos has two ways in. **Stories** tell a chapter of history as a guided journey across the globe, one step at a time, with the people who made it. **Atlas** lets you pick any year from 3500 BCE to today and choose what to see: states and empires, dominant religions, language families, population density, trade routes and great events.
 
 The experience is procedural. The repository ships no video, no photographs and no map tiles: the planet, atmosphere, relief, bathymetry, borders, routes and beacons are generated at runtime from compact vector and grid data, and portraits and thumbnails are fetched on demand from Wikipedia.
