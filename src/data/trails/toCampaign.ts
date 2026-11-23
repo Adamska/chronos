@@ -83,5 +83,6 @@ export function trailToCampaign(trail: Trail): ChronicleCampaign {
     events,
     arcs,
     territories: [],
+    ...(trail.story ? { story: trail.story } : {}),
   };
 }

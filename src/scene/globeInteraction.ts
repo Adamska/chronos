@@ -1,16 +1,10 @@
 import type { ThreeEvent } from "@react-three/fiber";
 import { vector3ToLonLat } from "@/geo/sphericalMath";
 import { useAtlasStore } from "@/store/useAtlasStore";
+import { useChronosStore } from "@/store/useChronosStore";
 import type { LonLat } from "@/types/chronicle";
 
-type GuessHandler = (point: LonLat) => void;
-
-let guessHandler: GuessHandler | null = null;
 let lastHover = 0;
-
-export function registerGuessHandler(handler: GuessHandler | null): void {
-  guessHandler = handler;
-}
 
 export function formatCoordinates([lon, lat]: LonLat): string {
   return `${Math.abs(lat).toFixed(1)}°${lat >= 0 ? "N" : "S"} ${Math.abs(lon).toFixed(1)}°${lon >= 0 ? "E" : "W"}`;
@@ -21,11 +15,12 @@ export function handleGlobeClick(event: ThreeEvent<MouseEvent>): void {
   if (event.delta > 6) return;
   const point = vector3ToLonLat(event.point);
   const atlas = useAtlasStore.getState();
-  if (atlas.challengeActive && guessHandler) {
-    guessHandler(point);
+  if (useChronosStore.getState().mode !== "atlas") return;
+  if (atlas.lens === "travel") {
+    atlas.setTravelOrigin({ coordinates: point, label: formatCoordinates(point) });
     return;
   }
-  if (atlas.lens === "travel") atlas.setTravelOrigin({ coordinates: point, label: formatCoordinates(point) });
+  atlas.queryPlace(point);
 }
 
 export function handleGlobeHover(event: ThreeEvent<PointerEvent>): void {

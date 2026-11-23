@@ -25,7 +25,7 @@ export function IdleThrottle() {
     let idle = false;
 
     const sleep = () => {
-      if (useChronosStore.getState().isPlaying || useAtlasStore.getState().touring) {
+      if (useChronosStore.getState().isPlaying) {
         idleTimer = window.setTimeout(sleep, IDLE_AFTER_MS);
         return;
       }

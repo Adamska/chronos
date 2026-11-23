@@ -6,7 +6,6 @@ import { AmbientSound } from "@/components/atlas/AmbientSound";
 import { GraphicsNotice } from "@/components/atlas/GraphicsNotice";
 import { restoreSharedView, syncUrl } from "@/components/atlas/shareState";
 import { CampaignPalette, SearchPill } from "@/components/hud/CampaignPalette";
-import { ChronicleNotice } from "@/components/hud/ChronicleNotice";
 import { HudOverlay } from "@/components/hud/HudOverlay";
 import { LabelOverlay } from "@/components/hud/LabelOverlay";
 import { Landing, hasSeenLanding } from "@/components/landing/Landing";
@@ -60,7 +59,6 @@ export function AtlasShell() {
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_55%,rgb(0_0_0/0.55)_100%)]" />
       <LabelOverlay />
       <HudOverlay search={<SearchPill />} />
-      <ChronicleNotice />
       <CampaignPalette />
       <Landing />
       <GraphicsNotice />

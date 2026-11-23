@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { storyOf } from "@/data/story";
 import type { CameraKeyframe, ChronicleCampaign, LayerKind } from "@/types/chronicle";
 import { TIMELINE_MAX_YEAR, TIMELINE_MIN_YEAR } from "@/types/chronicle";
 
@@ -12,9 +13,12 @@ export interface CameraRequest {
 }
 
 export type CameraMode = "directed" | "free";
-export type ChronicleStatus = "idle" | "loading" | "error";
+export type AppMode = "story" | "atlas";
 
 interface ChronosState {
+  mode: AppMode;
+  stepIndex: number;
+  figureId: string | null;
   campaign: ChronicleCampaign | null;
   campaignNonce: number;
   year: number;
@@ -26,8 +30,6 @@ interface ChronosState {
   cameraRequest: CameraRequest | null;
   cameraMode: CameraMode;
   paletteOpen: boolean;
-  chronicleStatus: ChronicleStatus;
-  chronicleMessage: string | null;
 }
 
 interface ChronosActions {
@@ -44,7 +46,10 @@ interface ChronosActions {
   requestCamera: (keyframe: CameraKeyframe) => void;
   yieldCamera: () => void;
   setPaletteOpen: (open: boolean) => void;
-  setChronicleStatus: (status: ChronicleStatus, message?: string | null) => void;
+  setMode: (mode: AppMode) => void;
+  goToStep: (index: number) => void;
+  stepStory: (direction: 1 | -1) => void;
+  showFigure: (figureId: string | null) => void;
 }
 
 export interface ChapterOptions {
@@ -61,7 +66,16 @@ const playbackSpeedFor = (campaign: ChronicleCampaign): number =>
 
 let cameraNonce = 0;
 
+function stepKeyframe(campaign: ChronicleCampaign, index: number): CameraKeyframe | null {
+  const step = storyOf(campaign).steps[index];
+  if (!step) return null;
+  return { id: step.id, year: step.year, title: step.title, caption: step.narration, target: step.target, altitude: step.altitude, tilt: step.tilt };
+}
+
 export const useChronosStore = create<ChronosStore>()((set, get) => ({
+  mode: "story",
+  stepIndex: 0,
+  figureId: null,
   campaign: null,
   campaignNonce: 0,
   year: 1000,
@@ -73,14 +87,15 @@ export const useChronosStore = create<ChronosStore>()((set, get) => ({
   cameraRequest: null,
   cameraMode: "directed",
   paletteOpen: false,
-  chronicleStatus: "idle",
-  chronicleMessage: null,
 
   loadCampaign: (campaign) => {
-    const opening = campaign.chapters[0];
+    const opening = stepKeyframe(campaign, 0) ?? campaign.chapters[0];
     cameraNonce += 1;
     set((state) => ({
       campaign,
+      mode: "story",
+      stepIndex: 0,
+      figureId: null,
       campaignNonce: state.campaignNonce + 1,
       year: opening?.year ?? campaign.startYear,
       isPlaying: false,
@@ -96,11 +111,9 @@ export const useChronosStore = create<ChronosStore>()((set, get) => ({
   setYear: (year) => set({ year: clampYear(year) }),
 
   setPlaying: (playing) => {
-    const { campaign, year } = get();
-    if (playing && campaign && year >= campaign.endYear) {
-      set({ year: campaign.startYear, isPlaying: true, cameraMode: "directed" });
-      return;
-    }
+    const { campaign, year, mode, stepIndex } = get();
+    if (playing && mode === "story" && campaign && stepIndex >= storyOf(campaign).steps.length - 1) get().goToStep(0);
+    if (playing && mode === "atlas" && year >= TIMELINE_MAX_YEAR - 1) set({ year: TIMELINE_MIN_YEAR });
     set(playing ? { isPlaying: true, cameraMode: "directed" } : { isPlaying: false });
   },
 
@@ -163,5 +176,29 @@ export const useChronosStore = create<ChronosStore>()((set, get) => ({
 
   setPaletteOpen: (open) => set({ paletteOpen: open }),
 
-  setChronicleStatus: (status, message = null) => set({ chronicleStatus: status, chronicleMessage: message }),
+  setMode: (mode) => {
+    if (get().mode === mode) return;
+    set({ mode, isPlaying: false, selection: null, figureId: null, yearsPerSecond: mode === "atlas" ? 40 : get().yearsPerSecond });
+    if (mode === "story") get().goToStep(get().stepIndex);
+  },
+
+  goToStep: (index) => {
+    const campaign = get().campaign;
+    const steps = campaign ? storyOf(campaign).steps : [];
+    const clamped = Math.min(steps.length - 1, Math.max(0, index));
+    const keyframe = campaign ? stepKeyframe(campaign, clamped) : null;
+    if (!keyframe) return;
+    cameraNonce += 1;
+    set({
+      mode: "story",
+      stepIndex: clamped,
+      selection: null,
+      cameraMode: "directed",
+      cameraRequest: { keyframe, nonce: cameraNonce },
+    });
+  },
+
+  stepStory: (direction) => get().goToStep(get().stepIndex + direction),
+
+  showFigure: (figureId) => set({ figureId: get().figureId === figureId ? null : figureId }),
 }));

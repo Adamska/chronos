@@ -1,35 +1,32 @@
 # Chronos
 
-**An interactive 3D temporal and geopolitical atlas, in English and French.** Chronos turns trade networks, scientific diffusion, migrations, campaigns and shifting borders into a cinematic, explorable globe, and keeps asking the question maps are best at answering: *why here?*
+**An interactive 3D history atlas, in English and French.** Chronos has two ways in. **Stories** tell a chapter of history as a guided journey across the globe, one step at a time, with the people who made it. **Atlas** lets you pick any year from 3500 BCE to today and choose what to see: states and empires, dominant religions, language families, population density, trade routes and great events.
 
-The experience is procedural. The repository ships no video, no photographs and no map tiles: the planet, atmosphere, relief, bathymetry, borders, routes, beacons, diagrams, posters and even the ambient sound are generated at runtime from compact vector and grid data, and archival thumbnails are fetched on demand from Wikipedia.
+The experience is procedural. The repository ships no video, no photographs and no map tiles: the planet, atmosphere, relief, bathymetry, borders, routes and beacons are generated at runtime from compact vector and grid data, and portraits and thumbnails are fetched on demand from Wikipedia.
 
-## Highlights
+## Stories
 
-**The globe**
-- **Real relief and bathymetry.** A 0.5° grid derived from NOAA ETOPO 2022 drives hillshading, a terrain tint by altitude and latitude, and true ocean-depth contours, all in GLSL.
-- **Historical political map.** Polity borders for any year from 3400 BCE to 2024, from the Cliopatria database (Seshat, CC BY 4.0), rasterised in a Web Worker and labelled with the largest states of the moment.
-- **Atmosphere and light.** Rayleigh/Mie limb scattering, a solar terminator that follows the season of the scrubbed year, and night-side city lights scaled by population.
-- **Great-circle storytelling.** SLERP routes with shader-driven pulses and instanced comet particles that trace the active corridors of each chronicle.
+Each story is a sequence of 10 to 16 steps. A step flies the camera somewhere, shows a short narration and only the one to three things that matter at that moment: an event, a route, the extent of an empire. Earlier steps stay on the globe as faint markers, so the story leaves a trail.
 
-**Content**
-- **Eleven curated campaigns:** the Silk Road, the Islamic Golden Age, the Age of Sail, the Fall of Rome, the Industrial Revolution, the Space Race, the Mongol Empire, the Bantu Expansion, Polynesian navigation, the Columbian Exchange and the Indian Ocean world.
-- **Nine threads and journeys:** silver, zero, plague, paper and printing; Xuanzang, Ibn Battuta, Zheng He and Olaudah Equiano.
-- **Fully bilingual.** Every chronicle, reference dataset and interface string exists in English and French (`/en`, `/fr`), and AI chronicles are generated in the reader's language.
-- **Honest uncertainty.** Debated or approximate events carry a badge and a note on what historians disagree about.
+- **24 stories:** the Roman Empire, Egypt of the Pharaohs, seven centuries of French and English rivalry, the French Revolution and Napoleon, the Silk Road, the Islamic Golden Age, the Age of Sail, the Fall of Rome, the Industrial Revolution, the Space Race, the Mongol Empire, the Bantu Expansion, Polynesian voyaging, the Columbian Exchange, the Indian Ocean world, the threads of silver, zero, plague, paper and printing, and the journeys of Xuanzang, Ibn Battuta, Zheng He and Olaudah Equiano.
+- **Key figures:** each story introduces two to six people. Opening one shows their portrait, dates and role, and draws their life on the globe, place by place.
+- **Play, read aloud, or step through:** autoplay paces each step by its length, optional speech synthesis reads the narration, and arrow keys move between steps. "Learn more" opens a dossier with context, the geographic reason the event happened where it did, a primary source when one is genuine, and Wikipedia.
+- **Borders of the time:** an optional switch shows the historical political map behind any step.
 
-**Lenses and layers**
-- **Travel time:** days needed to reach anywhere by surface travel in a given era, solved by Dijkstra in a Web Worker.
-- **Edge of the known world:** what Greco-Roman, Chinese, Islamic, Latin European and Polynesian geographers had charted.
-- **Winds, currents and climate:** ocean currents, trade winds, a monsoon season switch and climate periods on the timeline.
-- **Great cities**, **Meanwhile elsewhere** (contemporary events in other chronicles) and **Compare two years** (an outline overlay of another year's borders).
+## Atlas
 
-**Modes and tools**
-- **Landing gallery** with three entry points: explore, play, or watch a tour.
-- **Why here? challenge** with three difficulty levels, free hints (continent, then region) and a shareable result.
-- **Teacher mode:** pick places, share a class code, and read a results page with each student's score and the class's average error per place.
-- **Narrated tours** (system speech synthesis), **share links** that restore the exact view, **printable classroom sheets**, **poster export** and **synthesised ambient sound**.
-- **AI chronicle director:** `Cmd+K` accepts any historical question. With an OpenAI key the campaign streams in progressively, is cached and gets a share link; without one, an offline encyclopedia answers from curated entries.
+The atlas has a single background map and a few overlays, each with its own legend, so the globe never shows everything at once.
+
+| Background map | Source |
+| --- | --- |
+| States and empires | Cliopatria polity borders, rasterised in a Web Worker, crossfading as the year changes |
+| Dominant religions | Curated timelines of the majority religion of each modern country's population (approximate, drawn as soft zones) |
+| Language families | Curated timelines of the majority language family of each modern country (approximate) |
+| Population density | HYDE 3.2 grids at 28 dates, interpolated on the GPU |
+
+Overlays: about 150 major world events across every region and era, 25 great trade routes, the great cities of each period, and winds, currents and climate. Advanced tools add travel times by era, the edge of the known world for five cultures, and an outline comparison with another year.
+
+**What was here?** Clicking anywhere answers for the current year: the state that ruled the place, its dominant religion and language, the population density, the nearest great city and nearby world events.
 
 ## Getting started
 
@@ -38,14 +35,7 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:3000; the proxy redirects to `/en` or `/fr` from the browser language (a cookie remembers an explicit choice). Everything works without configuration.
-
-| Variable | Purpose |
-| --- | --- |
-| `OPENAI_API_KEY` | Enables structured, streamed chronicle generation and AI follow-up answers |
-| `CHRONICLE_MODEL` | OpenAI model (default `gpt-5.4-mini`) |
-| `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` | Persistent storage for generated chronicles and class challenges (otherwise kept in server memory) |
-| `NEXT_PUBLIC_SITE_URL` | Absolute base URL for Open Graph images |
+Open http://localhost:3000; the proxy redirects to `/en` or `/fr` from the browser language (a cookie remembers an explicit choice). Everything works offline and without configuration. `NEXT_PUBLIC_SITE_URL` sets the absolute base URL used in Open Graph images.
 
 | Script | Purpose |
 | --- | --- |
@@ -54,7 +44,7 @@ Open http://localhost:3000; the proxy redirects to `/en` or `/fr` from the brows
 | `npm test` | Vitest unit and data-integrity suites |
 | `npm run test:e2e` | Playwright end-to-end tests (set `PLAYWRIGHT_CHANNEL=chrome` to use an installed Chrome) |
 | `npm run check:links` | Checks every Wikipedia slug (also run weekly in CI) |
-| `npm run data:borders`, `npm run data:elevation` | Rebuild the Cliopatria and ETOPO derivatives from their sources |
+| `npm run data:borders`, `data:elevation`, `data:population` | Rebuild the Cliopatria, ETOPO and HYDE derivatives from their sources |
 
 ### Controls
 
@@ -62,64 +52,50 @@ Open http://localhost:3000; the proxy redirects to `/en` or `/fr` from the brows
 | --- | --- |
 | Drag / scroll | Orbit and zoom (yields the directed camera) |
 | `Shift` + arrows, `+` / `-` | Orbit and zoom from the keyboard |
-| `Space` | Play or pause chronological playback |
-| `←` / `→` and `[` / `]` | Previous or next chapter, previous or next event |
-| `Cmd+K` / `Ctrl+K` | Open the palette: chronicles, full-text event search, AI generation |
-| Wheel on the timeline | Zoom the focus track (double-click to reset) |
+| `←` / `→` | Previous or next step in a story; ten years back or forward in the atlas (`Alt` for a century) |
+| `Space` | Play or pause |
+| `Cmd+K` / `Ctrl+K` | Search stories, people, events, or type a year such as `1789` or `52 BC` |
+| `Esc` | Close the open card |
 
 ## Architecture
 
 ```
 src/
-  app/[lang]/             Localised pages: atlas, classroom sheets, class results
-  app/api/                chronicle (JSON and NDJSON stream), shared chronicles, follow-up questions,
-                          class challenges, Open Graph images
-  ai/                     Zod schemas, generation, normalisation, offline encyclopedia and answers
-  audio/                  Web Audio ambience
-  classroom/              Class challenge schemas
-  components/             HUD, tool menus, lenses, dossier, landing, palette
-  data/                   Campaigns, trails, catalog (lazy loaders), geography, environment, cities, uncertainty
-  geo/                    Spherical math, triangulation, relief, borders, travel solver
-  i18n/                   Locale config, dictionaries, French content and reference translations
-  scene/                  React Three Fiber layers
-  server/                 Key-value storage (Upstash or memory), ids, class storage
-  shaders/                GLSL for ocean, land, atmosphere, political map, arcs, beacons, lenses, lights
-  store/                  Zustand stores (chronicle and time, atlas modes, challenge, generation, polities)
-  workers/                Travel-time and border rasterisation workers
-scripts/                  Land caps, catalog, French catalog, borders, elevation, link checks
+  app/[lang]/        Localised page with metadata; app/api/og renders share images
+  components/story/  Story panel, step timeline, figure card, narration
+  components/atlas/  Layer panel, legends, atlas timeline, place card, world event card
+  components/hud/    Top bar and mode switch, search palette, labels, playback and hotkeys
+  data/              Stories (campaigns and trails), catalog, world events, trade routes, region timelines
+  geo/               Spherical math, triangulation, relief, borders, regions, population, travel solver
+  i18n/              Locale config, dictionaries, French translations of every story and dataset
+  scene/             React Three Fiber layers
+  shaders/           GLSL for ocean, land, atmosphere, raster overlays, population, arcs, beacons, lights
+  store/             Zustand stores (time and mode, atlas layers, world data, polities)
+  workers/           Travel-time and border rasterisation workers
+scripts/             Land caps, catalogs, borders, elevation, population, link checks
 ```
 
-All scene layers read the stores transiently inside `useFrame`, so scrubbing and playback never trigger React renders in the render loop. Chronicles load on demand from a lightweight catalog; the full library is fetched only for search, comparison panels and offline fallbacks.
+Scene layers read the stores transiently inside `useFrame`, so playback never triggers React renders in the render loop. Every layer eases in and out over time instead of popping, raster overlays crossfade between dates, and stories load on demand from a lightweight catalog.
 
-## Geospatial pipeline
+## Data model
 
-**Coordinates.** Everything is `[longitude, latitude]` in degrees; `x = r·cosφ·sinλ`, `y = r·sinφ`, `z = r·cosφ·cosλ`.
-
-**Land.** Natural Earth rings are unwrapped across the antimeridian, closed through the pole where needed, filled with jittered Steiner points for `earcut`, refined with conforming edge splits (no T-junction cracks) and oriented outward with a 3D test that falls back to planar orientation for slivers. The caps are triangulated once at build time (`scripts/build-land.mts`) into a quantised binary; the browser only adds walls and coastlines.
-
-**Relief.** `scripts/build-elevation.mts` averages ETOPO 2022 into a 720 × 360 byte grid (square-root encoding for depth and altitude). Shaders compute slopes in a local east/north frame for hillshading and read depth for bathymetric contours.
-
-**Borders.** `scripts/build-borders.mts` simplifies, quantises and splits Cliopatria into century bins of TopoJSON. At runtime a worker picks the polities active in the scrubbed year, rasterises them with d3-geo into an equirectangular texture and returns the largest polities as labels; the comparison overlay uses the same path in outline mode.
-
-**Travel time.** A half-degree grid Dijkstra with era-specific land and sea speeds, mountain penalties, pack ice, port delays and an open-ocean barrier before 1450, run in a self-contained worker and drawn as isochrones.
-
-## AI
-
-`POST /api/chronicle/stream` validates the query with Zod, checks the cache, then streams `progress` lines (title, events and routes as they are written) and a `final` line with the normalised campaign and its share id. `generateText`/`streamText` with `Output.object` produce `ChronicleCampaignSchema`, which uses nullable fields and `{ lon, lat }` objects for strict structured outputs. Without a key, or on failure, `matchEncyclopedia` prefers a whole chronicle whose title matches, otherwise assembles one from matching events. `POST /api/chronicle/ask` answers follow-up questions with a camera target, online or offline.
+A story is a chronicle (events, routes, territories) plus a story layer: an era, ordered steps that each reference the events, routes, territories and figures they show, and key figures with dated places. French translations mirror every field and are merged at load time. Validators in `.claude/scratch` check ids, dates, coordinates, Wikipedia titles, French coverage and typography.
 
 ## Quality and performance
 
-- **Tests:** about 110 Vitest cases (spherical math, crack-free triangulation, travel solver, land-cap format, encyclopedia, builders, catalog, data integrity for every chronicle, French coverage) and Playwright end-to-end tests for the atlas, palette, challenge, classroom, APIs and French locale. GitHub Actions runs lint, typecheck, unit tests, build and end-to-end tests on every push, plus a weekly Wikipedia link check.
-- **Adaptive quality:** a starting tier from hardware hints, then `PerformanceMonitor` steps pixel ratio, bloom, grain, stars and particle budgets; the tier can be pinned in settings.
-- **Off the main thread:** travel times and border rasterisation in Web Workers, land caps precomputed at build time, remaining work time-sliced into 8 ms slices.
-- **Idle and lazy:** 30 fps after a few seconds without interaction or playback; chronicles, post-processing and the full library load on demand; WebGL context loss is caught with a recovery prompt.
+- **Tests:** Vitest covers spherical math, crack-free triangulation, the travel solver, the land-cap format, the catalog, the integrity of every story and translation, the atlas time scale, region timelines and population decoding. Playwright covers stories, figures, search, shared links, atlas layers, place lookups and the French locale. GitHub Actions runs lint, typecheck, unit tests, build and end-to-end tests on every push, plus a weekly Wikipedia link check.
+- **Stable rendering:** a depth range that follows the camera, polygon offsets between land and coastlines, SMAA under the bloom pass and label hysteresis prevent flicker while moving.
+- **Adaptive quality:** a starting tier from hardware hints, then `PerformanceMonitor` adjusts pixel ratio, bloom, grain and particle budgets, ignoring idle periods; the tier can be pinned in settings.
+- **Off the main thread and lazy:** travel times and border rasterisation run in Web Workers, land caps are precomputed at build time, the frame rate drops to 30 fps when idle, and stories, world data and post-processing load on demand.
 
 ## Data sources and credits
 
-- Historical borders: **Cliopatria**, Seshat Global History Databank (Bennett et al. 2025, *Scientific Data* 12, 247), CC BY 4.0, simplified and binned by Chronos. See `public/data/borders/ATTRIBUTION.md`.
+- Historical borders: **Cliopatria**, Seshat Global History Databank (Bennett et al. 2025, *Scientific Data* 12, 247), CC BY 4.0. See `public/data/borders/ATTRIBUTION.md`.
+- Population: **HYDE 3.2.1** (Klein Goldewijk et al., PBL Netherlands Environmental Assessment Agency), CC BY 3.0, aggregated to one degree. See `public/data/population/ATTRIBUTION.md`.
 - Relief and bathymetry: **NOAA NCEI ETOPO 2022** (public domain). See `public/data/ELEVATION_ATTRIBUTION.md`.
-- Land outlines: **Natural Earth** via `world-atlas` (public domain).
-- Archival thumbnails and summaries: **Wikipedia** REST API, fetched at runtime.
+- Land and country outlines: **Natural Earth** via `world-atlas` (public domain).
+- Religion and language timelines, stories, world events and trade routes: written for Chronos from standard references; the religion and language maps are explicit approximations.
+- Portraits, thumbnails and summaries: **Wikipedia** REST API, fetched at runtime.
 
 ## License
 

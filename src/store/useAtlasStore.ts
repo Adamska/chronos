@@ -1,10 +1,15 @@
 import { create } from "zustand";
 import type { Season } from "@/data/environment";
-import { useChronosStore } from "@/store/useChronosStore";
+import { type AppMode, useChronosStore } from "@/store/useChronosStore";
 import type { LonLat } from "@/types/chronicle";
 
 export type Lens = "none" | "travel" | "known";
-export type Panel = "none" | "meanwhile" | "index" | "settings" | "ask" | "teacher";
+export type Panel = "none" | "settings";
+export type BaseMap = "countries" | "religions" | "languages" | "population" | "none";
+export type Overlay = "events" | "trade" | "cities" | "physical";
+
+export const BASE_MAPS: readonly BaseMap[] = ["countries", "religions", "languages", "population", "none"];
+export const OVERLAYS: readonly Overlay[] = ["events", "trade", "cities", "physical"];
 
 export interface TravelOrigin {
   readonly coordinates: LonLat;
@@ -17,41 +22,46 @@ export interface HoverPoint {
   readonly clientY: number;
 }
 
+export interface PlaceQuery {
+  readonly coordinates: LonLat;
+  readonly nonce: number;
+}
+
 const prefersReducedMotion = (): boolean =>
   typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 interface AtlasState {
+  baseMap: BaseMap;
+  overlays: Record<Overlay, boolean>;
+  storyBorders: boolean;
   lens: Lens;
   panel: Panel;
+  place: PlaceQuery | null;
+  worldEventId: string | null;
   travelOrigin: TravelOrigin | null;
   knownPerspective: string;
-  showEnvironment: boolean;
-  showCities: boolean;
-  showPolitical: boolean;
   season: Season;
   hover: HoverPoint | null;
   reducedMotion: boolean;
   narration: boolean;
-  touring: boolean;
-  challengeActive: boolean;
   contextLost: boolean;
   landingOpen: boolean;
   compareYear: number | null;
   posterNonce: number;
   ambientSound: boolean;
+  setBaseMap: (baseMap: BaseMap) => void;
+  toggleOverlay: (overlay: Overlay) => void;
+  toggleStoryBorders: () => void;
   setLens: (lens: Lens) => void;
   togglePanel: (panel: Panel) => void;
+  queryPlace: (coordinates: LonLat | null) => void;
+  showWorldEvent: (id: string | null) => void;
   setTravelOrigin: (origin: TravelOrigin | null) => void;
   setKnownPerspective: (id: string) => void;
-  toggleEnvironment: () => void;
-  toggleCities: () => void;
-  togglePolitical: () => void;
   setSeason: (season: Season) => void;
   setHover: (hover: HoverPoint | null) => void;
   setReducedMotion: (value: boolean) => void;
   setNarration: (value: boolean) => void;
-  setTouring: (value: boolean) => void;
-  setChallengeActive: (value: boolean) => void;
   setContextLost: (value: boolean) => void;
   setLandingOpen: (value: boolean) => void;
   toggleCompare: () => void;
@@ -60,38 +70,43 @@ interface AtlasState {
   setAmbientSound: (value: boolean) => void;
 }
 
+let placeNonce = 0;
+
 export const useAtlasStore = create<AtlasState>()((set, get) => ({
+  baseMap: "countries",
+  overlays: { events: true, trade: false, cities: false, physical: false },
+  storyBorders: false,
   lens: "none",
   panel: "none",
+  place: null,
+  worldEventId: null,
   travelOrigin: null,
   knownPerspective: "latin-europe",
-  showEnvironment: false,
-  showCities: false,
-  showPolitical: true,
   season: "summer",
   hover: null,
   reducedMotion: prefersReducedMotion(),
   narration: false,
-  touring: false,
-  challengeActive: false,
   contextLost: false,
   landingOpen: false,
   compareYear: null,
   posterNonce: 0,
   ambientSound: false,
+  setBaseMap: (baseMap) => set({ baseMap }),
+  toggleOverlay: (overlay) => set({ overlays: { ...get().overlays, [overlay]: !get().overlays[overlay] } }),
+  toggleStoryBorders: () => set({ storyBorders: !get().storyBorders }),
   setLens: (lens) => set({ lens: get().lens === lens ? "none" : lens }),
   togglePanel: (panel) => set({ panel: get().panel === panel ? "none" : panel }),
+  queryPlace: (coordinates) => {
+    placeNonce += 1;
+    set({ place: coordinates ? { coordinates, nonce: placeNonce } : null, worldEventId: null });
+  },
+  showWorldEvent: (worldEventId) => set({ worldEventId, place: null }),
   setTravelOrigin: (travelOrigin) => set({ travelOrigin }),
   setKnownPerspective: (knownPerspective) => set({ knownPerspective }),
-  toggleEnvironment: () => set({ showEnvironment: !get().showEnvironment }),
-  toggleCities: () => set({ showCities: !get().showCities }),
-  togglePolitical: () => set({ showPolitical: !get().showPolitical }),
   setSeason: (season) => set({ season }),
   setHover: (hover) => set({ hover }),
   setReducedMotion: (reducedMotion) => set({ reducedMotion }),
   setNarration: (narration) => set({ narration }),
-  setTouring: (touring) => set({ touring }),
-  setChallengeActive: (challengeActive) => set({ challengeActive, lens: "none" }),
   setContextLost: (contextLost) => set({ contextLost }),
   setLandingOpen: (landingOpen) => set({ landingOpen }),
   toggleCompare: () => {
@@ -99,11 +114,17 @@ export const useAtlasStore = create<AtlasState>()((set, get) => ({
       set({ compareYear: null });
       return;
     }
-    const { year, campaign } = useChronosStore.getState();
-    const span = campaign ? campaign.endYear - campaign.startYear : 400;
-    set({ compareYear: Math.round(year - Math.max(50, span * 0.25)) });
+    set({ compareYear: Math.round(useChronosStore.getState().year - 200) });
   },
   setCompareYear: (compareYear) => set({ compareYear }),
   requestPoster: () => set({ posterNonce: get().posterNonce + 1 }),
   setAmbientSound: (ambientSound) => set({ ambientSound }),
 }));
+
+export function politicalVisible(mode: AppMode, state: Pick<AtlasState, "baseMap" | "storyBorders"> = useAtlasStore.getState()): boolean {
+  return mode === "atlas" ? state.baseMap === "countries" : state.storyBorders;
+}
+
+export function overlayVisible(overlay: Overlay): boolean {
+  return useChronosStore.getState().mode === "atlas" && useAtlasStore.getState().overlays[overlay];
+}

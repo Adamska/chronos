@@ -25,6 +25,17 @@ export interface CampaignMetaTranslation {
   readonly territories?: Readonly<Record<string, { readonly name?: string }>>;
 }
 
-export interface CampaignTranslation extends CampaignMetaTranslation {
+export interface FigureTranslation {
+  readonly name?: string;
+  readonly role?: string;
+  readonly places?: readonly { readonly place?: string; readonly note?: string }[];
+}
+
+export interface StoryTranslation {
+  readonly steps?: Readonly<Record<string, { readonly title?: string; readonly narration?: string }>>;
+  readonly figures?: Readonly<Record<string, FigureTranslation>>;
+}
+
+export interface CampaignTranslation extends CampaignMetaTranslation, StoryTranslation {
   readonly events?: Readonly<Record<string, EventTranslation>>;
 }

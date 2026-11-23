@@ -17,6 +17,7 @@ import { lonLatToVector3, sampleGreatCircle } from "@/geo/sphericalMath";
 import flowFragment from "@/shaders/flow.frag";
 import flowVertex from "@/shaders/flow.vert";
 import { useAtlasStore } from "@/store/useAtlasStore";
+import { useChronosStore } from "@/store/useChronosStore";
 import type { LonLat } from "@/types/chronicle";
 
 const KIND_INDEX: Record<FlowKind, number> = { "warm-current": 0, "cold-current": 1, wind: 2, monsoon: 3 };
@@ -56,7 +57,9 @@ export function visibleFlows(season: Season): FlowLine[] {
 }
 
 export function EnvironmentLayer() {
-  const visible = useAtlasStore((state) => state.showEnvironment);
+  const physicalOn = useAtlasStore((state) => state.overlays.physical);
+  const atlasMode = useChronosStore((state) => state.mode === "atlas");
+  const visible = physicalOn && atlasMode;
   const season = useAtlasStore((state) => state.season);
   const geometry = useMemo(() => (visible ? buildFlowGeometry(visibleFlows(season)) : null), [visible, season]);
   const material = useMemo(

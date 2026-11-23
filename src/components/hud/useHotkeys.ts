@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { useAtlasStore } from "@/store/useAtlasStore";
 import { useChronosStore } from "@/store/useChronosStore";
 
 const isTypingTarget = (target: EventTarget | null): boolean =>
@@ -16,7 +17,10 @@ export function useHotkeys(): void {
         return;
       }
       if (event.key === "Escape") {
+        const atlas = useAtlasStore.getState();
         if (store.paletteOpen) store.setPaletteOpen(false);
+        else if (store.figureId) store.showFigure(null);
+        else if (atlas.place || atlas.worldEventId) atlas.queryPlace(null);
         else if (store.selection) store.select(null);
         return;
       }
@@ -24,18 +28,12 @@ export function useHotkeys(): void {
       if (event.key === " ") {
         event.preventDefault();
         store.togglePlaying();
-      } else if (event.key === "ArrowRight") {
-        store.stepChapter(1);
-      } else if (event.key === "ArrowLeft") {
-        store.stepChapter(-1);
-      } else if (event.key === "]" || event.key === "[") {
-        const events = store.campaign?.events ?? [];
-        const current = events.findIndex((entry) => store.selection?.kind === "event" && entry.id === store.selection.id);
-        const fallback = event.key === "]" ? events.findIndex((entry) => entry.year >= store.year) : events.findLastIndex((entry) => entry.year <= store.year);
-        const index = current >= 0 ? current + (event.key === "]" ? 1 : -1) : fallback;
-        const target = events[Math.min(events.length - 1, Math.max(0, index))];
-        if (target) store.focusEvent(target.id);
+        return;
       }
+      if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
+      const direction = event.key === "ArrowRight" ? 1 : -1;
+      if (store.mode === "story") store.stepStory(direction);
+      else store.setYear(Math.round(store.year) + direction * (event.altKey ? 100 : 10));
     };
     window.addEventListener("keydown", handle);
     return () => window.removeEventListener("keydown", handle);

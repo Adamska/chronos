@@ -1,5 +1,6 @@
 "use client";
 
+import { useShareLink } from "@/components/atlas/useShareLink";
 import { useT } from "@/i18n/I18nProvider";
 import { type QualityTier, useQualityStore } from "@/scene/quality";
 import { useAtlasStore } from "@/store/useAtlasStore";
@@ -29,6 +30,8 @@ export function SettingsPanel() {
   const speechAvailable = typeof window !== "undefined" && "speechSynthesis" in window;
   const ambientSound = useAtlasStore((state) => state.ambientSound);
   const setAmbientSound = useAtlasStore((state) => state.setAmbientSound);
+  const requestPoster = useAtlasStore((state) => state.requestPoster);
+  const share = useShareLink();
   const t = useT();
 
   return (
@@ -61,6 +64,14 @@ export function SettingsPanel() {
         {speechAvailable ? (
           <Toggle label={t("settings.narration.label")} hint={t("settings.narration.hint")} checked={narration} onChange={setNarration} />
         ) : null}
+      </div>
+      <div className="mt-2 flex flex-wrap gap-2 border-t border-hairline pt-3 text-[11.5px]">
+        <button type="button" onClick={share.copy} className="rounded-full border border-hairline px-3 py-1 text-ink-muted hover:text-ink">
+          {share.copied ? t("rail.share.copied") : t("rail.share.label")}
+        </button>
+        <button type="button" onClick={requestPoster} className="rounded-full border border-hairline px-3 py-1 text-ink-muted hover:text-ink">
+          {t("rail.poster.label")}
+        </button>
       </div>
     </section>
   );

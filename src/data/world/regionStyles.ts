@@ -1,0 +1,42 @@
+import type { CategoryStyle, LanguageId, ReligionId } from "@/types/world";
+
+export const RELIGION_STYLES: Readonly<Record<ReligionId, CategoryStyle>> = {
+  ancestral: { color: "#a8936e", en: "Ancestral and folk religions", fr: "Religions ancestrales et populaires" },
+  "ancient-polytheism": { color: "#c47a5e", en: "Ancient state polytheisms", fr: "Polythéismes antiques" },
+  zoroastrianism: { color: "#de5f4e", en: "Zoroastrianism", fr: "Zoroastrisme" },
+  judaism: { color: "#c88fd6", en: "Judaism", fr: "Judaïsme" },
+  "christianity-catholic": { color: "#4c8fe0", en: "Catholic (Latin) Christianity", fr: "Christianisme catholique (latin)" },
+  "christianity-orthodox": { color: "#5cc0d8", en: "Orthodox Christianity", fr: "Christianisme orthodoxe" },
+  "christianity-eastern": { color: "#a3c8f2", en: "Oriental and Eastern churches", fr: "Églises orientales" },
+  "christianity-protestant": { color: "#7078e0", en: "Protestant Christianity", fr: "Christianisme protestant" },
+  "islam-sunni": { color: "#45b07a", en: "Sunni Islam", fr: "Islam sunnite" },
+  "islam-shia": { color: "#9ccc5a", en: "Shia Islam", fr: "Islam chiite" },
+  hinduism: { color: "#ec8f3c", en: "Hinduism", fr: "Hindouisme" },
+  buddhism: { color: "#e8c65a", en: "Buddhism", fr: "Bouddhisme" },
+  "east-asian-traditions": { color: "#e07890", en: "East Asian traditions", fr: "Traditions d’Asie orientale" },
+  secular: { color: "#8c939c", en: "Non-religious majority", fr: "Majorité sans religion" },
+};
+
+export const LANGUAGE_STYLES: Readonly<Record<LanguageId, CategoryStyle>> = {
+  romance: { color: "#e8b04c", en: "Romance", fr: "Langues romanes" },
+  germanic: { color: "#e5844a", en: "Germanic", fr: "Langues germaniques" },
+  slavic: { color: "#c9566e", en: "Slavic", fr: "Langues slaves" },
+  celtic: { color: "#c4c260", en: "Celtic", fr: "Langues celtiques" },
+  hellenic: { color: "#e86f6f", en: "Greek", fr: "Grec" },
+  "indo-iranian": { color: "#c46aa8", en: "Indo-Iranian", fr: "Langues indo-iraniennes" },
+  semitic: { color: "#5fbf6a", en: "Semitic", fr: "Langues sémitiques" },
+  egyptian: { color: "#a6d88a", en: "Egyptian and Coptic", fr: "Égyptien et copte" },
+  berber: { color: "#8aa84a", en: "Berber", fr: "Langues berbères" },
+  turkic: { color: "#4aa6e0", en: "Turkic", fr: "Langues turciques" },
+  mongolic: { color: "#6c86e0", en: "Mongolic", fr: "Langues mongoles" },
+  "sino-tibetan": { color: "#9b7fe0", en: "Sino-Tibetan", fr: "Langues sino-tibétaines" },
+  "japonic-koreanic": { color: "#c79be8", en: "Japanese and Korean", fr: "Japonais et coréen" },
+  "austroasiatic-tai": { color: "#2fa58a", en: "Austroasiatic and Tai", fr: "Langues austroasiatiques et taï" },
+  austronesian: { color: "#3fc8d0", en: "Austronesian", fr: "Langues austronésiennes" },
+  dravidian: { color: "#d6a0a0", en: "Dravidian", fr: "Langues dravidiennes" },
+  uralic: { color: "#8fd0e8", en: "Uralic", fr: "Langues ouraliennes" },
+  "niger-congo": { color: "#c79a6e", en: "Niger-Congo", fr: "Langues nigéro-congolaises" },
+  "nilo-saharan": { color: "#9c7a5a", en: "Nilo-Saharan", fr: "Langues nilo-sahariennes" },
+  "indigenous-americas": { color: "#8fb08f", en: "Indigenous languages of the Americas", fr: "Langues autochtones des Amériques" },
+  other: { color: "#8a919c", en: "Other or unclassified", fr: "Autres ou non classées" },
+};

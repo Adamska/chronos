@@ -18,7 +18,9 @@ const INK = new Color("#e9e4d8");
 const CROWN = new Color("#e8c47a");
 
 export function CityLayer() {
-  const visible = useAtlasStore((state) => state.showCities);
+  const citiesOn = useAtlasStore((state) => state.overlays.cities);
+  const atlasMode = useChronosStore((state) => state.mode === "atlas");
+  const visible = citiesOn && atlasMode;
   const mesh = useRef<InstancedMesh>(null);
   const geometry = useMemo(() => new CircleGeometry(1, 28), []);
   const material = useMemo(() => new MeshBasicMaterial({ transparent: true, opacity: 0.55, depthWrite: false, toneMapped: false }), []);

@@ -169,7 +169,7 @@ export function EventDossier() {
       aria-label={t("dossier.aria")}
       data-hud-zone
       style={{ "--sheet-height": SHEET_HEIGHTS[sheet] } as CSSProperties}
-      className={`pointer-events-auto absolute inset-x-0 bottom-0 z-20 h-[var(--sheet-height)] transition-[transform,opacity,height] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] md:inset-x-auto md:right-4 md:top-4 md:bottom-[13.5rem] md:h-auto md:w-[min(420px,calc(100vw-24px))] ${
+      className={`pointer-events-auto absolute inset-x-0 bottom-0 z-20 h-[var(--sheet-height)] transition-[transform,opacity,height] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] md:inset-x-auto md:right-4 md:top-16 md:bottom-28 md:h-auto md:w-[min(420px,calc(100vw-24px))] ${
         open ? "translate-y-0 opacity-100 md:translate-x-0" : "pointer-events-none translate-y-full opacity-0 md:translate-x-[calc(100%+2rem)] md:translate-y-0"
       }`}
     >

@@ -8,14 +8,23 @@ const fraction = (year: number) => (year - TIMELINE_MIN_YEAR) / (TIMELINE_MAX_YE
 export function PalettePreview({ item }: { readonly item: PaletteItem | undefined }) {
   const t = useT();
   if (!item) return null;
-  if (item.kind === "query") {
+  if (item.kind === "year") {
     return (
       <div className="p-5">
-        <p className="eyebrow">{item.suggested ? t("preview.suggested") : t("preview.generate")}</p>
-        <p className="mt-2 font-serif text-[18px] leading-snug text-ink">{item.query}</p>
-        <p className="mt-3 text-[12px] leading-relaxed text-ink-muted">
-          {t("preview.body")}
-        </p>
+        <p className="eyebrow">{eraLabel(item.year)}</p>
+        <p className="mt-2 font-serif text-[20px] leading-snug text-ink">{t("palette.year", { year: formatYear(item.year) })}</p>
+        <p className="mt-3 text-[12px] leading-relaxed text-ink-muted">{t("preview.year")}</p>
+      </div>
+    );
+  }
+  if (item.kind === "figure") {
+    return (
+      <div className="p-5">
+        <span className="block h-1 w-10 rounded-full" style={{ background: item.entry.accent }} />
+        <p className="eyebrow mt-3">{formatSpan(item.figure.born, item.figure.died)}</p>
+        <p className="mt-1.5 font-serif text-[20px] leading-snug text-ink">{item.figure.name}</p>
+        <p className="mt-2 text-[12.5px] leading-relaxed text-ink/85">{item.figure.role}</p>
+        <p className="mt-3 text-[11px] text-ink-faint">{t("preview.in", { title: item.entry.title })}</p>
       </div>
     );
   }

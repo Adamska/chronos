@@ -5,20 +5,35 @@ import { readRecent } from "@/components/hud/recent";
 import { CATALOG, type CatalogEntry, localizedEntry } from "@/data/catalog";
 import { useLibrary } from "@/data/useLibrary";
 import { useLocale, useT } from "@/i18n/I18nProvider";
-import type { HistoricalEvent } from "@/types/chronicle";
+import { storyOf } from "@/data/story";
+import { type HistoricalEvent, TIMELINE_MAX_YEAR, TIMELINE_MIN_YEAR } from "@/types/chronicle";
+import type { KeyFigure } from "@/types/story";
 
 export type PaletteItem =
   | { readonly kind: "chronicle"; readonly entry: CatalogEntry }
   | { readonly kind: "event"; readonly entry: CatalogEntry; readonly event: HistoricalEvent }
-  | { readonly kind: "query"; readonly query: string; readonly suggested: boolean };
+  | { readonly kind: "figure"; readonly entry: CatalogEntry; readonly figure: KeyFigure }
+  | { readonly kind: "year"; readonly year: number };
 
 export interface PaletteSection {
   readonly title: string;
   readonly items: readonly PaletteItem[];
 }
 
-const SUGGESTIONS = ["palette.suggestion.1", "palette.suggestion.2", "palette.suggestion.3"] as const;
-const SOURCES = ["curated", "thread", "journey"] as const;
+const ERAS = [
+  { key: "era.antiquity", end: 500 },
+  { key: "era.middleAges", end: 1450 },
+  { key: "era.earlyModern", end: 1789 },
+  { key: "era.modern", end: Infinity },
+] as const;
+
+export function parseYear(query: string): number | null {
+  const match = /^(-?\d{1,4})\s*(av\.?\s*j\.?-?c\.?|bce?|bc|avant\s+j\.?-?c\.?)?$/i.exec(query.trim());
+  if (!match?.[1]) return null;
+  const value = Number(match[1]);
+  const year = match[2] ? -Math.abs(value) : value;
+  return year === 0 || year < TIMELINE_MIN_YEAR || year > TIMELINE_MAX_YEAR ? null : year;
+}
 
 const normalise = (text: string) => text.toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "");
 
@@ -39,14 +54,23 @@ export function usePaletteResults(query: string): PaletteSection[] {
     if (terms.length === 0) {
       const recent = readRecent()
         .map((id) => catalog.find((entry) => entry.id === id))
-        .filter((entry): entry is CatalogEntry => entry !== undefined);
+        .filter((entry): entry is CatalogEntry => entry !== undefined)
+        .slice(0, 4);
+      let start = -Infinity;
       return [
         ...(recent.length > 0 ? [{ title: t("palette.section.recent"), items: recent.map((entry) => ({ kind: "chronicle" as const, entry })) }] : []),
-        ...SOURCES.map((source) => ({
-          title: t(`palette.section.${source}`),
-          items: catalog.filter((entry) => entry.source === source).map((entry) => ({ kind: "chronicle" as const, entry })),
-        })),
-        { title: t("palette.section.suggestions"), items: SUGGESTIONS.map((key) => ({ kind: "query" as const, query: t(key), suggested: true })) },
+        ...ERAS.map((era) => {
+          const from = start;
+          start = era.end;
+          const items = catalog
+            .filter((entry) => {
+              const middle = (entry.startYear + entry.endYear) / 2;
+              return middle >= from && middle < era.end;
+            })
+            .sort((a, b) => a.startYear - b.startYear)
+            .map((entry) => ({ kind: "chronicle" as const, entry }));
+          return { title: t(era.key), items };
+        }).filter((section) => section.items.length > 0),
       ];
     }
 
@@ -65,9 +89,20 @@ export function usePaletteResults(query: string): PaletteSection[] {
       .slice(0, 8)
       .map(({ entry, event }) => ({ kind: "event" as const, entry, event }));
 
+    const figures = (library ?? [])
+      .flatMap((campaign) => {
+        const entry = catalog.find((candidate) => candidate.id === campaign.id);
+        return entry ? storyOf(campaign).figures.map((figure) => ({ entry, figure })) : [];
+      })
+      .filter(({ figure }) => matches(`${figure.name} ${figure.role}`, terms) >= Math.min(terms.length, 2))
+      .slice(0, 5)
+      .map(({ entry, figure }) => ({ kind: "figure" as const, entry, figure }));
+    const year = parseYear(trimmed);
+
     return [
-      ...(trimmed.length >= 3 ? [{ title: t("palette.section.generate"), items: [{ kind: "query" as const, query: trimmed, suggested: false }] }] : []),
+      ...(year !== null ? [{ title: t("palette.section.year"), items: [{ kind: "year" as const, year }] }] : []),
       ...(chronicles.length > 0 ? [{ title: t("palette.section.chronicles"), items: chronicles }] : []),
+      ...(figures.length > 0 ? [{ title: t("palette.section.figures"), items: figures }] : []),
       ...(events.length > 0 ? [{ title: t("palette.section.events"), items: events }] : []),
     ];
   }, [terms, trimmed, library, catalog, t]);

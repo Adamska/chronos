@@ -5,24 +5,27 @@ import { Canvas } from "@react-three/fiber";
 import { Suspense, lazy, useState } from "react";
 import { ACESFilmicToneMapping, SRGBColorSpace } from "three";
 import { CameraDirector } from "@/scene/CameraDirector";
-import { ChallengeMarkers } from "@/scene/ChallengeMarkers";
 import { ChronicleArcs } from "@/scene/ChronicleArcs";
 import { CompareLayer } from "@/scene/CompareLayer";
 import { CityLayer } from "@/scene/CityLayer";
 import { EarthGlobe } from "@/scene/EarthGlobe";
 import { EnvironmentLayer } from "@/scene/EnvironmentLayer";
 import { EventBeacons } from "@/scene/EventBeacons";
+import { FigurePath } from "@/scene/FigurePath";
 import { LensOverlay } from "@/scene/LensOverlay";
 import { PoliticalLayer } from "@/scene/PoliticalLayer";
+import { PopulationLayer } from "@/scene/PopulationLayer";
+import { RegionLayer } from "@/scene/RegionLayer";
 import { PosterCapture } from "@/scene/PosterCapture";
-import { MeanwhileMarkers } from "@/scene/MeanwhileMarkers";
 import { NightLights } from "@/scene/NightLights";
 import { DepthRange } from "@/scene/DepthRange";
+import { ViewOffset } from "@/scene/ViewOffset";
 import { IdleThrottle, isMeasuringFrames } from "@/scene/IdleThrottle";
 import { useQuality, useQualityStore } from "@/scene/quality";
 import { useAtlasStore } from "@/store/useAtlasStore";
 import { SmartLabels } from "@/scene/SmartLabels";
 import { TerritoryLayer } from "@/scene/TerritoryLayer";
+import { WorldLayers } from "@/scene/WorldLayers";
 
 const Effects = lazy(() => import("@/scene/Effects"));
 
@@ -60,6 +63,8 @@ export default function AtlasCanvas() {
       <Stars radius={60} depth={40} count={starCount} factor={2.4} saturation={0} fade speed={0.25} />
       <EarthGlobe />
       <PoliticalLayer />
+      <RegionLayer />
+      <PopulationLayer />
       <CompareLayer />
       <TerritoryLayer />
       <LensOverlay />
@@ -68,11 +73,12 @@ export default function AtlasCanvas() {
       <NightLights />
       <ChronicleArcs />
       <EventBeacons />
-      <MeanwhileMarkers />
-      <ChallengeMarkers />
+      <WorldLayers />
+      <FigurePath />
       <SmartLabels />
       <CameraDirector />
       <DepthRange />
+      <ViewOffset />
       <IdleThrottle />
       <PosterCapture />
       <Suspense fallback={null}>

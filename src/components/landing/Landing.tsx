@@ -27,12 +27,21 @@ function rememberLanding(): void {
   }
 }
 
-const FILTERS = ["all", "curated", "thread", "journey"] as const;
-const KINDS: ReadonlySet<string> = new Set(["curated", "thread", "journey"]);
-const isKind = (source: string): source is "curated" | "thread" | "journey" => KINDS.has(source);
+const FILTERS = ["all", "antiquity", "middle-ages", "early-modern", "modern"] as const;
+type Filter = (typeof FILTERS)[number];
+const FILTER_KEYS = { all: "landing.filter.all", antiquity: "era.antiquity", "middle-ages": "era.middleAges", "early-modern": "era.earlyModern", modern: "era.modern" } as const;
+
+function eraOfEntry(entry: CatalogEntry): Exclude<Filter, "all"> {
+  const middle = (entry.startYear + entry.endYear) / 2;
+  if (middle < 500) return "antiquity";
+  if (middle < 1450) return "middle-ages";
+  if (middle < 1789) return "early-modern";
+  return "modern";
+}
 
 function ChronicleCard({ entry, onOpen }: { readonly entry: CatalogEntry; readonly onOpen: (entry: CatalogEntry) => void }) {
   const t = useT();
+  const era = eraOfEntry(entry);
   return (
     <button
       type="button"
@@ -41,7 +50,7 @@ function ChronicleCard({ entry, onOpen }: { readonly entry: CatalogEntry; readon
     >
       <span className="flex items-center justify-between gap-2">
         <span className="h-1 w-8 rounded-full" style={{ background: entry.accent }} />
-        <span className="font-mono text-[9.5px] uppercase tracking-[0.16em] text-ink-faint">{isKind(entry.source) ? t(`landing.kind.${entry.source}`) : entry.source}</span>
+        <span className="font-mono text-[9.5px] uppercase tracking-[0.16em] text-ink-faint">{t(FILTER_KEYS[era])}</span>
       </span>
       <span className="font-serif text-[16px] leading-snug text-ink group-hover:text-ochre-soft">{entry.title}</span>
       <span className="line-clamp-2 text-[12px] leading-snug text-ink-muted">{entry.subtitle}</span>
@@ -53,7 +62,7 @@ function ChronicleCard({ entry, onOpen }: { readonly entry: CatalogEntry; readon
 export function Landing() {
   const open = useAtlasStore((state) => state.landingOpen);
   const setLandingOpen = useAtlasStore((state) => state.setLandingOpen);
-  const [filter, setFilter] = useState<(typeof FILTERS)[number]>("all");
+  const [filter, setFilter] = useState<Filter>("all");
   const dialog = useRef<HTMLDivElement>(null);
   const t = useT();
   const locale = useLocale();
@@ -72,11 +81,17 @@ export function Landing() {
     });
   };
   const doors = [
-    { title: t("landing.explore.title"), body: t("landing.explore.body"), act: close },
-    { title: t("landing.play.title"), body: t("landing.play.body"), act: () => (close(), useAtlasStore.getState().setChallengeActive(true)) },
-    { title: t("landing.tour.title"), body: t("landing.tour.body"), act: () => (close(), useAtlasStore.getState().setTouring(true)) },
+    { title: t("landing.story.title"), body: t("landing.story.body"), act: () => document.getElementById("landing-stories")?.scrollIntoView({ behavior: "smooth" }) },
+    {
+      title: t("landing.atlas.title"),
+      body: t("landing.atlas.body"),
+      act: () => {
+        useChronosStore.getState().setMode("atlas");
+        close();
+      },
+    },
   ];
-  const entries = catalog.filter((entry) => filter === "all" || entry.source === filter);
+  const entries = catalog.filter((entry) => filter === "all" || eraOfEntry(entry) === filter).sort((a, b) => a.startYear - b.startYear);
 
   return (
     <div ref={dialog} role="dialog" aria-modal="true" aria-label={t("landing.aria")} className="pointer-events-auto absolute inset-0 z-40 overflow-y-auto bg-gradient-to-b from-abyss/70 via-abyss/85 to-abyss">
@@ -89,21 +104,21 @@ export function Landing() {
         <p className="mt-4 max-w-2xl font-serif text-[19px] leading-snug text-ink/85 sm:text-[22px]">
           {t("landing.lede")}
         </p>
-        <div className="mt-8 grid gap-3 sm:grid-cols-3">
+        <div className="mt-8 grid gap-3 sm:grid-cols-2">
           {doors.map((door, index) => (
             <button
               key={door.title}
               type="button"
               onClick={door.act}
               autoFocus={index === 0}
-              className="glass-panel rounded-2xl px-5 py-4 text-left transition hover:border-ochre/40"
+              className="glass-panel rounded-2xl px-6 py-5 text-left transition hover:border-ochre/40"
             >
-              <span className="block font-serif text-[19px] text-ink">{door.title}</span>
-              <span className="mt-1 block text-[12.5px] leading-snug text-ink-muted">{door.body}</span>
+              <span className="block font-serif text-[22px] text-ink">{door.title}</span>
+              <span className="mt-1.5 block text-[13px] leading-snug text-ink-muted">{door.body}</span>
             </button>
           ))}
         </div>
-        <div className="mt-10 flex flex-wrap items-center justify-between gap-3">
+        <div id="landing-stories" className="mt-10 flex scroll-mt-6 flex-wrap items-center justify-between gap-3">
           <h2 className="eyebrow">{t("landing.chronicles")}</h2>
           <div className="flex gap-1 rounded-full bg-white/[0.04] p-0.5 text-[11.5px]" role="group" aria-label={t("landing.filter")}>
             {FILTERS.map((value) => (
@@ -114,7 +129,7 @@ export function Landing() {
                 onClick={() => setFilter(value)}
                 className={`rounded-full px-3 py-1 transition ${filter === value ? "bg-white/10 text-ink" : "text-ink-muted hover:text-ink"}`}
               >
-                {t(`landing.filter.${value}`)}
+                {t(FILTER_KEYS[value])}
               </button>
             ))}
           </div>

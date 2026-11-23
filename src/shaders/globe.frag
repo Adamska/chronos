@@ -41,7 +41,7 @@ void main() {
   float contourValue = depth * 9.0;
   float contourWidth = max(fwidth(contourValue), 1e-4);
   float contour = 1.0 - smoothstep(0.0, contourWidth * 1.4, abs(fract(contourValue - 0.5) - 0.5));
-  ocean += uGraticule * contour * 0.05 * smoothstep(0.04, 0.2, depth);
+  ocean += uGraticule * contour * 0.018 * smoothstep(0.04, 0.2, depth);
 
   float lonDegrees = degrees(longitude);
   float lonDerivative = min(fwidth(lonDegrees), fwidth(degrees(shiftedLongitude)));
@@ -50,7 +50,7 @@ void main() {
   float poleFade = smoothstep(88.0, 76.0, abs(latDegrees));
   float graticule = max(gridLine(lonDegrees, 15.0, lonDerivative) * poleFade, gridLine(latDegrees, 15.0, latDerivative));
   float equator = 1.0 - smoothstep(0.0, latDerivative * 1.5, abs(latDegrees));
-  ocean += uGraticule * (graticule * 0.075 + equator * 0.06);
+  ocean += uGraticule * (graticule * 0.035 + equator * 0.03);
 
   vec3 worldNormal = normalize(vWorldNormal);
   vec3 viewDirection = normalize(cameraPosition - vWorldPosition);

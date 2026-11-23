@@ -19,10 +19,10 @@ const FLOW_SWATCHES: Record<FlowKind, string> = {
 
 function Card({ title, children }: { readonly title: string; readonly children: React.ReactNode }) {
   return (
-    <section className="glass-panel pointer-events-auto rounded-2xl px-4 py-3">
-      <h2 className="eyebrow mb-2">{title}</h2>
+    <div className="mt-2 rounded-xl bg-white/[0.03] px-3 py-2.5">
+      <h3 className="sr-only">{title}</h3>
       {children}
-    </section>
+    </div>
   );
 }
 
@@ -163,7 +163,7 @@ export function CompareCard() {
       </p>
       <input
         type="range"
-        min={-3000}
+        min={-3500}
         max={2024}
         value={compareYear}
         aria-label={t("lens.compare.slider")}
@@ -172,7 +172,7 @@ export function CompareCard() {
       />
       <div className="mt-1 flex gap-1">
         {[-100, -50, 50, 100].map((step) => (
-          <button key={step} type="button" onClick={() => setCompareYear(Math.max(-3000, Math.min(2024, compareYear + step)))} className="flex-1 rounded-full border border-hairline py-0.5 font-mono text-[10px] text-ink-muted hover:text-ink">
+          <button key={step} type="button" onClick={() => setCompareYear(Math.max(-3500, Math.min(2024, compareYear + step)))} className="flex-1 rounded-full border border-hairline py-0.5 font-mono text-[10px] text-ink-muted hover:text-ink">
             {step > 0 ? `+${step}` : step}
           </button>
         ))}

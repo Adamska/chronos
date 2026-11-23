@@ -1,4 +1,5 @@
 import type { ArcKind, LayerKind, LonLat, PrimarySource } from "@/types/chronicle";
+import type { StoryLayer } from "@/types/story";
 
 export type TrailKind = "thread" | "journey";
 
@@ -26,6 +27,7 @@ export interface Trail {
   readonly accent: string;
   readonly keywords: readonly string[];
   readonly stops: readonly TrailStop[];
+  readonly story?: StoryLayer;
 }
 
 export type PopulationPoint = readonly [year: number, thousands: number];

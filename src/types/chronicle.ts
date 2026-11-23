@@ -1,3 +1,5 @@
+import type { StoryLayer } from "@/types/story";
+
 export type LonLat = readonly [lon: number, lat: number];
 
 export type LayerKind = "borders" | "trade" | "conflict" | "science";
@@ -100,6 +102,7 @@ export interface ChronicleCampaign {
   readonly events: readonly HistoricalEvent[];
   readonly arcs: readonly GeoArc[];
   readonly territories: readonly TerritoryZone[];
+  readonly story?: StoryLayer;
 }
 
 export const LAYER_KINDS: readonly LayerKind[] = ["borders", "trade", "conflict", "science"];
@@ -111,5 +114,5 @@ export const LAYER_LABELS: Record<LayerKind, string> = {
   science: "Science & Ideas",
 };
 
-export const TIMELINE_MIN_YEAR = -3000;
+export const TIMELINE_MIN_YEAR = -3500;
 export const TIMELINE_MAX_YEAR = 2026;

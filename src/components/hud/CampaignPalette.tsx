@@ -3,19 +3,15 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { PalettePreview } from "@/components/hud/PalettePreview";
 import { pushRecent } from "@/components/hud/recent";
-import { useChronicleRequest } from "@/components/hud/useChronicleRequest";
 import { type PaletteItem, usePaletteResults } from "@/components/hud/usePaletteResults";
 import { useFocusTrap } from "@/components/useFocusTrap";
 import { loadChronicle } from "@/data/catalog";
 import { formatSpan, formatYear } from "@/data/campaigns/registry";
-import { pluralForm } from "@/i18n/dictionaries";
-import { useLocale, useT } from "@/i18n/I18nProvider";
+import { useT } from "@/i18n/I18nProvider";
 import { useChronosStore } from "@/store/useChronosStore";
-import { useGenerationStore } from "@/store/useGenerationStore";
 
 export function SearchPill() {
   const setPaletteOpen = useChronosStore((state) => state.setPaletteOpen);
-  const status = useChronosStore((state) => state.chronicleStatus);
   const t = useT();
   return (
     <button
@@ -25,7 +21,7 @@ export function SearchPill() {
       className="glass-panel pointer-events-auto flex w-[22rem] items-center gap-3 rounded-full px-4 py-2 text-left text-[12.5px] text-ink-muted transition hover:text-ink"
     >
       <svg viewBox="0 0 16 16" className="size-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.6"><circle cx="7" cy="7" r="4.5" /><path d="m10.5 10.5 3 3" /></svg>
-      <span className="flex-1 truncate">{status === "loading" ? t("palette.pill.loading") : t("palette.pill.idle")}</span>
+      <span className="flex-1 truncate">{t("palette.pill.idle")}</span>
       <kbd className="rounded border border-white/10 px-1.5 py-0.5 font-mono text-[10px] text-ink-faint">⌘K</kbd>
     </button>
   );
@@ -33,12 +29,24 @@ export function SearchPill() {
 
 function ItemRow({ item, active }: { readonly item: PaletteItem; readonly active: boolean }) {
   const t = useT();
-  if (item.kind === "query") {
+  if (item.kind === "year") {
     return (
       <>
-        <svg viewBox="0 0 10 10" className="size-2.5 shrink-0 text-ochre" fill="currentColor" aria-hidden><path d="M5 0 6.2 3.8 10 5 6.2 6.2 5 10 3.8 6.2 0 5 3.8 3.8Z" /></svg>
-        <span className="min-w-0 flex-1 truncate text-[13.5px] text-ink/90">{item.suggested ? item.query : t("palette.query.generate", { query: item.query })}</span>
-        <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.14em] text-ochre/80">{item.suggested ? t("palette.query.try") : t("palette.query.generateTag")}</span>
+        <span className="size-2.5 shrink-0 rounded-full border border-ochre" />
+        <span className="min-w-0 flex-1 truncate text-[13.5px] text-ink/90">{t("palette.year", { year: formatYear(item.year) })}</span>
+        <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.14em] text-ochre/80">{t("mode.atlas")}</span>
+      </>
+    );
+  }
+  if (item.kind === "figure") {
+    return (
+      <>
+        <span className="grid size-5 shrink-0 place-items-center rounded-full bg-white/[0.06] font-serif text-[11px] text-ink">{item.figure.name.charAt(0)}</span>
+        <span className="min-w-0 flex-1">
+          <span className={`block truncate text-[13.5px] ${active ? "text-ink" : "text-ink/90"}`}>{item.figure.name}</span>
+          <span className="block truncate text-[11.5px] text-ink-muted">{item.figure.role}</span>
+        </span>
+        <span className="shrink-0 font-mono text-[10px] text-ink-faint">{formatSpan(item.figure.born, item.figure.died)}</span>
       </>
     );
   }
@@ -60,12 +68,7 @@ function ItemRow({ item, active }: { readonly item: PaletteItem; readonly active
 export function CampaignPalette() {
   const open = useChronosStore((state) => state.paletteOpen);
   const setPaletteOpen = useChronosStore((state) => state.setPaletteOpen);
-  const status = useChronosStore((state) => state.chronicleStatus);
-  const message = useChronosStore((state) => state.chronicleMessage);
-  const request = useChronicleRequest();
-  const progress = useGenerationStore((state) => state.progress);
   const t = useT();
-  const locale = useLocale();
   const [query, setQuery] = useState("");
   const [cursor, setCursor] = useState(0);
   const dialog = useRef<HTMLDivElement>(null);
@@ -81,17 +84,29 @@ export function CampaignPalette() {
   if (!open) return null;
 
   const activate = (item: PaletteItem | undefined) => {
-    if (!item || status === "loading") return;
-    if (item.kind === "query") {
-      void request(item.query);
+    if (!item) return;
+    const store = useChronosStore.getState();
+    if (item.kind === "year") {
+      store.setMode("atlas");
+      store.setYear(item.year);
+      store.setPaletteOpen(false);
       return;
     }
     void loadChronicle(item.entry.id).then((campaign) => {
       if (!campaign) return;
       pushRecent(campaign.id);
-      const store = useChronosStore.getState();
       store.loadCampaign(campaign);
-      if (item.kind === "event") store.focusEvent(item.event.id);
+      if (item.kind === "event") {
+        const steps = campaign.story?.steps ?? [];
+        const index = steps.findIndex((step) => step.events.includes(item.event.id));
+        if (index >= 0) store.goToStep(index);
+        store.select({ kind: "event", id: item.event.id });
+      } else if (item.kind === "figure") {
+        const steps = campaign.story?.steps ?? [];
+        const index = steps.findIndex((step) => step.figures.includes(item.figure.id));
+        if (index >= 0) store.goToStep(index);
+        store.showFigure(item.figure.id);
+      }
     });
   };
 
@@ -120,24 +135,7 @@ export function CampaignPalette() {
               placeholder={t("palette.placeholder")}
               className="flex-1 bg-transparent font-serif text-[18px] text-ink outline-none placeholder:text-ink-faint"
             />
-            {status === "loading" ? <span className="size-4 animate-spin rounded-full border-2 border-ochre/30 border-t-ochre" /> : null}
           </div>
-          {status === "error" && message ? <p className="border-b border-hairline px-5 py-2.5 text-[12px] text-vermilion">{message}</p> : null}
-          {status === "loading" && progress ? (
-            <div aria-live="polite" className="border-b border-hairline px-5 py-3">
-              <p className="eyebrow">{t("palette.progress.title")}</p>
-              <p className="mt-1 font-serif text-[16px] text-ink">{progress.title ?? t("palette.progress.researching")}</p>
-              <p className="mt-1 font-mono text-[10.5px] text-ink-muted">
-                {t(`palette.progress.events.${pluralForm(progress.events.length, locale)}`, { count: progress.events.length })} ·{" "}
-                {t(`palette.progress.routes.${pluralForm(progress.arcs, locale)}`, { count: progress.arcs })}
-              </p>
-              <ul className="mt-2 space-y-0.5">
-                {progress.events.slice(-4).map((title) => (
-                  <li key={title} className="truncate text-[12px] text-ink/75">{title}</li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
           <div className="scrollbar-quiet max-h-[56vh] overflow-y-auto p-2">
             {sections.map((section, sectionIndex) => (
               <section key={section.title} aria-label={section.title}>
@@ -145,7 +143,7 @@ export function CampaignPalette() {
                 <ul>
                   {section.items.map((item, itemIndex) => {
                     const position = (offsets[sectionIndex] ?? 0) + itemIndex;
-                    const key = item.kind === "query" ? `q-${item.query}` : item.kind === "event" ? `e-${item.event.id}` : `c-${item.entry.id}`;
+                    const key = item.kind === "year" ? `y-${item.year}` : item.kind === "event" ? `e-${item.event.id}` : item.kind === "figure" ? `f-${item.figure.id}` : `c-${item.entry.id}`;
                     return (
                       <li key={key}>
                         <button

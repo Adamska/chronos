@@ -7,8 +7,9 @@ import { localChokepoint, localCityName } from "@/i18n/reference";
 import type { PolityLabel } from "@/geo/borderRaster";
 import type { CityRecord } from "@/types/atlas";
 import type { ChronicleCampaign, HistoricalEvent, TerritoryZone } from "@/types/chronicle";
+import type { WorldEvent } from "@/types/world";
 
-export type LabelKind = "event" | "territory" | "chokepoint" | "city" | "polity";
+export type LabelKind = "event" | "territory" | "chokepoint" | "city" | "polity" | "world";
 
 export interface LabelSpec {
   readonly id: string;
@@ -19,6 +20,7 @@ export interface LabelSpec {
   readonly event?: HistoricalEvent;
   readonly zone?: TerritoryZone;
   readonly city?: CityRecord;
+  readonly world?: WorldEvent;
 }
 
 const cache = new WeakMap<ChronicleCampaign, readonly LabelSpec[]>();
@@ -86,6 +88,25 @@ export function polityLabelsFor(labels: readonly PolityLabel[]): readonly LabelS
     anchor: lonLatToVector3(label.lon, label.lat, 1.012),
   }));
   polityCache.set(labels, specs);
+  return specs;
+}
+
+const worldCache = new WeakMap<readonly WorldEvent[], readonly LabelSpec[]>();
+const NO_WORLD: readonly WorldEvent[] = [];
+
+export function worldLabelsFor(events: readonly WorldEvent[] | undefined): readonly LabelSpec[] {
+  const list = events ?? NO_WORLD;
+  const cached = worldCache.get(list);
+  if (cached) return cached;
+  const specs = list.map((event) => ({
+    id: event.id,
+    kind: "world" as const,
+    text: event.title,
+    priority: 30 + event.significance * 8,
+    anchor: lonLatToVector3(event.coordinates[0], event.coordinates[1], 1.008),
+    world: event,
+  }));
+  worldCache.set(list, specs);
   return specs;
 }
 

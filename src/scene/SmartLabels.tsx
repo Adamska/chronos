@@ -4,12 +4,13 @@ import { useFrame } from "@react-three/fiber";
 import { useMemo } from "react";
 import { Vector3 } from "three";
 import { populationAt } from "@/scene/cityMetrics";
-import { combineLabels, labelNodes, labelsFor, polityLabelsFor } from "@/scene/labelModel";
-import { useAtlasStore } from "@/store/useAtlasStore";
-import { isConcealed } from "@/store/useChallengeStore";
-import { campaignFade, eventPresence, eventSpotlight, territoryPresence } from "@/scene/temporal";
+import { combineLabels, labelNodes, labelsFor, polityLabelsFor, worldLabelsFor } from "@/scene/labelModel";
+import { overlayVisible, politicalVisible, useAtlasStore } from "@/store/useAtlasStore";
+import { worldEventPresence } from "@/data/worldLayer";
+import { storyFocus } from "@/scene/storyFocus";
 import { useChronosStore } from "@/store/useChronosStore";
 import { usePolityStore } from "@/store/usePolityStore";
+import { useWorldStore } from "@/store/useWorldStore";
 
 const LABEL_HEIGHT = 20;
 const MAX_ZONES = 12;
@@ -19,9 +20,12 @@ const toCamera = new Vector3();
 
 export function SmartLabels() {
   const campaign = useChronosStore((state) => state.campaign);
-  const withCities = useAtlasStore((state) => state.showCities);
+  const citiesOn = useAtlasStore((state) => state.overlays.cities);
+  const atlasMode = useChronosStore((state) => state.mode === "atlas");
+  const withCities = citiesOn && atlasMode;
   const polities = usePolityStore((state) => state.labels);
-  const labels = combineLabels(labelsFor(campaign, withCities), polityLabelsFor(polities));
+  const worldEvents = useWorldStore((state) => state.data?.events);
+  const labels = combineLabels(combineLabels(labelsFor(campaign, withCities), polityLabelsFor(polities)), worldLabelsFor(worldEvents));
   const widths = useMemo(() => new Float32Array(labels.length), [labels]);
   const lastX = useMemo(() => new Float32Array(labels.length).fill(-1), [labels]);
   const lastY = useMemo(() => new Float32Array(labels.length).fill(-1), [labels]);
@@ -31,15 +35,14 @@ export function SmartLabels() {
   const zones = useMemo(() => ({ rects: new Float32Array(MAX_ZONES * 4), count: 0, frame: 0 }), []);
 
   useFrame(({ camera, size }) => {
-    if (!campaign) return;
-    const { year, layers, selection } = useChronosStore.getState();
-    const fade = campaignFade(campaign);
+    const { year, selection, mode } = useChronosStore.getState();
+    const focus = storyFocus();
     const distance = camera.position.length();
     const threshold = distance > 4.2 ? 62 : distance > 3.1 ? 48 : distance > 2.3 ? 36 : distance > 1.7 ? 24 : 0;
     const selectedId = selection?.kind === "event" ? selection.id : null;
     toCamera.copy(camera.position).normalize();
-    const concealed = isConcealed();
-    const politicalOn = useAtlasStore.getState().showPolitical && layers.borders;
+    const politicalOn = politicalVisible(mode);
+    const eventsOn = overlayVisible("events");
     if (zones.frame++ % ZONE_REFRESH_FRAMES === 0) {
       zones.count = 0;
       document.querySelectorAll<HTMLElement>("[data-hud-zone]").forEach((element) => {
@@ -67,12 +70,16 @@ export function SmartLabels() {
       let presence = 1;
       let priority = label.priority;
       if (label.event) {
-        presence = concealed ? 0 : eventPresence(label.event, year, fade, layers);
-        priority += eventSpotlight(label.event, year, fade) * 25 + (label.id === selectedId ? 100 : 0);
+        presence = (focus.events.get(label.event.id) ?? 0) >= 1 ? 1 : 0;
+        priority += 60 + (label.id === focus.lead ? 40 : 0) + (label.id === selectedId ? 100 : 0);
       } else if (label.zone) {
-        presence = concealed || politicalOn ? 0 : territoryPresence(label.zone, year, fade, layers);
+        presence = focus.territories.has(label.zone.id) ? 1 : 0;
+        priority += 40;
+      } else if (label.world) {
+        presence = eventsOn ? worldEventPresence(label.world, year) : 0;
+        priority += presence * 20;
       } else if (label.kind === "polity") {
-        presence = politicalOn && !concealed ? 1 : 0;
+        presence = politicalOn ? 1 : 0;
       } else if (label.city) {
         const population = populationAt(label.city, year);
         presence = population > 0 ? 1 : 0;
@@ -113,7 +120,7 @@ export function SmartLabels() {
       if (shown[index] !== state) {
         shown[index] = state;
         node.style.opacity = visible ? "1" : "0";
-        node.style.pointerEvents = visible && label.kind === "event" ? "auto" : "none";
+        node.style.pointerEvents = visible && (label.kind === "event" || label.kind === "world") ? "auto" : "none";
       }
     }
   });
