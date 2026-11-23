@@ -78,7 +78,7 @@ export function PlaceCard() {
   if (!open) return null;
 
   return (
-    <section ref={root} data-hud-zone aria-live="polite" className="glass-panel fade-rise pointer-events-auto flex max-h-full flex-col rounded-2xl">
+    <section ref={root} data-hud-zone aria-live="polite" className="glass-panel fade-rise pointer-events-auto flex min-h-0 max-h-full flex-col rounded-2xl">
       <header className="flex items-start justify-between gap-3 px-4 pb-2 pt-3.5">
         <div>
           <p className="eyebrow">{worldEventId ? t("place.event") : t("place.title")}</p>

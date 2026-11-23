@@ -33,7 +33,7 @@ export function FigureCard() {
   if (!figure) return null;
 
   return (
-    <section ref={root} data-hud-zone aria-label={figure.name} className="glass-panel fade-rise pointer-events-auto flex max-h-full w-full flex-col rounded-2xl">
+    <section ref={root} data-hud-zone aria-label={figure.name} className="glass-panel fade-rise pointer-events-auto flex min-h-0 max-h-full w-full flex-col rounded-2xl">
       <header className="flex gap-3 px-4 pb-3 pt-4">
         <Portrait figure={figure} />
         <div className="min-w-0 flex-1">
