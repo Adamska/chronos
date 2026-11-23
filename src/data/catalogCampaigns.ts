@@ -168,6 +168,17 @@ export const CAMPAIGN_ENTRIES: readonly CatalogEntry[] = [
     load: () => import("@/data/campaigns/worldWarTwo").then((module) => sortCampaignEvents(module.worldWarTwoCampaign)),
   },
   {
+    id: "decolonization",
+    title: "Decolonisation",
+    subtitle: "The end of the European empires, from Delhi to Pretoria",
+    startYear: 1945,
+    endYear: 1994,
+    accent: "#4f9c8f",
+    source: "curated",
+    keywords: ["decolonisation","decolonization","independence","end of empire","partition of india","gandhi","nehru","ho chi minh","dien bien phu","bandung","suez crisis","nkrumah","algerian war","lumumba","year of africa","carnation revolution","amilcar cabral","nelson mandela","apartheid","third world"],
+    load: () => import("@/data/campaigns/decolonization").then((module) => sortCampaignEvents(module.decolonizationCampaign)),
+  },
+  {
     id: "silk-road",
     title: "The Silk Road & Eurasian Exchange",
     subtitle: "Oases, passes and monsoon winds that tied Eurasia together",

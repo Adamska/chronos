@@ -4,6 +4,7 @@ import { aztecsIncasCampaign } from "@/data/campaigns/aztecsIncas";
 import { bantuExpansionCampaign } from "@/data/campaigns/bantuExpansion";
 import { columbianExchangeCampaign } from "@/data/campaigns/columbianExchange";
 import { crusadesCampaign } from "@/data/campaigns/crusades";
+import { decolonizationCampaign } from "@/data/campaigns/decolonization";
 import { fallOfRomeCampaign } from "@/data/campaigns/fallOfRome";
 import { franceEnglandCampaign } from "@/data/campaigns/franceEngland";
 import { greeceAlexanderCampaign } from "@/data/campaigns/greeceAlexander";
@@ -43,6 +44,7 @@ export const CAMPAIGNS: readonly ChronicleCampaign[] = [
   aztecsIncasCampaign,
   worldWarOneCampaign,
   worldWarTwoCampaign,
+  decolonizationCampaign,
   silkRoadCampaign,
   islamicGoldenAgeCampaign,
   ageOfSailCampaign,
