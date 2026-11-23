@@ -146,6 +146,17 @@ export const CAMPAIGN_ENTRIES: readonly CatalogEntry[] = [
     load: () => import("@/data/campaigns/aztecsIncas").then((module) => sortCampaignEvents(module.aztecsIncasCampaign)),
   },
   {
+    id: "world-war-one",
+    title: "The First World War",
+    subtitle: "Four years that broke empires and redrew the map of the world",
+    startYear: 1914,
+    endYear: 1923,
+    accent: "#8a8a5c",
+    source: "curated",
+    keywords: ["first world war","world war i","great war","ww1","sarajevo","franz ferdinand","western front","trenches","marne","verdun","somme","gallipoli","anzac","armenian genocide","russian revolution","lawrence of arabia","armistice","treaty of versailles","spanish flu","foch"],
+    load: () => import("@/data/campaigns/worldWarOne").then((module) => sortCampaignEvents(module.worldWarOneCampaign)),
+  },
+  {
     id: "silk-road",
     title: "The Silk Road & Eurasian Exchange",
     subtitle: "Oases, passes and monsoon winds that tied Eurasia together",
