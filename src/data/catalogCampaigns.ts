@@ -102,6 +102,17 @@ export const CAMPAIGN_ENTRIES: readonly CatalogEntry[] = [
     load: () => import("@/data/campaigns/vikings").then((module) => sortCampaignEvents(module.vikingsCampaign)),
   },
   {
+    id: "crusades",
+    title: "The Crusades",
+    subtitle: "Holy war, siege and trade between Europe and the Levant",
+    startYear: 1095,
+    endYear: 1291,
+    accent: "#a85a3c",
+    source: "curated",
+    keywords: ["crusades","first crusade","holy land","jerusalem","urban ii","saladin","richard the lionheart","templars","hospitallers","outremer","acre","hattin","fourth crusade","sack of constantinople","frederick ii","saint louis","baybars","mamluks","byzantium","jihad"],
+    load: () => import("@/data/campaigns/crusades").then((module) => sortCampaignEvents(module.crusadesCampaign)),
+  },
+  {
     id: "silk-road",
     title: "The Silk Road & Eurasian Exchange",
     subtitle: "Oases, passes and monsoon winds that tied Eurasia together",
