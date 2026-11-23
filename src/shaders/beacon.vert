@@ -17,7 +17,7 @@ void main() {
   if (uMode < 0.5) {
     float cycle = fract(uTime * 0.42 + aPhase);
     transformed *= 0.2 + cycle;
-    vAlpha = aPresence * pow(1.0 - cycle, 1.7);
+    vAlpha = aPresence * pow(clamp(1.0 - cycle, 0.0, 1.0), 1.7);
   } else {
     vAlpha = aPresence * (0.85 + 0.15 * sin(uTime * 2.2 + aPhase * 6.2831));
   }

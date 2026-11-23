@@ -22,7 +22,9 @@ float landHeight(vec2 uv) {
 
 vec3 terrainColor(float elevation, float latitude, float grain) {
   float lat = abs(latitude);
-  float arid = exp(-pow((lat - 24.0) / 8.0, 2.0)) * 0.8 + exp(-pow((lat - 42.0) / 5.0, 2.0)) * 0.3;
+  float tropic = (lat - 24.0) / 8.0;
+  float steppe = (lat - 42.0) / 5.0;
+  float arid = exp(-tropic * tropic) * 0.8 + exp(-steppe * steppe) * 0.3;
   vec3 humid = vec3(0.07, 0.085, 0.072);
   vec3 desert = vec3(0.13, 0.112, 0.085);
   vec3 lowland = mix(humid, desert, clamp(arid * 0.85 + grain * 0.2, 0.0, 1.0));
@@ -80,4 +82,5 @@ void main() {
   gl_FragColor = vec4(color, uOpacity);
   #include <tonemapping_fragment>
   #include <colorspace_fragment>
+  gl_FragColor = any(isnan(gl_FragColor)) || any(isinf(gl_FragColor)) ? vec4(0.0) : gl_FragColor;
 }

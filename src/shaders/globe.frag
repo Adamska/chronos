@@ -60,7 +60,8 @@ void main() {
   vec3 halfVector = normalize(uSunDirection + viewDirection);
   float glint = pow(max(dot(worldNormal, halfVector), 0.0), 90.0) * daylight * (1.0 - depth * 0.6);
 
-  float terminatorBand = exp(-pow(diffuse / 0.09, 2.0));
+  float terminatorCoordinate = diffuse / 0.09;
+  float terminatorBand = exp(-terminatorCoordinate * terminatorCoordinate);
   vec3 night = ocean * 0.32;
   vec3 color = mix(night, ocean * (0.75 + 0.45 * max(diffuse, 0.0)), daylight);
   color += vec3(0.92, 0.55, 0.28) * terminatorBand * 0.045;
@@ -73,4 +74,5 @@ void main() {
   gl_FragColor = vec4(color, 1.0);
   #include <tonemapping_fragment>
   #include <colorspace_fragment>
+  gl_FragColor = any(isnan(gl_FragColor)) || any(isinf(gl_FragColor)) ? vec4(0.0) : gl_FragColor;
 }

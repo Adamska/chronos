@@ -34,4 +34,5 @@ void main() {
   gl_FragColor = vec4(color, visible * (0.18 + 0.72 * t * t) * uOpacity * facing);
   #include <tonemapping_fragment>
   #include <colorspace_fragment>
+  gl_FragColor = any(isnan(gl_FragColor)) || any(isinf(gl_FragColor)) ? vec4(0.0) : gl_FragColor;
 }
